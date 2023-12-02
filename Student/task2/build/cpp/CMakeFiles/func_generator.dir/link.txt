@@ -1,0 +1,1 @@
+/usr/bin/c++  -O0 -Wall -g -pedantic CMakeFiles/func_generator.dir/func_gen.cpp.o -o ../func_generator  ../src/SysYFIR/libIRLib.a 

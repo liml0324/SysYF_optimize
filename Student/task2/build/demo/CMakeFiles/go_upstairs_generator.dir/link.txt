@@ -1,0 +1,1 @@
+/usr/bin/c++  -O0 -Wall -g -pedantic CMakeFiles/go_upstairs_generator.dir/go_upstairs_gen.cpp.o -o ../go_upstairs_generator  ../src/SysYFIR/libIRLib.a 

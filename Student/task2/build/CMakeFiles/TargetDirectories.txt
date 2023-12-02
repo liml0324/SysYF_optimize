@@ -1,0 +1,14 @@
+/home/ubuntu/CompilePrinciple/lab6/Student/task2/build/CMakeFiles/edit_cache.dir
+/home/ubuntu/CompilePrinciple/lab6/Student/task2/build/CMakeFiles/rebuild_cache.dir
+/home/ubuntu/CompilePrinciple/lab6/Student/task2/build/src/SysYFIR/CMakeFiles/IRLib.dir
+/home/ubuntu/CompilePrinciple/lab6/Student/task2/build/src/SysYFIR/CMakeFiles/edit_cache.dir
+/home/ubuntu/CompilePrinciple/lab6/Student/task2/build/src/SysYFIR/CMakeFiles/rebuild_cache.dir
+/home/ubuntu/CompilePrinciple/lab6/Student/task2/build/demo/CMakeFiles/go_upstairs_generator.dir
+/home/ubuntu/CompilePrinciple/lab6/Student/task2/build/demo/CMakeFiles/edit_cache.dir
+/home/ubuntu/CompilePrinciple/lab6/Student/task2/build/demo/CMakeFiles/rebuild_cache.dir
+/home/ubuntu/CompilePrinciple/lab6/Student/task2/build/cpp/CMakeFiles/assign_generator.dir
+/home/ubuntu/CompilePrinciple/lab6/Student/task2/build/cpp/CMakeFiles/func_generator.dir
+/home/ubuntu/CompilePrinciple/lab6/Student/task2/build/cpp/CMakeFiles/if_generator.dir
+/home/ubuntu/CompilePrinciple/lab6/Student/task2/build/cpp/CMakeFiles/while_generator.dir
+/home/ubuntu/CompilePrinciple/lab6/Student/task2/build/cpp/CMakeFiles/edit_cache.dir
+/home/ubuntu/CompilePrinciple/lab6/Student/task2/build/cpp/CMakeFiles/rebuild_cache.dir
