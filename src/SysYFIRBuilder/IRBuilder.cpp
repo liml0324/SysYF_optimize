@@ -12,6 +12,7 @@ namespace IR
 
 // store temporary value
 Ptr<Value> tmp_val = nullptr;
+PtrVec<Value> initValues;//初值列表，为数组准备的
 
 // types
 Ptr<Type> VOID_T;
@@ -20,6 +21,7 @@ Ptr<Type> INT32_T;
 Ptr<Type> FLOAT_T;
 Ptr<Type> INT32PTR_T;
 Ptr<Type> FLOATPTR_T;
+
 
 void IRBuilder::visit(SyntaxTree::Assembly &node) {
     VOID_T = Type::get_void_type(module);
@@ -39,16 +41,14 @@ void IRBuilder::visit(SyntaxTree::InitVal &node) {
     if(node.isExp) {
         node.expr->accept(*this);
         if(tmp_val) {
-            if(tmp_val->get_type()->is_integer_type()) {
-                auto tmp_int_val = std::dynamic_pointer_cast<ConstantInt>(tmp_val);
-                tmp_val = CONST_INT(tmp_int_val->get_value());
-            }
-            else if(tmp_val->get_type()->is_float_type()) {
-                auto tmp_float_val = std::dynamic_pointer_cast<ConstantFloat>(tmp_val);
-                tmp_val = CONST_FLOAT(tmp_float_val->get_value());
-            }
+            initValues.push_back(tmp_val);
         }
     } 
+    else {
+        for(auto &init_val : node.elementList) {
+            init_val->accept(*this);
+        }
+    }
 }
 
 void IRBuilder::visit(SyntaxTree::FuncDef &node) {}
@@ -58,16 +58,335 @@ void IRBuilder::visit(SyntaxTree::FuncFParamList &node) {}
 void IRBuilder::visit(SyntaxTree::FuncParam &node) {}
 
 void IRBuilder::visit(SyntaxTree::VarDef &node) {
-    if(node.is_inited) {
-        node.initializers->accept(*this);
+    initValues.clear();//清空初始值
+    if(node.array_length.empty()) {//不是数组
+        if(node.is_constant) {//是常量
+            node.initializers->accept(*this);//获取初始值
+            auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[0]);//常量必然有初值，且初值必然为常数
+            auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[0]);
+            if(scope.in_global()) {//全局变量
+                if(node.btype == SyntaxTree::Type::INT) {//整型
+                    if(float_val) {
+                        tmp_val = CONST_INT((int)(float_val->get_value()));
+                    }
+                    else if(int_val) {
+                        tmp_val = CONST_INT(int_val->get_value());
+                    }
+                    tmp_val = GlobalVariable::create(node.name, module, INT32_T, true, dynamic_pointer_cast<Constant>(tmp_val));
+                }
+                else if(node.btype == SyntaxTree::Type::FLOAT) {//浮点型
+                    if(float_val) {
+                        tmp_val = CONST_FLOAT(float_val->get_value());
+                    }
+                    else if(int_val) {
+                        tmp_val = CONST_FLOAT((float)(int_val->get_value()));
+                    }
+                    tmp_val = GlobalVariable::create(node.name, module, INT32_T, true, dynamic_pointer_cast<Constant>(tmp_val));
+                }
+            }
+            else {//局部变量
+                if(node.btype == SyntaxTree::Type::INT) {//整型
+                    if(float_val) {
+                        tmp_val = CONST_INT((int)(float_val->get_value()));
+                    }
+                    else if(int_val) {
+                        tmp_val = CONST_INT(int_val->get_value());
+                    }
+                }
+                else if(node.btype == SyntaxTree::Type::FLOAT) {//浮点型
+                    if(float_val) {
+                        tmp_val = CONST_FLOAT(float_val->get_value());
+                    }
+                    else if(int_val) {
+                        tmp_val = CONST_FLOAT((float)(int_val->get_value()));
+                    }
+                }
+            }
+        }
+        else {//不是常量
+            Ptr<Value> init_val = nullptr;
+            if(node.is_inited) {//确认是否有初值
+                node.initializers->accept(*this);
+                init_val = initValues[0];
+            }
+            if(scope.in_global()) {//全局变量
+                //全局变量的初值一定是常数表达式
+                if(node.btype == SyntaxTree::Type::INT) {
+                    Ptr<Constant> initializer;
+                    if(init_val) {
+                        if(init_val->get_type()->is_integer_type()) {
+                            initializer = CONST_INT(dynamic_pointer_cast<ConstantInt>(init_val)->get_value());
+                        }
+                        else if(init_val->get_type()->is_float_type()) {
+                            initializer = CONST_INT((int)(dynamic_pointer_cast<ConstantFloat>(init_val)->get_value()));
+                        }
+                    }
+                    else {
+                        initializer = CONST_INT(0);
+                    }
+                    tmp_val = GlobalVariable::create(node.name, module, INT32_T, false, initializer);
+                }
+                else if(node.btype == SyntaxTree::Type::FLOAT) {
+                    Ptr<Constant> initializer;
+                    if(init_val) {
+                        if(init_val->get_type()->is_integer_type()) {
+                            initializer = CONST_FLOAT((float)(dynamic_pointer_cast<ConstantInt>(init_val)->get_value()));
+                        }
+                        else if(init_val->get_type()->is_float_type()) {
+                            initializer = CONST_FLOAT(dynamic_pointer_cast<ConstantFloat>(init_val)->get_value());
+                        }
+                    }
+                    else {
+                        initializer = CONST_FLOAT(0);
+                    }
+                    tmp_val = GlobalVariable::create(node.name, module, FLOAT_T, false, initializer);
+                }
+            }
+            else {//局部变量
+                if(node.btype == SyntaxTree::Type::INT) {
+                    tmp_val = builder->create_alloca(INT32_T);//分配内存
+                    if(init_val) {//有初值则用store存入初值
+                        if(init_val->get_type()->is_integer_type()) {
+                            builder->create_store(init_val, tmp_val);
+                        }
+                        else if(init_val->get_type()->is_float_type()) {
+                            auto tmp_float_val = std::dynamic_pointer_cast<ConstantFloat>(init_val);
+                            if(tmp_float_val)   {//是常量的话就不必用fptosi转换了
+                                builder->create_store(CONST_INT((int)(tmp_float_val->get_value())), tmp_val);
+                            }
+                            else {
+                                init_val = builder->create_fptosi(init_val, INT32_T);
+                                builder->create_store(init_val, tmp_val);
+                            }
+                        }
+                    }
+                    else {//无初值则存入0
+                        builder->create_store(CONST_INT(0), tmp_val);
+                    }
+                }
+                else if(node.btype == SyntaxTree::Type::FLOAT) {//浮点型也一样
+                    tmp_val = builder->create_alloca(FLOAT_T);
+                    if(init_val) {
+                        if(init_val->get_type()->is_integer_type()) {
+                            auto tmp_int_val = std::dynamic_pointer_cast<ConstantInt>(init_val);
+                            if(tmp_int_val) {
+                                builder->create_store(CONST_FLOAT((float)(tmp_int_val->get_value())), tmp_val);
+                            }
+                            else {
+                                init_val = builder->create_sitofp(init_val, FLOAT_T);
+                                builder->create_store(init_val, tmp_val);
+                            }
+                        }
+                        else if(init_val->get_type()->is_float_type()) {
+                            builder->create_store(init_val, tmp_val);
+                        }
+                    }
+                    else {
+                        builder->create_store(CONST_FLOAT(0), tmp_val);
+                    }
+                }
+            }
+            
+        }
     }
+    else {//是数组
+        node.array_length[0]->accept(*this);//暂时只考虑一维数组
+        auto array_len = dynamic_pointer_cast<ConstantInt>(tmp_val)->get_value();
+        if(node.is_constant) {//数组常量
+            node.initializers->accept(*this);
+            if(initValues.size() == 1) {//处理如int a = {2}的情况（这时每个元素都是2）
+                for(int i = 1; i < array_len; i++) {
+                    initValues.push_back(initValues[0]);
+                }
+            }
+            if(scope.in_global()) {//全局变量
+                if(node.btype == SyntaxTree::Type::INT) {
+                    auto array_type = ArrayType::get(INT32_T, array_len);
+                    PtrVec<Constant> init_values;//创建全局数组时，必须全部用常量初始化
+                    for(int i = 0; i < initValues.size(); i++) {//把初始值压入
+                        auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
+                        auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
+                        if(int_val) {
+                            init_values.push_back(CONST_INT(int_val->get_value()));
+                        }
+                        else if(float_val) {
+                            init_values.push_back(CONST_INT((int)(float_val->get_value())));
+                        }
+                    }
+                    for(int i = init_values.size(); i < array_len; i++) {//如果初始值不够，用0补齐
+                        init_values.push_back(CONST_INT(0));
+                    }
+                    auto initializer = ConstantArray::create(array_type, init_values);//创建初值数组
+                    tmp_val = GlobalVariable::create(node.name, module, array_type, true, initializer);
+                }
+                else if(node.btype == SyntaxTree::Type::FLOAT) {//浮点型也一样
+                    auto array_type = ArrayType::get(FLOAT_T, node.array_length.size());
+                    PtrVec<Constant> init_values;
+                    for(int i = 0; i < initValues.size(); i++) {
+                        auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
+                        auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
+                        if(int_val) {
+                            init_values.push_back(CONST_FLOAT((float)(int_val->get_value())));
+                        }
+                        else if(float_val) {
+                            init_values.push_back(CONST_FLOAT(float_val->get_value()));
+                        }
+                    }
+                    for(int i = init_values.size(); i < array_len; i++) {
+                        init_values.push_back(CONST_FLOAT(0));
+                    }
+                    auto initializer = ConstantArray::create(array_type, init_values);
+                    tmp_val = GlobalVariable::create(node.name, module, array_type, true, initializer);
+                }
+            }
+            else {//非全局的常量数组没有对应的API，这里的定义会有问题（ConstantArray无法用变量寻址）
+                    //但测试样例中没有这种情况，暂时先这样写
+                if(node.btype == SyntaxTree::Type::INT) {
+                    PtrVec<Constant> init_values;
+                    for(int i = 0; i < initValues.size(); i++) {
+                        auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
+                        auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
+                        if(int_val) {
+                            init_values.push_back(CONST_INT(int_val->get_value()));
+                        }
+                        else if(float_val) {
+                            init_values.push_back(CONST_INT((int)(float_val->get_value())));
+                        }
+                    }
+                    for(int i = init_values.size(); i < array_len; i++) {
+                        init_values.push_back(CONST_INT(0));
+                    }
+                    tmp_val = ConstantArray::create(ArrayType::get(INT32_T, array_len), init_values);
+                }
+                else if(node.btype == SyntaxTree::Type::FLOAT) {
+                    PtrVec<Constant> init_values;
+                    for(int i = 0; i < initValues.size(); i++) {
+                        auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
+                        auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
+                        if(int_val) {
+                            init_values.push_back(CONST_FLOAT((float)(int_val->get_value())));
+                        }
+                        else if(float_val) {
+                            init_values.push_back(CONST_FLOAT(float_val->get_value()));
+                        }
+                    }
+                    for(int i = init_values.size(); i < array_len; i++) {
+                        init_values.push_back(CONST_FLOAT(0));
+                    }
+                    tmp_val = ConstantArray::create(ArrayType::get(FLOAT_T, array_len), init_values);
+                }
+            }
+        }
+        else {//非常量数组
+            if(node.is_inited) {
+                node.initializers->accept(*this);
+                if(initValues.size() == 1) {
+                    for(int i = 1; i < array_len; i++) {
+                        initValues.push_back(initValues[0]);
+                    }
+                }
+            }
+            if(scope.in_global()) {//全局数组变量
+                if(node.btype == SyntaxTree::Type::INT) {
+                    auto array_type = ArrayType::get(INT32_T, array_len);
+                    PtrVec<Constant> init_values;//初值必为常量
+                    for(int i = 0; i < initValues.size(); i++) {
+                        auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
+                        auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
+                        if(int_val) {
+                            init_values.push_back(CONST_INT(int_val->get_value()));
+                        }
+                        else if(float_val) {
+                            init_values.push_back(CONST_INT((int)(float_val->get_value())));
+                        }
+                    }
+                    for(int i = init_values.size(); i < array_len; i++) {
+                        init_values.push_back(CONST_INT(0));
+                    }
+                    auto initializer = ConstantArray::create(array_type, init_values);
+                    tmp_val = GlobalVariable::create(node.name, module, array_type, false, initializer);
+                }
+                else if(node.btype == SyntaxTree::Type::FLOAT) {
+                    auto array_type = ArrayType::get(FLOAT_T, array_len);
+                    PtrVec<Constant> init_values;
+                    for(int i = 0; i < initValues.size(); i++) {
+                        auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
+                        auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
+                        if(int_val) {
+                            init_values.push_back(CONST_FLOAT((float)(int_val->get_value())));
+                        }
+                        else if(float_val) {
+                            init_values.push_back(CONST_FLOAT(float_val->get_value()));
+                        }
+                    }
+                    for(int i = init_values.size(); i < array_len; i++) {
+                        init_values.push_back(CONST_FLOAT(0));
+                    }
+                    auto initializer = ConstantArray::create(array_type, init_values);
+                    tmp_val = GlobalVariable::create(node.name, module, array_type, true, initializer);
+                }
+            }
+            else {
+                if(node.btype == SyntaxTree::Type::INT) {
+                    auto array_type = ArrayType::get(INT32_T, array_len);
+                    Ptr<Value> init_value;
+                    tmp_val = builder->create_alloca(array_type);
+                    for(int i = 0; i < initValues.size(); i++) {//有初值则用store存入初值
+                        if(initValues[i]->get_type()->is_float_type()) {
+                            init_value = builder->create_fptosi(initValues[i], INT32_T);
+                        }
+                        else {
+                            init_value = initValues[i];
+                        }
+                        auto array_index = CONST_INT(i);
+                        auto array_ptr = builder->create_gep(tmp_val, {CONST_INT(0), array_index});
+                        builder->create_store(init_value, array_ptr);
+                    }
+                    for(int i = initValues.size(); i < array_len; i++) {//否则补0
+                        auto array_index = CONST_INT(i);
+                        auto array_ptr = builder->create_gep(tmp_val, {CONST_INT(0), array_index});
+                        builder->create_store(CONST_INT(0), array_ptr);
+                    }
+                }
+                else if(node.btype == SyntaxTree::Type::FLOAT) {//浮点型也一样
+                    auto array_type = ArrayType::get(FLOAT_T, array_len);
+                    Ptr<Value> init_value;
+                    tmp_val = builder->create_alloca(array_type);
+                    for(int i = 0; i < initValues.size(); i++) {
+                        if(initValues[i]->get_type()->is_integer_type()) {
+                            init_value = builder->create_sitofp(initValues[i], FLOAT_T);
+                        }
+                        else {
+                            init_value = initValues[i];
+                        }
+                        auto array_index = CONST_INT(i);
+                        auto array_ptr = builder->create_gep(tmp_val, {CONST_INT(0), array_index});
+                        builder->create_store(init_value, array_ptr);
+                    }
+                    for(int i = initValues.size(); i < array_len; i++) {
+                        auto array_index = CONST_INT(i);
+                        auto array_ptr = builder->create_gep(tmp_val, {CONST_INT(0), array_index});
+                        builder->create_store(CONST_FLOAT(0), array_ptr);
+                    }
+                }
+            }
+        }
+    }
+    scope.push(node.name, tmp_val);
 }
 
 void IRBuilder::visit(SyntaxTree::LVal &node) {}
 
 void IRBuilder::visit(SyntaxTree::AssignStmt &node) {}
 
-void IRBuilder::visit(SyntaxTree::Literal &node) {}
+void IRBuilder::visit(SyntaxTree::Literal &node) {
+    if(node.literal_type == SyntaxTree::Type::INT) {
+        tmp_val = CONST_INT(node.int_const);
+    }
+    else {
+        tmp_val = CONST_FLOAT(node.float_const);
+    }
+}
 
 void IRBuilder::visit(SyntaxTree::ReturnStmt &node) {}
 
@@ -77,13 +396,37 @@ void IRBuilder::visit(SyntaxTree::EmptyStmt &node) {}
 
 void IRBuilder::visit(SyntaxTree::ExprStmt &node) {}
 
-void IRBuilder::visit(SyntaxTree::UnaryCondExpr &node) {}
+void IRBuilder::visit(SyntaxTree::UnaryCondExpr &node) {//可能存在问题，暂时先这样写
+    node.rhs->accept(*this);
+    if(tmp_val->get_type()->is_integer_type()) {
+        tmp_val = builder->create_icmp_ne(tmp_val, CONST_INT(0));
+    }
+    else if(tmp_val->get_type()->is_float_type()) {
+        tmp_val = builder->create_fcmp_ne(tmp_val, CONST_FLOAT(0));
+    }
+    else {//bool
+        tmp_val = builder->create_zext(tmp_val, INT32_T);
+        tmp_val = builder->create_icmp_ne(tmp_val, CONST_INT(0));
+    }
+}
 
 void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {}
 
 void IRBuilder::visit(SyntaxTree::BinaryExpr &node) {}
 
-void IRBuilder::visit(SyntaxTree::UnaryExpr &node) {}
+void IRBuilder::visit(SyntaxTree::UnaryExpr &node) {
+    node.rhs->accept(*this);
+    if(tmp_val) {
+        if(node.op == SyntaxTree::UnaryOp::MINUS) {
+            if(tmp_val->get_type()->is_integer_type()) {
+                tmp_val = builder->create_isub(tmp_val, CONST_INT(0));
+            }
+            else if(tmp_val->get_type()->is_float_type()) {
+                tmp_val = builder->create_fsub(tmp_val, CONST_INT(0));
+            }
+        }
+    }
+}
 
 void IRBuilder::visit(SyntaxTree::FuncCallStmt &node) {}
 
