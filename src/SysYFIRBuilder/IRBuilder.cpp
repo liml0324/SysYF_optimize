@@ -432,7 +432,19 @@ void IRBuilder::visit(SyntaxTree::LVal &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::AssignStmt &node) {
-    
+    is_assign = true;
+    node.target->accept(*this);
+    auto lval = tmp_val;
+    is_assign = false;
+    node.value->accept(*this);
+    auto rval = tmp_val;
+    if(lval->get_type()->get_pointer_element_type()->is_integer_type() && rval->get_type()->is_float_type()) {
+        rval = builder->create_fptosi(rval, INT32_T);
+    }
+    else if(lval->get_type()->get_pointer_element_type()->is_float_type() && rval->get_type()->is_integer_type()) {
+        rval = builder->create_sitofp(rval, FLOAT_T);
+    }
+    builder->create_store(rval, lval);
 }
 
 void IRBuilder::visit(SyntaxTree::Literal &node) {
