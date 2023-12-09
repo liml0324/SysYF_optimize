@@ -9,10 +9,11 @@ namespace IR
 
 // You can define global variables here
 // to store state
+bool is_assign;//只有赋值语句需要真正的“左值”
+PtrVec<Value> initValues;//初值列表，为数组准备的
 
 // store temporary value
 Ptr<Value> tmp_val = nullptr;
-PtrVec<Value> initValues;//初值列表，为数组准备的
 
 // types
 Ptr<Type> VOID_T;
@@ -375,9 +376,64 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
     scope.push(node.name, tmp_val);
 }
 
-void IRBuilder::visit(SyntaxTree::LVal &node) {}
+void IRBuilder::visit(SyntaxTree::LVal &node) {
+    auto lval = scope.find(node.name, false);//找到变量
+    auto get_lval = !is_assign;//如果不是赋值语句，那就需要load（即拿到lval的值）
+    is_assign = false;//取消assign标记，否则如果出现a[n] = b这种赋值语句，会取得n的指针而非n的值
+    auto is_global_const = false;
+    if(node.array_index.size()) {//是数组
+        PtrVec<Value> array_index;
+        for(auto &index : node.array_index) {
+            index->accept(*this);
+            if(tmp_val) {
+                array_index.push_back(tmp_val);
+            }
+        }
+        auto global_lval = dynamic_pointer_cast<GlobalVariable>(lval);
+        if(global_lval && global_lval->is_const() && dynamic_pointer_cast<Constant>(array_index[0])) {//是全局常量数组，且下标是常量
+            auto init_array = dynamic_pointer_cast<ConstantArray>(global_lval->get_init());//常量不能被再次赋值，因此这里不管是不是assign，都直接取出它的值
+            auto init_val = init_array->get_element_value(dynamic_pointer_cast<ConstantInt>(array_index[0])->get_value());
+            tmp_val = init_val;
+            is_global_const = true;
+        }
+        else {
+            auto array_ptr = builder->create_gep(lval, {CONST_INT(0), array_index[0]});
+            if(global_lval && global_lval->is_const()) {//是全局常量数组，但下标不是常量
+                                                        //非全局常量数组还不知如何处理，先空着
+                tmp_val = builder->create_load(array_ptr);
+            }
+            else {
+                tmp_val = array_ptr;
+            }
+        }
+    }
+    else {
+        auto global_lval = dynamic_pointer_cast<GlobalVariable>(lval);
+        if(global_lval && global_lval->is_const()) {
+            auto init_val = global_lval->get_init();
+            tmp_val = init_val;
+            is_global_const = true;
+        }
+        else if(dynamic_pointer_cast<ConstantInt>(lval)) {
+            auto int_val = std::dynamic_pointer_cast<ConstantInt>(lval);
+            tmp_val = CONST_INT(int_val->get_value());
+        }
+        else if(dynamic_pointer_cast<ConstantFloat>(lval)) {
+            auto float_val = std::dynamic_pointer_cast<ConstantFloat>(lval);
+            tmp_val = CONST_FLOAT(float_val->get_value());
+        }
+        else
+            tmp_val = lval;
+    }
+    if(get_lval && !dynamic_pointer_cast<ConstantInt>(lval) && !dynamic_pointer_cast<ConstantFloat>(lval) && !is_global_const) {//需要Lval的不是赋值语句，且不是常量，需要load
+                                                                                                                                //这里只考虑了全局常量数组
+        tmp_val = builder->create_load(tmp_val);
+    }
+}
 
-void IRBuilder::visit(SyntaxTree::AssignStmt &node) {}
+void IRBuilder::visit(SyntaxTree::AssignStmt &node) {
+    
+}
 
 void IRBuilder::visit(SyntaxTree::Literal &node) {
     if(node.literal_type == SyntaxTree::Type::INT) {
