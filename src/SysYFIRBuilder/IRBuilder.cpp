@@ -195,11 +195,6 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
         auto array_len = dynamic_pointer_cast<ConstantInt>(tmp_val)->get_value();
         if(node.is_constant) {//数组常量
             node.initializers->accept(*this);
-            if(initValues.size() == 1) {//处理如int a = {2}的情况（这时每个元素都是2）
-                for(int i = 1; i < array_len; i++) {
-                    initValues.push_back(initValues[0]);
-                }
-            }
             if(scope.in_global()) {//全局变量
                 if(node.btype == SyntaxTree::Type::INT) {
                     auto array_type = ArrayType::get(INT32_T, array_len);
@@ -281,11 +276,6 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
         else {//非常量数组
             if(node.is_inited) {
                 node.initializers->accept(*this);
-                if(initValues.size() == 1) {
-                    for(int i = 1; i < array_len; i++) {
-                        initValues.push_back(initValues[0]);
-                    }
-                }
             }
             if(scope.in_global()) {//全局数组变量
                 if(node.btype == SyntaxTree::Type::INT) {
