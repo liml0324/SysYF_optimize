@@ -11,6 +11,10 @@ namespace IR
 // to store state
 bool is_assign;//只有赋值语句需要真正的“左值”
 PtrVec<Value> initValues;//初值列表，为数组准备的
+PtrVec<SyntaxTree::FuncParam> func_params;//函数参数列表
+Ptr<Value> func_ret_val;//函数返回值（的指针），return时把返回值store到里面
+Ptr<BasicBlock> retBB;//函数返回基本块，return时保存返回值后跳转到这里即可
+bool is_func_body;//当前基本块是函数体，visit BlockStmt时如果这个标记为true，就不需要再scope.enter()
 
 // store temporary value
 Ptr<Value> tmp_val = nullptr;
@@ -52,11 +56,93 @@ void IRBuilder::visit(SyntaxTree::InitVal &node) {
     }
 }
 
-void IRBuilder::visit(SyntaxTree::FuncDef &node) {}
+void IRBuilder::visit(SyntaxTree::FuncDef &node) {
+    func_params.clear();
+    if(node.param_list)// 有参数
+        node.param_list->accept(*this);
+    PtrVec<Type> param_types;
+    for(auto &param : func_params) {// 获取参数类型
+        if(param->param_type == SyntaxTree::Type::INT) {
+            if(param->array_index.empty())
+                param_types.push_back(INT32_T);
+            else
+                param_types.push_back(INT32PTR_T);
+        }
+        else {
+            if(param->array_index.empty())
+                param_types.push_back(FLOAT_T);
+            else
+                param_types.push_back(FLOATPTR_T);
+        }
+    }
+    Ptr<Type> ret_type;// 获取返回值类型
+    if(node.ret_type == SyntaxTree::Type::INT) {
+        ret_type = INT32_T;
+    }
+    else if(node.ret_type == SyntaxTree::Type::FLOAT){
+        ret_type = FLOAT_T;
+    }
+    else if(node.ret_type == SyntaxTree::Type::VOID) {
+        ret_type = VOID_T;
+    }
+    auto func_type = FunctionType::create(ret_type, param_types);
+    auto func = Function::create(func_type, node.name, module);// 创建函数
+    scope.push(node.name, func);// 把函数名加入符号表
+    auto func_def_BB = BasicBlock::create(module, "entry", func);// 创建函数入口基本块
+    builder->set_insert_point(func_def_BB);
+    scope.enter();// 提前enter，因为参数是局部变量
+    if(ret_type != VOID_T)// 为返回值分配空间
+        func_ret_val = builder->create_alloca(ret_type);
+    else
+        func_ret_val = nullptr;
+    PtrVec<Value> func_args;
+    for(auto &arg : func->get_args()) {
+        func_args.push_back(arg);
+    }
+    for(int i = 0; i < (int)func_args.size(); i++) {// 处理参数
+        auto arg = func_args[i];
+        auto param = func_params[i];
+        auto param_name = param->name;
+        auto param_ptr = builder->create_alloca(arg->get_type());
+        builder->create_store(arg, param_ptr);// 保存传入的参数
+        scope.push(param_name, param_ptr);
+    }
+    retBB = BasicBlock::create(module, "retBB", func);
+    is_func_body = true;// 标记当前基本块是函数体，这样在visit BlockStmt时就不会再enter
+    node.body->accept(*this);
+    is_func_body = false;
+    if(!builder->get_insert_block()->get_terminator()) {// 如果函数体没有return语句，那么就在最后加上一个return
+        if(ret_type == INT32_T) {
+            builder->create_store(CONST_INT(0), func_ret_val);
+        }
+        else if(ret_type == FLOAT_T) {
+            builder->create_store(CONST_FLOAT(0), func_ret_val);
+        }
+        builder->create_br(retBB);
+    }
+    scope.exit();// 退出函数作用域
 
-void IRBuilder::visit(SyntaxTree::FuncFParamList &node) {}
+    builder->set_insert_point(retBB);// 创建函数返回基本块
+    if(ret_type != VOID_T) {
+        auto ret_val = builder->create_load(func_ret_val);
+        builder->create_ret(ret_val);
+    }
+    else {
+        builder->create_void_ret();
+    }
+}
 
-void IRBuilder::visit(SyntaxTree::FuncParam &node) {}
+void IRBuilder::visit(SyntaxTree::FuncFParamList &node) {
+    func_params.clear();
+    for(auto &param : node.params) {
+        param->accept(*this);// visit每一个参数即可
+    }
+}
+
+void IRBuilder::visit(SyntaxTree::FuncParam &node) {// 这里只将参数存起来，留给FuncDef处理
+    auto param = Ptr<SyntaxTree::FuncParam>(new SyntaxTree::FuncParam(node));
+    func_params.push_back(param);
+}
 
 void IRBuilder::visit(SyntaxTree::VarDef &node) {
     initValues.clear();//清空初始值
@@ -456,7 +542,7 @@ void IRBuilder::visit(SyntaxTree::ExprStmt &node) {}
 
 void IRBuilder::visit(SyntaxTree::UnaryCondExpr &node) {//可能存在问题，暂时先这样写
     node.rhs->accept(*this);
-    if(tmp_val->get_type()->is_integer_type()) {
+    if(tmp_val->get_type()->is_integer_type() && tmp_val->get_type()->get_size() > 1) {
         tmp_val = builder->create_icmp_ne(tmp_val, CONST_INT(0));
     }
     else if(tmp_val->get_type()->is_float_type()) {
