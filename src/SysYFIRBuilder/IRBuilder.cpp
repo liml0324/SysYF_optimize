@@ -291,7 +291,7 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
                 if(node.btype == SyntaxTree::Type::INT) {
                     auto array_type = ArrayType::get(INT32_T, array_len);
                     PtrVec<Constant> init_values;//创建全局数组时，必须全部用常量初始化
-                    for(int i = 0; i < initValues.size(); i++) {//把初始值压入
+                    for(int i = 0; i < (int)initValues.size(); i++) {//把初始值压入
                         auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
                         auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
                         if(int_val) {
@@ -310,7 +310,7 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
                 else if(node.btype == SyntaxTree::Type::FLOAT) {//浮点型也一样
                     auto array_type = ArrayType::get(FLOAT_T, node.array_length.size());
                     PtrVec<Constant> init_values;
-                    for(int i = 0; i < initValues.size(); i++) {
+                    for(int i = 0; i < (int)initValues.size(); i++) {
                         auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
                         auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
                         if(int_val) {
@@ -331,7 +331,7 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
                     //但测试样例中没有这种情况，暂时先这样写
                 if(node.btype == SyntaxTree::Type::INT) {
                     PtrVec<Constant> init_values;
-                    for(int i = 0; i < initValues.size(); i++) {
+                    for(int i = 0; i < (int)initValues.size(); i++) {
                         auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
                         auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
                         if(int_val) {
@@ -348,7 +348,7 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
                 }
                 else if(node.btype == SyntaxTree::Type::FLOAT) {
                     PtrVec<Constant> init_values;
-                    for(int i = 0; i < initValues.size(); i++) {
+                    for(int i = 0; i < (int)initValues.size(); i++) {
                         auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
                         auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
                         if(int_val) {
@@ -373,7 +373,7 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
                 if(node.btype == SyntaxTree::Type::INT) {
                     auto array_type = ArrayType::get(INT32_T, array_len);
                     PtrVec<Constant> init_values;//初值必为常量
-                    for(int i = 0; i < initValues.size(); i++) {
+                    for(int i = 0; i < (int)initValues.size(); i++) {
                         auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
                         auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
                         if(int_val) {
@@ -392,7 +392,7 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
                 else if(node.btype == SyntaxTree::Type::FLOAT) {
                     auto array_type = ArrayType::get(FLOAT_T, array_len);
                     PtrVec<Constant> init_values;
-                    for(int i = 0; i < initValues.size(); i++) {
+                    for(int i = 0; i < (int)initValues.size(); i++) {
                         auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
                         auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
                         if(int_val) {
@@ -414,7 +414,7 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
                     auto array_type = ArrayType::get(INT32_T, array_len);
                     Ptr<Value> init_value;
                     tmp_val = builder->create_alloca(array_type);
-                    for(int i = 0; i < initValues.size(); i++) {//有初值则用store存入初值
+                    for(int i = 0; i < (int)initValues.size(); i++) {//有初值则用store存入初值
                         if(initValues[i]->get_type()->is_float_type()) {
                             init_value = builder->create_fptosi(initValues[i], INT32_T);
                         }
@@ -435,7 +435,7 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
                     auto array_type = ArrayType::get(FLOAT_T, array_len);
                     Ptr<Value> init_value;
                     tmp_val = builder->create_alloca(array_type);
-                    for(int i = 0; i < initValues.size(); i++) {
+                    for(int i = 0; i < (int)initValues.size(); i++) {
                         if(initValues[i]->get_type()->is_integer_type()) {
                             init_value = builder->create_sitofp(initValues[i], FLOAT_T);
                         }
