@@ -462,7 +462,9 @@ void IRBuilder::visit(SyntaxTree::BlockStmt &node) {}
 
 void IRBuilder::visit(SyntaxTree::EmptyStmt &node) {}
 
-void IRBuilder::visit(SyntaxTree::ExprStmt &node) {}
+void IRBuilder::visit(SyntaxTree::ExprStmt &node) {
+
+}
 
 void IRBuilder::visit(SyntaxTree::UnaryCondExpr &node) {//可能存在问题，暂时先这样写
     node.rhs->accept(*this);
@@ -478,9 +480,212 @@ void IRBuilder::visit(SyntaxTree::UnaryCondExpr &node) {//可能存在问题，�
     }
 }
 
-void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {}
+void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
+    auto nowfunc=builder->get_insert_block()->get_parent();
+    if(node.op==SyntaxTree::BinaryCondOp::LAND ){//强行使用中间变量result存储and及or表达式计算结果
+        Ptr<Value> rexp,lexp,result;
+        auto lexpBB_and = BasicBlock::create(module, "lexpBB_and", nowfunc);
+        auto rexpBB_and = BasicBlock::create(module, "rexpBB_and", nowfunc);
+        auto resultBB_and = BasicBlock::create(module, "resultBB_and", nowfunc);
+        result=builder->create_alloca(INT1_T);
+        builder->create_br(lexpBB_and);
+        builder->set_insert_point(lexpBB_and);
+        node.lhs->accept(*this);
+        lexp=tmp_val;
+        auto lint=dynamic_pointer_cast<IntegerType>(lexp->get_type());
+        if(lint.get()==NULL){//判断lexp返回类型
+            lexp=builder->create_fcmp_ne(lexp, CONST_FLOAT(0));
+        }
+        else if(lint->get_num_bits()!=1){
+            lexp=builder->create_icmp_ne(lexp, CONST_INT(0));
+        }
+        builder->create_store(lexp,result);
+        builder->create_cond_br(lexp,rexpBB_and,resultBB_and);
+        builder->set_insert_point(rexpBB_and);
+        node.rhs->accept(*this);
+        rexp=tmp_val;
+        auto rint=dynamic_pointer_cast<IntegerType>(rexp->get_type());
+        if(rint.get()==NULL){
+            rexp=builder->create_fcmp_ne(rexp, CONST_FLOAT(0));
+        }
+        else if(rint->get_num_bits()!=1){
+            rexp=builder->create_icmp_ne(rexp, CONST_INT(0));
+        }
+        builder->create_store(rexp,result);
+        builder->create_br(resultBB_and);
+        builder->set_insert_point(resultBB_and);
+        tmp_val=builder->create_load(result);
+    }
+    else if(node.op==SyntaxTree::BinaryCondOp::LOR){
+        Ptr<Value> rexp,lexp,result;
+        auto lexpBB_or = BasicBlock::create(module, "lexpBB_or", nowfunc);
+        auto rexpBB_or = BasicBlock::create(module, "rexpBB_or", nowfunc);
+        auto resultBB_or = BasicBlock::create(module, "resultBB_or", nowfunc);
+        result=builder->create_alloca(INT1_T);
+        builder->create_br(lexpBB_or);
+        builder->set_insert_point(lexpBB_or);
+        node.lhs->accept(*this);
+        lexp=tmp_val;
+        auto lint=dynamic_pointer_cast<IntegerType>(lexp->get_type());
+        if(lint.get()==NULL){
+            lexp=builder->create_fcmp_ne(lexp, CONST_FLOAT(0));
+        }
+        else if(lint->get_num_bits()!=1){
+            lexp=builder->create_icmp_ne(lexp, CONST_INT(0));
+        }
+        builder->create_store(lexp,result);
+        builder->create_cond_br(lexp,resultBB_or,rexpBB_or);
+        builder->set_insert_point(rexpBB_or);
+        node.rhs->accept(*this);
+        rexp=tmp_val;
+        auto rint=dynamic_pointer_cast<IntegerType>(rexp->get_type());
+        if(rint.get()==NULL){
+            rexp=builder->create_fcmp_ne(rexp, CONST_FLOAT(0));
+        }
+        else if(rint->get_num_bits()!=1){
+            rexp=builder->create_icmp_ne(rexp, CONST_INT(0));
+        }
+        builder->create_store(rexp,result);
+        builder->create_br(resultBB_or);
+        builder->set_insert_point(resultBB_or);
+        tmp_val=builder->create_load(result);
+    }
+    else{//其余表达式正常计算
+        Ptr<Value> rexp,lexp;
+        node.lhs->accept(*this);
+        lexp=tmp_val;
+        node.rhs->accept(*this);
+        rexp=tmp_val;
+        if(lexp->get_type()->get_type_id()!=rexp->get_type()->get_type_id()){
+            if(lexp->get_type()->is_integer_type()){
+                lexp=builder->create_sitofp(lexp,FLOAT_T);
+            }
+            else{
+                rexp=builder->create_sitofp(rexp,FLOAT_T);
+            }
+        }
+        switch (node.op)
+        {
+        case SyntaxTree::BinaryCondOp::LT:
+            if(lexp->get_type()->is_integer_type()){
+                tmp_val=builder->create_icmp_lt(lexp, rexp);
+            }
+            else{
+                tmp_val=builder->create_fcmp_lt(lexp, rexp);
+            }
+            break;
 
-void IRBuilder::visit(SyntaxTree::BinaryExpr &node) {}
+        case SyntaxTree::BinaryCondOp::LTE:
+            if(lexp->get_type()->is_integer_type()){
+                tmp_val=builder->create_icmp_le(lexp, rexp);
+            }
+            else{
+                tmp_val=builder->create_fcmp_le(lexp, rexp);
+            }
+            break;
+        case SyntaxTree::BinaryCondOp::GT:
+            if(lexp->get_type()->is_integer_type()){
+                tmp_val=builder->create_icmp_gt(lexp, rexp);
+            }
+            else{
+                tmp_val=builder->create_fcmp_gt(lexp, rexp);
+            }
+            break;
+        case SyntaxTree::BinaryCondOp::GTE:
+            if(lexp->get_type()->is_integer_type()){
+                tmp_val=builder->create_icmp_ge(lexp, rexp);
+            }
+            else{
+                tmp_val=builder->create_fcmp_ge(lexp, rexp);
+            }
+            break;
+        case SyntaxTree::BinaryCondOp::EQ:
+            if(lexp->get_type()->is_integer_type()){
+                tmp_val=builder->create_icmp_eq(lexp, rexp);
+            }
+            else{
+                tmp_val=builder->create_fcmp_eq(lexp, rexp);
+            }
+            break;
+        case SyntaxTree::BinaryCondOp::NEQ:
+            if(lexp->get_type()->is_integer_type()){
+                tmp_val=builder->create_icmp_ne(lexp, rexp);
+            }
+            else{
+                tmp_val=builder->create_fcmp_ne(lexp, rexp);
+            }
+            break;
+        
+        default:
+            break;
+        }
+    }
+    
+
+}
+
+void IRBuilder::visit(SyntaxTree::BinaryExpr &node) {
+    Ptr<Value> rexp,lexp;
+    node.lhs->accept(*this);
+    lexp=tmp_val;
+    node.rhs->accept(*this);
+    rexp=tmp_val;
+    if(lexp->get_type()->get_type_id()!=rexp->get_type()->get_type_id()){//强制类型转换
+        if(lexp->get_type()->is_integer_type()){
+            lexp=builder->create_sitofp(lexp,FLOAT_T);
+        }
+        else{
+            rexp=builder->create_sitofp(rexp,FLOAT_T);
+        }
+    }
+    switch (node.op)
+    {
+    case SyntaxTree::BinOp::PLUS:
+        if(lexp->get_type()->is_integer_type()){
+            tmp_val=builder->create_iadd(lexp, rexp);
+        }
+        else{
+            tmp_val=builder->create_fadd(lexp, rexp);
+        }
+        break;
+    case SyntaxTree::BinOp::MINUS:
+        if(lexp->get_type()->is_integer_type()){
+            tmp_val=builder->create_isub(lexp, rexp);
+        }
+        else{
+            tmp_val=builder->create_fsub(lexp, rexp);
+        }
+        break;
+    case SyntaxTree::BinOp::MULTIPLY:
+        if(lexp->get_type()->is_integer_type()){
+            tmp_val=builder->create_imul(lexp, rexp);
+        }
+        else{
+            tmp_val=builder->create_fmul(lexp, rexp);
+        }
+        break;
+    case SyntaxTree::BinOp::DIVIDE:
+        if(lexp->get_type()->is_integer_type()){
+            tmp_val=builder->create_isdiv(lexp, rexp);
+        }
+        else{
+            tmp_val=builder->create_fdiv(lexp, rexp);
+        }
+        break;
+    case SyntaxTree::BinOp::MODULO:
+        if(lexp->get_type()->is_integer_type()){
+            tmp_val=builder->create_isrem(lexp, rexp);
+        }
+        else{
+            std::cout<<"Invalid use of float type MODULO!"<<std::endl;
+            exit(1);
+        }
+        break;
+    default:
+        break;
+    }
+
+}
 
 void IRBuilder::visit(SyntaxTree::UnaryExpr &node) {
     node.rhs->accept(*this);
