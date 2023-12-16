@@ -15,7 +15,8 @@ PtrVec<SyntaxTree::FuncParam> func_params;//函数参数列表
 Ptr<Value> func_ret_val;//函数返回值（的指针），return时把返回值store到里面
 Ptr<BasicBlock> retBB;//函数返回基本块，return时保存返回值后跳转到这里即可
 bool is_func_body;//当前基本块是函数体，visit BlockStmt时如果这个标记为true，就不需要再scope.enter()
-
+//while的条件部分，循环体、结束后的基本块
+Ptr<BasicBlock> While_cond=nullptr,While_body=nullptr,While_end=nullptr;
 // store temporary value
 Ptr<Value> tmp_val = nullptr;
 
@@ -532,14 +533,52 @@ void IRBuilder::visit(SyntaxTree::Literal &node) {
     }
 }
 
-void IRBuilder::visit(SyntaxTree::ReturnStmt &node) {}
+void IRBuilder::visit(SyntaxTree::ReturnStmt &node) {
+    if(node.ret.get()!=NULL){
+        node.ret->accept(*this);
+        builder->create_store(tmp_val,func_ret_val);
+    }
+    //tmp_val=nullptr;
+}
 
-void IRBuilder::visit(SyntaxTree::BlockStmt &node) {}
+void IRBuilder::visit(SyntaxTree::BlockStmt &node) {
+    scope.enter();
+    for(auto stm:node.body){
+        stm->accept(*this);
+    }
+    scope.exit();
+}
 
-void IRBuilder::visit(SyntaxTree::EmptyStmt &node) {}
+void IRBuilder::visit(SyntaxTree::EmptyStmt &node) {
+    tmp_val=nullptr;
+}
 
 void IRBuilder::visit(SyntaxTree::ExprStmt &node) {
-
+    using namespace SyntaxTree;
+    auto UnaryCondExprptr=dynamic_pointer_cast<UnaryCondExpr>(node.exp);
+    auto BinaryCondExprptr=dynamic_pointer_cast<BinaryCondExpr>(node.exp);
+    auto BinaryExprptr=dynamic_pointer_cast<BinaryExpr>(node.exp);
+    auto UnaryExprptr=dynamic_pointer_cast<UnaryExpr>(node.exp);
+    auto IfStmtptr=dynamic_pointer_cast<IfStmt>(node.exp);
+    auto WhileStmtptr=dynamic_pointer_cast<WhileStmt>(node.exp);
+    if(UnaryCondExprptr.get()!=NULL){
+        UnaryCondExprptr->accept(*this);
+    }
+    else if(BinaryCondExprptr.get()!=NULL){
+        BinaryCondExprptr->accept(*this);
+    }
+    else if(BinaryExprptr.get()!=NULL){
+        BinaryExprptr->accept(*this);
+    }
+    else if(UnaryExprptr.get()!=NULL){
+        UnaryExprptr->accept(*this);
+    }
+    else if(IfStmtptr.get()!=NULL){
+        IfStmtptr->accept(*this);
+    }
+    else if(WhileStmtptr.get()!=NULL){
+        WhileStmtptr->accept(*this);
+    }
 }
 
 void IRBuilder::visit(SyntaxTree::UnaryCondExpr &node) {//可能存在问题，暂时先这样写
@@ -693,6 +732,7 @@ void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
             break;
         
         default:
+            tmp_val=nullptr;
             break;
         }
     }
@@ -758,6 +798,7 @@ void IRBuilder::visit(SyntaxTree::BinaryExpr &node) {
         }
         break;
     default:
+        tmp_val=nullptr;
         break;
     }
 
@@ -777,15 +818,78 @@ void IRBuilder::visit(SyntaxTree::UnaryExpr &node) {
     }
 }
 
-void IRBuilder::visit(SyntaxTree::FuncCallStmt &node) {}
+void IRBuilder::visit(SyntaxTree::FuncCallStmt &node) {
+    PtrVec<Value> args={};
+    auto func_call=scope.find(node.name,true);
+    for(auto exp:node.params){
+        exp->accept(*this);
+        args.push_back(tmp_val);
+    }
+    tmp_val=builder->create_call(func_call, args); 
+}
 
-void IRBuilder::visit(SyntaxTree::IfStmt &node) {}
+void IRBuilder::visit(SyntaxTree::IfStmt &node) {
+    auto nowfunc=builder->get_insert_block()->get_parent();
+    node.cond_exp->accept(*this);
+    Ptr<BasicBlock> trueBB = BasicBlock::create(module, "trueBB_if", nowfunc);    // true分支
+    Ptr<BasicBlock> falseBB = nullptr;
+    Ptr<BasicBlock> endBB = BasicBlock::create(module, "endBB_if", nowfunc);
+    if(node.else_statement.get()!=NULL){
+        falseBB=BasicBlock::create(module, "falseBB_if", nowfunc);  // false分支
+    }
+    
+    builder->create_cond_br(tmp_val, trueBB, falseBB);
+    builder->set_insert_point(trueBB);
+    node.if_statement->accept(*this);
+    builder->create_br(endBB);
+    if(node.else_statement.get()!=NULL){
+        builder->set_insert_point(falseBB);
+        node.else_statement->accept(*this);
+        builder->create_br(endBB);
+    }
+    builder->set_insert_point(endBB);
+    tmp_val=nullptr;
+}
 
-void IRBuilder::visit(SyntaxTree::WhileStmt &node) {}
+void IRBuilder::visit(SyntaxTree::WhileStmt &node) {
+    Ptr<BasicBlock> While_cond_store=While_cond;
+    Ptr<BasicBlock> While_body_store=While_body;
+    Ptr<BasicBlock> While_end_store=While_end;
+    auto nowfunc=builder->get_insert_block()->get_parent();
+    While_cond=BasicBlock::create(module, "condBB_while", nowfunc);
+    While_body=BasicBlock::create(module, "bodyBB_while", nowfunc);
+    While_end=BasicBlock::create(module, "endBB_while", nowfunc);
+    builder->create_br(While_cond);
 
-void IRBuilder::visit(SyntaxTree::BreakStmt &node) {}
+    builder->set_insert_point(While_cond);
+    node.cond_exp->accept(*this);
+    builder->create_cond_br(tmp_val,While_body,While_end);
 
-void IRBuilder::visit(SyntaxTree::ContinueStmt &node) {}
+    builder->set_insert_point(While_body);
+    node.statement->accept(*this);
+    builder->create_br(While_cond);
 
+    builder->set_insert_point(While_end);
+    tmp_val=nullptr;
+    While_cond=While_cond_store;
+    While_body=While_body_store;
+    While_end=While_end_store;
+}
+
+void IRBuilder::visit(SyntaxTree::BreakStmt &node) {
+    auto nowfunc=builder->get_insert_block()->get_parent();
+    Ptr<BasicBlock> after=BasicBlock::create(module, "afterBB_while", nowfunc);
+    builder->create_br(While_end);//这里插入跳转，要重开一个基本块
+    builder->set_insert_point(after);
+    tmp_val=nullptr;
+}
+
+void IRBuilder::visit(SyntaxTree::ContinueStmt &node) {
+    auto nowfunc=builder->get_insert_block()->get_parent();
+    Ptr<BasicBlock> after=BasicBlock::create(module, "afterBB_while", nowfunc);
+    builder->create_br(While_cond);
+    builder->set_insert_point(after);
+    tmp_val=nullptr;
+}
 }
 }
