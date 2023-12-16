@@ -44,6 +44,7 @@ void IRBuilder::visit(SyntaxTree::Assembly &node) {
 // You need to fill them
 
 void IRBuilder::visit(SyntaxTree::InitVal &node) {
+    
     if(node.isExp) {
         node.expr->accept(*this);
         if(tmp_val) {
@@ -58,6 +59,7 @@ void IRBuilder::visit(SyntaxTree::InitVal &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::FuncDef &node) {
+    
     func_params.clear();
     if(node.param_list)// 有参数
         node.param_list->accept(*this);
@@ -134,6 +136,7 @@ void IRBuilder::visit(SyntaxTree::FuncDef &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::FuncFParamList &node) {
+    
     func_params.clear();
     for(auto &param : node.params) {
         param->accept(*this);// visit每一个参数即可
@@ -141,11 +144,13 @@ void IRBuilder::visit(SyntaxTree::FuncFParamList &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::FuncParam &node) {// 这里只将参数存起来，留给FuncDef处理
+    
     auto param = Ptr<SyntaxTree::FuncParam>(new SyntaxTree::FuncParam(node));
     func_params.push_back(param);
 }
 
 void IRBuilder::visit(SyntaxTree::VarDef &node) {
+    
     initValues.clear();//清空初始值
     if(node.array_length.empty()) {//不是数组
         if(node.is_constant) {//是常量
@@ -454,6 +459,7 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::LVal &node) {
+    
     auto lval = scope.find(node.name, false);//找到变量
     auto get_lval = !is_assign;//如果不是赋值语句，那就需要load（即拿到lval的值）
     is_assign = false;//取消assign标记，否则如果出现a[n] = b这种赋值语句，会取得n的指针而非n的值
@@ -509,6 +515,7 @@ void IRBuilder::visit(SyntaxTree::LVal &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::AssignStmt &node) {
+    
     is_assign = true;
     node.target->accept(*this);
     auto lval = tmp_val;
@@ -525,6 +532,7 @@ void IRBuilder::visit(SyntaxTree::AssignStmt &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::Literal &node) {
+    
     if(node.literal_type == SyntaxTree::Type::INT) {
         tmp_val = CONST_INT(node.int_const);
     }
@@ -534,6 +542,7 @@ void IRBuilder::visit(SyntaxTree::Literal &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::ReturnStmt &node) {
+    
     if(node.ret.get()!=NULL){
         node.ret->accept(*this);
         if(tmp_val->get_type()->is_integer_type() && func_ret_val->get_type()->get_pointer_element_type()->is_float_type()) {
@@ -549,8 +558,9 @@ void IRBuilder::visit(SyntaxTree::ReturnStmt &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::BlockStmt &node) {
+    
     scope.enter();
-    for(auto stm:node.body){
+    for(auto &stm:node.body){
         stm->accept(*this);
     }
     scope.exit();
@@ -561,31 +571,33 @@ void IRBuilder::visit(SyntaxTree::EmptyStmt &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::ExprStmt &node) {
-    using namespace SyntaxTree;
-    auto UnaryCondExprptr=dynamic_pointer_cast<UnaryCondExpr>(node.exp);
-    auto BinaryCondExprptr=dynamic_pointer_cast<BinaryCondExpr>(node.exp);
-    auto BinaryExprptr=dynamic_pointer_cast<BinaryExpr>(node.exp);
-    auto UnaryExprptr=dynamic_pointer_cast<UnaryExpr>(node.exp);
-    auto IfStmtptr=dynamic_pointer_cast<IfStmt>(node.exp);
-    auto WhileStmtptr=dynamic_pointer_cast<WhileStmt>(node.exp);
-    if(UnaryCondExprptr.get()!=NULL){
-        UnaryCondExprptr->accept(*this);
-    }
-    else if(BinaryCondExprptr.get()!=NULL){
-        BinaryCondExprptr->accept(*this);
-    }
-    else if(BinaryExprptr.get()!=NULL){
-        BinaryExprptr->accept(*this);
-    }
-    else if(UnaryExprptr.get()!=NULL){
-        UnaryExprptr->accept(*this);
-    }
-    else if(IfStmtptr.get()!=NULL){
-        IfStmtptr->accept(*this);
-    }
-    else if(WhileStmtptr.get()!=NULL){
-        WhileStmtptr->accept(*this);
-    }
+    // 
+    // using namespace SyntaxTree;
+    // auto UnaryCondExprptr=dynamic_pointer_cast<UnaryCondExpr>(node.exp);
+    // auto BinaryCondExprptr=dynamic_pointer_cast<BinaryCondExpr>(node.exp);
+    // auto BinaryExprptr=dynamic_pointer_cast<BinaryExpr>(node.exp);
+    // auto UnaryExprptr=dynamic_pointer_cast<UnaryExpr>(node.exp);
+    // auto IfStmtptr=dynamic_pointer_cast<IfStmt>(node.exp);
+    // auto WhileStmtptr=dynamic_pointer_cast<WhileStmt>(node.exp);
+    // if(UnaryCondExprptr.get()!=NULL){
+    //     UnaryCondExprptr->accept(*this);
+    // }
+    // else if(BinaryCondExprptr.get()!=NULL){
+    //     BinaryCondExprptr->accept(*this);
+    // }
+    // else if(BinaryExprptr.get()!=NULL){
+    //     BinaryExprptr->accept(*this);
+    // }
+    // else if(UnaryExprptr.get()!=NULL){
+    //     UnaryExprptr->accept(*this);
+    // }
+    // else if(IfStmtptr.get()!=NULL){
+    //     IfStmtptr->accept(*this);
+    // }
+    // else if(WhileStmtptr.get()!=NULL){
+    //     WhileStmtptr->accept(*this);
+    // }
+    node.exp->accept(*this);
 }
 
 void IRBuilder::visit(SyntaxTree::UnaryCondExpr &node) {//可能存在问题，暂时先这样写
@@ -603,6 +615,7 @@ void IRBuilder::visit(SyntaxTree::UnaryCondExpr &node) {//可能存在问题，�
 }
 
 void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
+    
     auto nowfunc=builder->get_insert_block()->get_parent();
     if(node.op==SyntaxTree::BinaryCondOp::LAND ){//强行使用中间变量result存储and及or表达式计算结果
         Ptr<Value> rexp,lexp,result;
@@ -748,6 +761,7 @@ void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::BinaryExpr &node) {
+    
     Ptr<Value> rexp,lexp;
     node.lhs->accept(*this);
     lexp=tmp_val;
@@ -870,6 +884,7 @@ void IRBuilder::visit(SyntaxTree::BinaryExpr &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::UnaryExpr &node) {
+    
     node.rhs->accept(*this);
     if(tmp_val) {
         if(node.op == SyntaxTree::UnaryOp::MINUS) {
@@ -884,13 +899,27 @@ void IRBuilder::visit(SyntaxTree::UnaryExpr &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::FuncCallStmt &node) {
-    PtrVec<Value> args={};
-    auto func_call=scope.find(node.name,true);
-    for(auto exp:node.params){
-        exp->accept(*this);
-        args.push_back(tmp_val);
+    PtrVec<Value> args;
+    PtrVec<Type> arg_types;
+    auto func = dynamic_pointer_cast<Function>(scope.find(node.name, true));
+    auto func_type = func->get_function_type();
+    for(unsigned int i = 0; i < func_type->get_num_of_args(); i++) {
+        arg_types.push_back(func_type->get_param_type(i));
     }
-    tmp_val=builder->create_call(func_call, args); 
+
+    for(int i = 0; i < (int)node.params.size(); i++) {
+        node.params[i]->accept(*this);
+        if(tmp_val) {
+            if(tmp_val->get_type()->is_integer_type() && arg_types[i]->is_float_type()) {
+                tmp_val = builder->create_sitofp(tmp_val, FLOAT_T);
+            }
+            else if(tmp_val->get_type()->is_float_type() && arg_types[i]->is_integer_type()) {
+                tmp_val = builder->create_fptosi(tmp_val, INT32_T);
+            }
+            args.push_back(tmp_val);
+        }
+    }
+    tmp_val = builder->create_call(func, args);
 }
 
 void IRBuilder::visit(SyntaxTree::IfStmt &node) {
