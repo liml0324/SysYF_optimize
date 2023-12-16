@@ -931,8 +931,10 @@ void IRBuilder::visit(SyntaxTree::IfStmt &node) {
     if(node.else_statement.get()!=NULL){
         falseBB=BasicBlock::create(module, "falseBB_if", nowfunc);  // false分支
     }
-    
-    builder->create_cond_br(tmp_val, trueBB, falseBB);
+    if(node.else_statement.get()!=NULL)
+        builder->create_cond_br(tmp_val, trueBB, falseBB);
+    else
+        builder->create_cond_br(tmp_val, trueBB, endBB);
     builder->set_insert_point(trueBB);
     node.if_statement->accept(*this);
     builder->create_br(endBB);
