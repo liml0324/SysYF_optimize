@@ -536,8 +536,15 @@ void IRBuilder::visit(SyntaxTree::Literal &node) {
 void IRBuilder::visit(SyntaxTree::ReturnStmt &node) {
     if(node.ret.get()!=NULL){
         node.ret->accept(*this);
+        if(tmp_val->get_type()->is_integer_type() && func_ret_val->get_type()->get_pointer_element_type()->is_float_type()) {
+            tmp_val = builder->create_sitofp(tmp_val, FLOAT_T);
+        }
+        else if(tmp_val->get_type()->is_float_type() && func_ret_val->get_type()->get_pointer_element_type()->is_integer_type()) {
+            tmp_val = builder->create_fptosi(tmp_val, INT32_T);
+        }
         builder->create_store(tmp_val,func_ret_val);
     }
+    builder->create_br(retBB);
     //tmp_val=nullptr;
 }
 
@@ -607,11 +614,11 @@ void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
         builder->set_insert_point(lexpBB_and);
         node.lhs->accept(*this);
         lexp=tmp_val;
-        auto lint=dynamic_pointer_cast<IntegerType>(lexp->get_type());
-        if(lint.get()==NULL){//判断lexp返回类型
+        // auto lint=dynamic_pointer_cast<IntegerType>(lexp->get_type());
+        if(lexp->get_type()->is_float_type()){//判断lexp返回类型
             lexp=builder->create_fcmp_ne(lexp, CONST_FLOAT(0));
         }
-        else if(lint->get_num_bits()!=1){
+        else if(lexp->get_type()->is_integer_type() && lexp->get_type()->get_size() > 1){
             lexp=builder->create_icmp_ne(lexp, CONST_INT(0));
         }
         builder->create_store(lexp,result);
@@ -619,11 +626,11 @@ void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
         builder->set_insert_point(rexpBB_and);
         node.rhs->accept(*this);
         rexp=tmp_val;
-        auto rint=dynamic_pointer_cast<IntegerType>(rexp->get_type());
-        if(rint.get()==NULL){
+        // auto rint=dynamic_pointer_cast<IntegerType>(rexp->get_type());
+        if(rexp->get_type()->is_float_type()){
             rexp=builder->create_fcmp_ne(rexp, CONST_FLOAT(0));
         }
-        else if(rint->get_num_bits()!=1){
+        else if(rexp->get_type()->is_integer_type() && rexp->get_type()->get_size() > 1){
             rexp=builder->create_icmp_ne(rexp, CONST_INT(0));
         }
         builder->create_store(rexp,result);
@@ -641,11 +648,11 @@ void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
         builder->set_insert_point(lexpBB_or);
         node.lhs->accept(*this);
         lexp=tmp_val;
-        auto lint=dynamic_pointer_cast<IntegerType>(lexp->get_type());
-        if(lint.get()==NULL){
+        // auto lint=dynamic_pointer_cast<IntegerType>(lexp->get_type());
+        if(lexp->get_type()->is_float_type()){//判断lexp返回类型
             lexp=builder->create_fcmp_ne(lexp, CONST_FLOAT(0));
         }
-        else if(lint->get_num_bits()!=1){
+        else if(lexp->get_type()->is_integer_type() && lexp->get_type()->get_size() > 1){
             lexp=builder->create_icmp_ne(lexp, CONST_INT(0));
         }
         builder->create_store(lexp,result);
@@ -653,11 +660,11 @@ void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
         builder->set_insert_point(rexpBB_or);
         node.rhs->accept(*this);
         rexp=tmp_val;
-        auto rint=dynamic_pointer_cast<IntegerType>(rexp->get_type());
-        if(rint.get()==NULL){
+        // auto rint=dynamic_pointer_cast<IntegerType>(rexp->get_type());
+        if(rexp->get_type()->is_float_type()){
             rexp=builder->create_fcmp_ne(rexp, CONST_FLOAT(0));
         }
-        else if(rint->get_num_bits()!=1){
+        else if(rexp->get_type()->is_integer_type() && rexp->get_type()->get_size() > 1){
             rexp=builder->create_icmp_ne(rexp, CONST_INT(0));
         }
         builder->create_store(rexp,result);
@@ -746,61 +753,119 @@ void IRBuilder::visit(SyntaxTree::BinaryExpr &node) {
     lexp=tmp_val;
     node.rhs->accept(*this);
     rexp=tmp_val;
-    if(lexp->get_type()->get_type_id()!=rexp->get_type()->get_type_id()){//强制类型转换
-        if(lexp->get_type()->is_integer_type()){
-            lexp=builder->create_sitofp(lexp,FLOAT_T);
+    if(dynamic_pointer_cast<Constant>(lexp) && dynamic_pointer_cast<Constant>(rexp)) {
+        if(lexp->get_type()->is_integer_type() && rexp->get_type()->is_float_type()) {
+            lexp = CONST_FLOAT((float)(dynamic_pointer_cast<ConstantInt>(lexp)->get_value()));
         }
-        else{
-            rexp=builder->create_sitofp(rexp,FLOAT_T);
+        else if(lexp->get_type()->is_float_type() && rexp->get_type()->is_integer_type()) {
+            rexp = CONST_FLOAT((float)(dynamic_pointer_cast<ConstantInt>(rexp)->get_value()));
+        }
+        if(lexp->get_type()->is_integer_type()) {
+            auto lexp_int_val = std::dynamic_pointer_cast<ConstantInt>(lexp);
+            auto rexp_int_val = std::dynamic_pointer_cast<ConstantInt>(rexp);
+            switch (node.op)
+            {
+            case SyntaxTree::BinOp::PLUS:
+                tmp_val = CONST_INT(lexp_int_val->get_value() + rexp_int_val->get_value());
+                break;
+            case SyntaxTree::BinOp::MINUS:
+                tmp_val = CONST_INT(lexp_int_val->get_value() - rexp_int_val->get_value());
+                break;
+            case SyntaxTree::BinOp::MULTIPLY:
+                tmp_val = CONST_INT(lexp_int_val->get_value() * rexp_int_val->get_value());
+                break;
+            case SyntaxTree::BinOp::DIVIDE:
+                tmp_val = CONST_INT(lexp_int_val->get_value() / rexp_int_val->get_value());
+                break;
+            case SyntaxTree::BinOp::MODULO:
+                tmp_val = CONST_INT(lexp_int_val->get_value() % rexp_int_val->get_value());
+                break;
+            default:
+                tmp_val = nullptr;
+                break;
+            }
+        }
+        else if(lexp->get_type()->is_float_type()) {
+            auto lexp_float_val = std::dynamic_pointer_cast<ConstantFloat>(lexp);
+            auto rexp_float_val = std::dynamic_pointer_cast<ConstantFloat>(rexp);
+            switch (node.op)
+            {
+            case SyntaxTree::BinOp::PLUS:
+                tmp_val = CONST_FLOAT(lexp_float_val->get_value() + rexp_float_val->get_value());
+                break;
+            case SyntaxTree::BinOp::MINUS:
+                tmp_val = CONST_FLOAT(lexp_float_val->get_value() - rexp_float_val->get_value());
+                break;
+            case SyntaxTree::BinOp::MULTIPLY:
+                tmp_val = CONST_FLOAT(lexp_float_val->get_value() * rexp_float_val->get_value());
+                break;
+            case SyntaxTree::BinOp::DIVIDE:
+                tmp_val = CONST_FLOAT(lexp_float_val->get_value() / rexp_float_val->get_value());
+                break;
+            default:
+                tmp_val = nullptr;
+                break;
+            }
+        }   
+    }
+    else {
+        if(lexp->get_type()->get_type_id()!=rexp->get_type()->get_type_id()){//强制类型转换
+            if(lexp->get_type()->is_integer_type()){
+                lexp=builder->create_sitofp(lexp,FLOAT_T);
+            }
+            else{
+                rexp=builder->create_sitofp(rexp,FLOAT_T);
+            }
+        }
+        switch (node.op)
+        {
+        case SyntaxTree::BinOp::PLUS:
+            if(lexp->get_type()->is_integer_type()){
+                tmp_val=builder->create_iadd(lexp, rexp);
+            }
+            else{
+                tmp_val=builder->create_fadd(lexp, rexp);
+            }
+            break;
+        case SyntaxTree::BinOp::MINUS:
+            if(lexp->get_type()->is_integer_type()){
+                tmp_val=builder->create_isub(lexp, rexp);
+            }
+            else{
+                tmp_val=builder->create_fsub(lexp, rexp);
+            }
+            break;
+        case SyntaxTree::BinOp::MULTIPLY:
+            if(lexp->get_type()->is_integer_type()){
+                tmp_val=builder->create_imul(lexp, rexp);
+            }
+            else{
+                tmp_val=builder->create_fmul(lexp, rexp);
+            }
+            break;
+        case SyntaxTree::BinOp::DIVIDE:
+            if(lexp->get_type()->is_integer_type()){
+                tmp_val=builder->create_isdiv(lexp, rexp);
+            }
+            else{
+                tmp_val=builder->create_fdiv(lexp, rexp);
+            }
+            break;
+        case SyntaxTree::BinOp::MODULO:
+            if(lexp->get_type()->is_integer_type()){
+                tmp_val=builder->create_isrem(lexp, rexp);
+            }
+            else{
+                std::cout<<"Invalid use of float type MODULO!"<<std::endl;
+                exit(1);
+            }
+            break;
+        default:
+            tmp_val=nullptr;
+            break;
         }
     }
-    switch (node.op)
-    {
-    case SyntaxTree::BinOp::PLUS:
-        if(lexp->get_type()->is_integer_type()){
-            tmp_val=builder->create_iadd(lexp, rexp);
-        }
-        else{
-            tmp_val=builder->create_fadd(lexp, rexp);
-        }
-        break;
-    case SyntaxTree::BinOp::MINUS:
-        if(lexp->get_type()->is_integer_type()){
-            tmp_val=builder->create_isub(lexp, rexp);
-        }
-        else{
-            tmp_val=builder->create_fsub(lexp, rexp);
-        }
-        break;
-    case SyntaxTree::BinOp::MULTIPLY:
-        if(lexp->get_type()->is_integer_type()){
-            tmp_val=builder->create_imul(lexp, rexp);
-        }
-        else{
-            tmp_val=builder->create_fmul(lexp, rexp);
-        }
-        break;
-    case SyntaxTree::BinOp::DIVIDE:
-        if(lexp->get_type()->is_integer_type()){
-            tmp_val=builder->create_isdiv(lexp, rexp);
-        }
-        else{
-            tmp_val=builder->create_fdiv(lexp, rexp);
-        }
-        break;
-    case SyntaxTree::BinOp::MODULO:
-        if(lexp->get_type()->is_integer_type()){
-            tmp_val=builder->create_isrem(lexp, rexp);
-        }
-        else{
-            std::cout<<"Invalid use of float type MODULO!"<<std::endl;
-            exit(1);
-        }
-        break;
-    default:
-        tmp_val=nullptr;
-        break;
-    }
+    
 
 }
 
