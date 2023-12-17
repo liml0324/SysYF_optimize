@@ -503,7 +503,7 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::LVal &node) {
-    std::cout << "LVal" << std::endl;
+    
     auto lval = scope.find(node.name, false);//找到变量
     auto need_load = !is_assign;//如果不是赋值语句，那就需要load（即拿到lval的值）
     is_assign = false;//取消assign标记，否则如果出现a[n] = b这种赋值语句，会取得n的指针而非n的值
@@ -710,7 +710,7 @@ void IRBuilder::visit(SyntaxTree::EmptyStmt &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::ExprStmt &node) {
-    std::cout << "ExprStmt" << std::endl;
+    
     // 
     // using namespace SyntaxTree;
     // auto UnaryCondExprptr=dynamic_pointer_cast<UnaryCondExpr>(node.exp);
@@ -741,7 +741,7 @@ void IRBuilder::visit(SyntaxTree::ExprStmt &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::UnaryCondExpr &node) {//可能存在问题，暂时先这样写
-    std::cout << "UnaryCondExpr" << std::endl;
+    
     node.rhs->accept(*this);
     if(tmp_val->get_type()->is_integer_type() && tmp_val->get_type()->get_size() > 1) {
         tmp_val = builder->create_icmp_eq(tmp_val, CONST_INT(0));
@@ -756,7 +756,7 @@ void IRBuilder::visit(SyntaxTree::UnaryCondExpr &node) {//可能存在问题，�
 }
 
 void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
-    std::cout << "BinaryCondExpr" << std::endl;
+    
     auto nowfunc=builder->get_insert_block()->get_parent();
     if(node.op==SyntaxTree::BinaryCondOp::LAND ){//强行使用中间变量result存储and及or表达式计算结果
         Ptr<Value> rexp,lexp,result;
@@ -1025,7 +1025,7 @@ void IRBuilder::visit(SyntaxTree::BinaryExpr &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::UnaryExpr &node) {
-    std::cout << "UnaryExpr" << std::endl;
+    
     node.rhs->accept(*this);
     if(tmp_val) {
         if(node.op == SyntaxTree::UnaryOp::MINUS) {
