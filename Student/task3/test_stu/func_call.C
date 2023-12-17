@@ -1,5 +1,19 @@
 float f(float x){
-    return 
+    return x+1;
+}
+
+float ab(float x){//绝对值函数 
+	if(x<0)
+		return -1*x;
+	return x;
+}
+
+int times_power2(int x,int p){
+	while(p){
+		x=x*2;
+		p=p-1;
+	}
+	return x;
 }
 
 float Romberg(float a,float b,float ep,int n){
@@ -32,7 +46,7 @@ float Romberg(float a,float b,float ep,int n){
         }
 		h=h/2;sum=0;
         i=1;
-		while(i<=(1<<(k-1))*n){//插入点值 
+		while(i<=times_power2(1,k-1)*n){//插入点值 
 			sum=sum+f(a+(2*i-1)*h);
             i=i+1;
 		}
@@ -47,4 +61,8 @@ float Romberg(float a,float b,float ep,int n){
 	//printf("k=%d,M=%d,k/M=%lf\n",k,M,k*1.0/M);//测试k/M用代码 
 	sum=Rk[k-1];//返回值 
 	return sum;
+}
+
+float main(){
+	return Romberg(0,10,0.0001,4);
 }
