@@ -11,12 +11,14 @@ namespace IR
 // to store state
 bool is_assign;//只有赋值语句需要真正的“左值”
 PtrVec<Value> initValues;//初值列表，为数组准备的
+PtrVec<ConstantInt> array_len_vec;//数组长度列表
 PtrVec<SyntaxTree::FuncParam> func_params;//函数参数列表
 Ptr<Value> func_ret_val;//函数返回值（的指针），return时把返回值store到里面
 Ptr<BasicBlock> retBB;//函数返回基本块，return时保存返回值后跳转到这里即可
 bool is_func_body;//当前基本块是函数体，visit BlockStmt时如果这个标记为true，就不需要再scope.enter()
 //while的条件部分，循环体、结束后的基本块
 Ptr<BasicBlock> While_cond=nullptr,While_body=nullptr,While_end=nullptr;
+int bb_num = 0;//基本块编号
 // store temporary value
 Ptr<Value> tmp_val = nullptr;
 
@@ -44,7 +46,6 @@ void IRBuilder::visit(SyntaxTree::Assembly &node) {
 // You need to fill them
 
 void IRBuilder::visit(SyntaxTree::InitVal &node) {
-    
     if(node.isExp) {
         node.expr->accept(*this);
         if(tmp_val) {
@@ -52,14 +53,30 @@ void IRBuilder::visit(SyntaxTree::InitVal &node) {
         }
     } 
     else {
+        int exp_num = 0;
         for(auto &init_val : node.elementList) {
+            if(init_val->isExp) {
+                exp_num++;
+            }
+            else {
+                if(exp_num > 0 && exp_num < array_len_vec.back()->get_value()) {
+                    for(int i = exp_num; i < array_len_vec.back()->get_value(); i++) {
+                        initValues.push_back(CONST_INT(0));
+                    }
+                }
+                exp_num = 0;
+            }
             init_val->accept(*this);
+        }
+        if(exp_num > 0 && exp_num < array_len_vec.back()->get_value()) {
+            for(int i = exp_num; i < array_len_vec.back()->get_value(); i++) {
+                initValues.push_back(CONST_INT(0));
+            }
         }
     }
 }
 
 void IRBuilder::visit(SyntaxTree::FuncDef &node) {
-    
     func_params.clear();
     if(node.param_list)// 有参数
         node.param_list->accept(*this);
@@ -107,6 +124,22 @@ void IRBuilder::visit(SyntaxTree::FuncDef &node) {
         auto param = func_params[i];
         auto param_name = param->name;
         auto param_ptr = builder->create_alloca(arg->get_type());
+        if(param->array_index.size()) {
+            array_len_vec.clear();
+            array_len_vec.push_back(CONST_INT(0));// 数组长度的第一维无关紧要
+            for(int j = 1; j < (int)param->array_index.size(); j++) {
+                param->array_index[j]->accept(*this);
+                auto int_val = dynamic_pointer_cast<ConstantInt>(tmp_val);
+                auto float_val = dynamic_pointer_cast<ConstantFloat>(tmp_val);
+                if(int_val) {
+                    array_len_vec.push_back(CONST_INT(int_val->get_value()));
+                }
+                else if(float_val) {
+                    array_len_vec.push_back(CONST_INT((int)(float_val->get_value())));
+                }
+            }
+            scope.pushDim(param_name, array_len_vec);
+        }
         builder->create_store(arg, param_ptr);// 保存传入的参数
         scope.push(param_name, param_ptr);
     }
@@ -150,7 +183,6 @@ void IRBuilder::visit(SyntaxTree::FuncParam &node) {// 这里只将参数存起�
 }
 
 void IRBuilder::visit(SyntaxTree::VarDef &node) {
-    
     initValues.clear();//清空初始值
     if(node.array_length.empty()) {//不是数组
         if(node.is_constant) {//是常量
@@ -253,9 +285,6 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
                             }
                         }
                     }
-                    else {//无初值则存入0
-                        builder->create_store(CONST_INT(0), tmp_val);
-                    }
                 }
                 else if(node.btype == SyntaxTree::Type::FLOAT) {//浮点型也一样
                     tmp_val = builder->create_alloca(FLOAT_T);
@@ -274,17 +303,28 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
                             builder->create_store(init_val, tmp_val);
                         }
                     }
-                    else {
-                        builder->create_store(CONST_FLOAT(0), tmp_val);
-                    }
                 }
             }
             
         }
     }
     else {//是数组
-        node.array_length[0]->accept(*this);//暂时只考虑一维数组
-        auto array_len = dynamic_pointer_cast<ConstantInt>(tmp_val)->get_value();
+        // PtrVec<ConstantInt> array_len_vec;
+        array_len_vec.clear();
+        int array_len = 1;
+        for(int i = 0; i < (int)node.array_length.size(); i++) {
+            node.array_length[i]->accept(*this);
+            auto array_len_int = dynamic_pointer_cast<ConstantInt>(tmp_val);
+            auto array_len_float = dynamic_pointer_cast<ConstantFloat>(tmp_val);
+            if(array_len_int) {
+                array_len_vec.push_back(CONST_INT(array_len_int->get_value()));
+            }
+            else if(array_len_float) {
+                array_len_vec.push_back(CONST_INT((int)(array_len_float->get_value())));
+            }
+            array_len *= array_len_vec[i]->get_value();
+        }
+        scope.pushDim(node.name, array_len_vec);
         if(node.is_constant) {//数组常量
             node.initializers->accept(*this);
             if(scope.in_global()) {//全局变量
@@ -425,10 +465,12 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
                         auto array_ptr = builder->create_gep(tmp_val, {CONST_INT(0), array_index});
                         builder->create_store(init_value, array_ptr);
                     }
-                    for(int i = initValues.size(); i < array_len; i++) {//否则补0
-                        auto array_index = CONST_INT(i);
-                        auto array_ptr = builder->create_gep(tmp_val, {CONST_INT(0), array_index});
-                        builder->create_store(CONST_INT(0), array_ptr);
+                    if(node.is_inited) {
+                        for(int i = initValues.size(); i < array_len; i++) {//用0补齐
+                            auto array_index = CONST_INT(i);
+                            auto array_ptr = builder->create_gep(tmp_val, {CONST_INT(0), array_index});
+                            builder->create_store(CONST_INT(0), array_ptr);
+                        }
                     }
                 }
                 else if(node.btype == SyntaxTree::Type::FLOAT) {//浮点型也一样
@@ -446,10 +488,12 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
                         auto array_ptr = builder->create_gep(tmp_val, {CONST_INT(0), array_index});
                         builder->create_store(init_value, array_ptr);
                     }
-                    for(int i = initValues.size(); i < array_len; i++) {
-                        auto array_index = CONST_INT(i);
-                        auto array_ptr = builder->create_gep(tmp_val, {CONST_INT(0), array_index});
-                        builder->create_store(CONST_FLOAT(0), array_ptr);
+                    if(node.is_inited) {
+                        for(int i = initValues.size(); i < array_len; i++) {
+                            auto array_index = CONST_INT(i);
+                            auto array_ptr = builder->create_gep(tmp_val, {CONST_INT(0), array_index});
+                            builder->create_store(CONST_FLOAT(0), array_ptr);
+                        }
                     }
                 }
             }
@@ -459,56 +503,150 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::LVal &node) {
-    
     auto lval = scope.find(node.name, false);//找到变量
-    auto get_lval = !is_assign;//如果不是赋值语句，那就需要load（即拿到lval的值）
+    auto need_load = !is_assign;//如果不是赋值语句，那就需要load（即拿到lval的值）
     is_assign = false;//取消assign标记，否则如果出现a[n] = b这种赋值语句，会取得n的指针而非n的值
     auto is_global_const = false;
-    if(node.array_index.size()) {//是数组
-        PtrVec<Value> array_index;
+    if(lval->get_type()->is_pointer_type() && node.array_index.size()) {//是数组，且有下标
+        PtrVec<Value> array_index_vec;
+        auto local_array_len_vec = scope.findDim(node.name);
         for(auto &index : node.array_index) {
             index->accept(*this);
             if(tmp_val) {
-                array_index.push_back(tmp_val);
+                array_index_vec.push_back(tmp_val);
             }
+        }
+        for(auto i = array_index_vec.size(); i < local_array_len_vec.size(); i++) {
+            array_index_vec.push_back(CONST_INT(0));
         }
         auto global_lval = dynamic_pointer_cast<GlobalVariable>(lval);
-        if(global_lval && global_lval->is_const() && dynamic_pointer_cast<Constant>(array_index[0])) {//是全局常量数组，且下标是常量
-            auto init_array = dynamic_pointer_cast<ConstantArray>(global_lval->get_init());//常量不能被再次赋值，因此这里不管是不是assign，都直接取出它的值
-            auto init_val = init_array->get_element_value(dynamic_pointer_cast<ConstantInt>(array_index[0])->get_value());
-            tmp_val = init_val;
-            is_global_const = true;
-        }
-        else {
-            auto array_ptr = builder->create_gep(lval, {CONST_INT(0), array_index[0]});
-            if(global_lval && global_lval->is_const()) {//是全局常量数组，但下标不是常量
-                                                        //非全局常量数组还不知如何处理，先空着
-                tmp_val = builder->create_load(array_ptr);
+        auto is_const_index = true;
+        for(auto &index : array_index_vec) {
+            if(!dynamic_pointer_cast<Constant>(index)) {
+                is_const_index = false;
+                break;
             }
-            else {
-                tmp_val = array_ptr;
+        }
+        if(global_lval && global_lval->is_const() && is_const_index) {//是全局常量数组，且下标是常量
+            auto array_index = 0;
+            need_load = false;
+            //这一段在计算下标（换算成一维）
+            for(int i = 0; i < (int)array_index_vec.size()-1; i++) {
+                auto int_index = dynamic_pointer_cast<ConstantInt>(array_index_vec[i]);
+                auto float_index = dynamic_pointer_cast<ConstantFloat>(array_index_vec[i]);
+                if(int_index) {
+                    array_index += int_index->get_value();
+                }
+                else if(float_index) {
+                    array_index += (int)(float_index->get_value());
+                }
+                auto array_len = local_array_len_vec[i+1]->get_value();
+                array_index *= array_len;
+            }
+            auto int_index = dynamic_pointer_cast<ConstantInt>(array_index_vec.back());
+            auto float_index = dynamic_pointer_cast<ConstantFloat>(array_index_vec.back());
+            if(int_index) {
+                array_index += int_index->get_value();
+            }
+            else if(float_index) {
+                array_index += (int)(float_index->get_value());
+            }
+
+            if(node.array_index.size() < local_array_len_vec.size()) {//下标数量少于数组维数，说明是取数组的地址
+                tmp_val = builder->create_gep(lval, {CONST_INT(0), CONST_INT(array_index)});
+            }
+            else {//下标数量等于数组维数，说明是取数组元素的值
+                auto init_array = dynamic_pointer_cast<ConstantArray>(global_lval->get_init());//常量不能被再次赋值，因此这里不管是不是assign，都直接取出它的值
+                auto init_val = init_array->get_element_value(array_index);
+                tmp_val = init_val;
+            }
+        }
+        else if(lval->get_type()->get_pointer_element_type()->is_array_type()) {//是数组
+            //这一段在计算下标（换算成一维）
+            Ptr<Value> array_index = CONST_INT(0);
+            for(int i = 0; i < (int)array_index_vec.size()-1; i++) {
+                auto array_len = local_array_len_vec[i+1];
+                auto array_index_tmp = array_index_vec[i];
+                if(array_index_tmp->get_type()->is_float_type()) {
+                    array_index_tmp = builder->create_fptosi(array_index_tmp, INT32_T);
+                }
+                array_index = builder->create_iadd(array_index, array_index_tmp);
+                array_index = builder->create_imul(array_index, array_len);
+            }
+            auto array_index_tmp = array_index_vec.back();
+            if(array_index_tmp->get_type()->is_float_type()) {
+                array_index_tmp = builder->create_fptosi(array_index_tmp, INT32_T);
+            }
+            array_index = builder->create_iadd(array_index, array_index_tmp);
+
+            if(node.array_index.size() < local_array_len_vec.size()) {//下标数量少于数组维数，说明是取数组的地址
+                tmp_val = builder->create_gep(lval, {CONST_INT(0), array_index});
+                need_load = false;
+            }
+            else {//下标数量等于数组维数
+                tmp_val = builder->create_gep(lval, {CONST_INT(0), array_index});
+            }
+        }
+        else {//是指针
+            lval = builder->create_load(lval);//先进行一个load
+            //这一段在计算下标（换算成一维）
+            Ptr<Value> array_index = CONST_INT(0);
+            for(int i = 0; i < (int)array_index_vec.size()-1; i++) {
+                auto array_len = local_array_len_vec[i+1];
+                auto array_index_tmp = array_index_vec[i];
+                if(array_index_tmp->get_type()->is_float_type()) {
+                    array_index_tmp = builder->create_fptosi(array_index_tmp, INT32_T);
+                }
+                array_index = builder->create_iadd(array_index, array_index_tmp);
+                array_index = builder->create_imul(array_index, array_len);
+            }
+            auto array_index_tmp = array_index_vec.back();
+            if(array_index_tmp->get_type()->is_float_type()) {
+                array_index_tmp = builder->create_fptosi(array_index_tmp, INT32_T);
+            }
+            array_index = builder->create_iadd(array_index, array_index_tmp);
+
+            if(node.array_index.size() < local_array_len_vec.size()) {//下标数量少于数组维数，说明是取数组的地址
+                tmp_val = builder->create_gep(lval, {array_index});
+                need_load = false;
+            }
+            else {//下标数量等于数组维数
+                tmp_val = builder->create_gep(lval, {array_index});
             }
         }
     }
-    else {
+    else if(lval->get_type()->is_pointer_type() && (lval->get_type()->get_pointer_element_type()->is_array_type() || lval->get_type()->get_pointer_element_type()->is_pointer_type())&& node.array_index.empty()) {//是指针，且没有下标
+        need_load = false;
+        if(lval->get_type()->get_pointer_element_type()->is_array_type()) {
+            tmp_val = builder->create_gep(lval, {CONST_INT(0), CONST_INT(0)});//取数组的地址
+        }
+        else {
+            tmp_val = builder->create_load(lval);//取指针的值
+            tmp_val = builder->create_gep(tmp_val, {CONST_INT(0)});//取指针指向的地址
+        }
+    }
+    else {//不是数组
         auto global_lval = dynamic_pointer_cast<GlobalVariable>(lval);
         if(global_lval && global_lval->is_const()) {
             auto init_val = global_lval->get_init();
             tmp_val = init_val;
             is_global_const = true;
+            need_load = false;
         }
         else if(dynamic_pointer_cast<ConstantInt>(lval)) {
             auto int_val = std::dynamic_pointer_cast<ConstantInt>(lval);
             tmp_val = CONST_INT(int_val->get_value());
+            need_load = false;
         }
         else if(dynamic_pointer_cast<ConstantFloat>(lval)) {
             auto float_val = std::dynamic_pointer_cast<ConstantFloat>(lval);
             tmp_val = CONST_FLOAT(float_val->get_value());
+            need_load = false;
         }
         else
             tmp_val = lval;
     }
-    if(get_lval && !dynamic_pointer_cast<ConstantInt>(lval) && !dynamic_pointer_cast<ConstantFloat>(lval) && !is_global_const) {//需要Lval的不是赋值语句，且不是常量，需要load
+    if(need_load) {//需要Lval的不是赋值语句，且不是常量，需要load
                                                                                                                                 //这里只考虑了全局常量数组
         tmp_val = builder->create_load(tmp_val);
     }
@@ -619,9 +757,9 @@ void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
     auto nowfunc=builder->get_insert_block()->get_parent();
     if(node.op==SyntaxTree::BinaryCondOp::LAND ){//强行使用中间变量result存储and及or表达式计算结果
         Ptr<Value> rexp,lexp,result;
-        auto lexpBB_and = BasicBlock::create(module, "lexpBB_and", nowfunc);
-        auto rexpBB_and = BasicBlock::create(module, "rexpBB_and", nowfunc);
-        auto resultBB_and = BasicBlock::create(module, "resultBB_and", nowfunc);
+        auto lexpBB_and = BasicBlock::create(module, "lexpBB_and"+std::to_string(bb_num++), nowfunc);
+        auto rexpBB_and = BasicBlock::create(module, "rexpBB_and"+std::to_string(bb_num++), nowfunc);
+        auto resultBB_and = BasicBlock::create(module, "resultBB_and"+std::to_string(bb_num++), nowfunc);
         result=builder->create_alloca(INT1_T);
         builder->create_br(lexpBB_and);
         builder->set_insert_point(lexpBB_and);
@@ -653,9 +791,9 @@ void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
     }
     else if(node.op==SyntaxTree::BinaryCondOp::LOR){
         Ptr<Value> rexp,lexp,result;
-        auto lexpBB_or = BasicBlock::create(module, "lexpBB_or", nowfunc);
-        auto rexpBB_or = BasicBlock::create(module, "rexpBB_or", nowfunc);
-        auto resultBB_or = BasicBlock::create(module, "resultBB_or", nowfunc);
+        auto lexpBB_or = BasicBlock::create(module, "lexpBB_or"+std::to_string(bb_num++), nowfunc);
+        auto rexpBB_or = BasicBlock::create(module, "rexpBB_or"+std::to_string(bb_num++), nowfunc);
+        auto resultBB_or = BasicBlock::create(module, "resultBB_or"+std::to_string(bb_num++), nowfunc);
         result=builder->create_alloca(INT1_T);
         builder->create_br(lexpBB_or);
         builder->set_insert_point(lexpBB_or);
@@ -889,10 +1027,22 @@ void IRBuilder::visit(SyntaxTree::UnaryExpr &node) {
     if(tmp_val) {
         if(node.op == SyntaxTree::UnaryOp::MINUS) {
             if(tmp_val->get_type()->is_integer_type()) {
-                tmp_val = builder->create_isub(tmp_val, CONST_INT(0));
+                if(dynamic_pointer_cast<ConstantInt>(tmp_val)) {
+                    auto int_val = std::dynamic_pointer_cast<ConstantInt>(tmp_val);
+                    tmp_val = CONST_INT(-int_val->get_value());
+                }
+                else {
+                    tmp_val = builder->create_isub(CONST_INT(0), tmp_val);
+                }
             }
             else if(tmp_val->get_type()->is_float_type()) {
-                tmp_val = builder->create_fsub(tmp_val, CONST_INT(0));
+                if(dynamic_pointer_cast<ConstantFloat>(tmp_val)) {
+                    auto float_val = std::dynamic_pointer_cast<ConstantFloat>(tmp_val);
+                    tmp_val = CONST_FLOAT(-float_val->get_value());
+                }
+                else {
+                    tmp_val = builder->create_fsub(CONST_FLOAT(0), tmp_val);
+                }
             }
         }
     }
@@ -925,11 +1075,11 @@ void IRBuilder::visit(SyntaxTree::FuncCallStmt &node) {
 void IRBuilder::visit(SyntaxTree::IfStmt &node) {
     auto nowfunc=builder->get_insert_block()->get_parent();
     node.cond_exp->accept(*this);
-    Ptr<BasicBlock> trueBB = BasicBlock::create(module, "trueBB_if", nowfunc);    // true分支
+    Ptr<BasicBlock> trueBB = BasicBlock::create(module, "trueBB_if"+std::to_string(bb_num++), nowfunc);    // true分支
     Ptr<BasicBlock> falseBB = nullptr;
-    Ptr<BasicBlock> endBB = BasicBlock::create(module, "endBB_if", nowfunc);
+    Ptr<BasicBlock> endBB = BasicBlock::create(module, "endBB_if"+std::to_string(bb_num++), nowfunc);
     if(node.else_statement.get()!=NULL){
-        falseBB=BasicBlock::create(module, "falseBB_if", nowfunc);  // false分支
+        falseBB=BasicBlock::create(module, "falseBB_if"+std::to_string(bb_num++), nowfunc);  // false分支
     }
     if(node.else_statement.get()!=NULL)
         builder->create_cond_br(tmp_val, trueBB, falseBB);
@@ -952,9 +1102,9 @@ void IRBuilder::visit(SyntaxTree::WhileStmt &node) {
     Ptr<BasicBlock> While_body_store=While_body;
     Ptr<BasicBlock> While_end_store=While_end;
     auto nowfunc=builder->get_insert_block()->get_parent();
-    While_cond=BasicBlock::create(module, "condBB_while", nowfunc);
-    While_body=BasicBlock::create(module, "bodyBB_while", nowfunc);
-    While_end=BasicBlock::create(module, "endBB_while", nowfunc);
+    While_cond=BasicBlock::create(module, "condBB_while"+std::to_string(bb_num++), nowfunc);
+    While_body=BasicBlock::create(module, "bodyBB_while"+std::to_string(bb_num++), nowfunc);
+    While_end=BasicBlock::create(module, "endBB_while"+std::to_string(bb_num++), nowfunc);
     builder->create_br(While_cond);
 
     builder->set_insert_point(While_cond);
@@ -974,7 +1124,7 @@ void IRBuilder::visit(SyntaxTree::WhileStmt &node) {
 
 void IRBuilder::visit(SyntaxTree::BreakStmt &node) {
     auto nowfunc=builder->get_insert_block()->get_parent();
-    Ptr<BasicBlock> after=BasicBlock::create(module, "afterBB_while", nowfunc);
+    Ptr<BasicBlock> after=BasicBlock::create(module, "afterBB_while"+std::to_string(bb_num++), nowfunc);
     builder->create_br(While_end);//这里插入跳转，要重开一个基本块
     builder->set_insert_point(after);
     tmp_val=nullptr;
@@ -982,7 +1132,7 @@ void IRBuilder::visit(SyntaxTree::BreakStmt &node) {
 
 void IRBuilder::visit(SyntaxTree::ContinueStmt &node) {
     auto nowfunc=builder->get_insert_block()->get_parent();
-    Ptr<BasicBlock> after=BasicBlock::create(module, "afterBB_while", nowfunc);
+    Ptr<BasicBlock> after=BasicBlock::create(module, "afterBB_while"+std::to_string(bb_num++), nowfunc);
     builder->create_br(While_cond);
     builder->set_insert_point(after);
     tmp_val=nullptr;

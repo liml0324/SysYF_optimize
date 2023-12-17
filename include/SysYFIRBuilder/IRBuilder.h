@@ -19,12 +19,14 @@ public:
     void enter() {
         name2var.push_back({});
         name2func.push_back({});
+        name2dim.push_back({});
     }
 
     // exit a scope
     void exit() {
         name2var.pop_back();
         name2func.pop_back();
+        name2dim.pop_back();
     }
 
     bool in_global() {
@@ -43,6 +45,11 @@ public:
         else{
             result = (name2var[name2var.size() - 1].insert({name, val})).second;
         }
+        return result;
+    }
+
+    bool pushDim(std::string name, PtrVec<ConstantInt> val) {
+        bool result = (name2dim[name2dim.size() - 1].insert({name, val})).second;
         return result;
     }
 
@@ -66,10 +73,21 @@ public:
         return nullptr;
     }
 
+    PtrVec<ConstantInt> findDim(std::string name) {
+        for (auto s = name2dim.rbegin(); s!= name2dim.rend();s++) {
+            auto iter = s->find(name);
+            if (iter != s->end()) {
+                return iter->second;
+            }
+        }
+        return PtrVec<ConstantInt>();
+    }
+
 
 private:
     std::vector<std::map<std::string, Ptr<Value> >> name2var;
     std::vector<std::map<std::string, Ptr<Value> >> name2func;
+    std::vector<std::map<std::string, PtrVec<ConstantInt> >> name2dim;
 };
 
 class IRBuilder: public SyntaxTree::Visitor
