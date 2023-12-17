@@ -1,0 +1,14 @@
+int main(){
+    int i=0,j=1,k=2;
+    float x=100,y=2,z=45;
+    if(i || j+1){
+        x=2;
+    }
+    if(x && k){
+        y=0;
+    }
+    if(-y+2 && (i || !x)){
+        z=3;
+    }
+    return z;
+}

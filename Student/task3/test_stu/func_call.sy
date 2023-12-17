@@ -1,0 +1,50 @@
+float f(float x){
+    return 
+}
+
+float Romberg(float a,float b,float ep,int n){
+	//输入的a，b为积分上下界，ep为误差，M为最大迭代次数，n为开始的梯形积分分段数，f是被积函数 
+	int i,k,j,M;float h,sum;float Rk[1000],Rk1[1000],temp[1000];
+    M=1000;
+	h=(b-a)/n;sum=0;
+	for(i=1;i<n;i++){//计算初值 
+		sum=sum+f(a+i*h);
+	}
+	Rk[0]=h*(f(a)/2+f(b)/2+sum);
+	//printf("Rk[0]=%lf\n",Rk[0]);
+    k=1;
+	while(k<M&&ab(Rk[k-1]-Rk1[k-2])>=ep){
+		//temp=Rk1;Rk1=Rk;Rk=temp;//更新向量 
+        k=0;
+        while(k<M){
+            temp[k]=Rk1[k];
+            k=k+1;
+        }
+        k=0;
+        while(k<M){
+            Rk1[k]=Rk[k];
+            k=k+1;
+        }
+        k=0;
+        while(k<M){
+            Rk[k]=temp[k];
+            k=k+1;
+        }
+		h=h/2;sum=0;
+        i=1;
+		while(i<=(1<<(k-1))*n){//插入点值 
+			sum=sum+f(a+(2*i-1)*h);
+            i=i+1;
+		}
+		//printf("i=%d,sum=%lf",i,sum);
+		Rk[0]=sum*h+Rk1[0]/2;sum=4;
+		for(j=1;j<=k;j++){//计算向量下一行 
+			Rk[j]=Rk[j-1]+(Rk[j-1]-Rk1[j-1])/(sum-1);
+			sum=sum*4;
+		}
+        k=k+1;
+	}
+	//printf("k=%d,M=%d,k/M=%lf\n",k,M,k*1.0/M);//测试k/M用代码 
+	sum=Rk[k-1];//返回值 
+	return sum;
+}

@@ -1078,6 +1078,12 @@ void IRBuilder::visit(SyntaxTree::FuncCallStmt &node) {
 void IRBuilder::visit(SyntaxTree::IfStmt &node) {
     auto nowfunc=builder->get_insert_block()->get_parent();
     node.cond_exp->accept(*this);
+    if(tmp_val->get_type()->is_integer_type() && tmp_val->get_type()->get_size() > 1) {
+        tmp_val = builder->create_icmp_ne(tmp_val, CONST_INT(0));
+    }
+    else if(tmp_val->get_type()->is_float_type()) {
+        tmp_val = builder->create_fcmp_ne(tmp_val, CONST_FLOAT(0));
+    }
     Ptr<BasicBlock> trueBB = BasicBlock::create(module, "trueBB_if"+std::to_string(bb_num++), nowfunc);    // true分支
     Ptr<BasicBlock> falseBB = nullptr;
     Ptr<BasicBlock> endBB = BasicBlock::create(module, "endBB_if"+std::to_string(bb_num++), nowfunc);
@@ -1112,6 +1118,12 @@ void IRBuilder::visit(SyntaxTree::WhileStmt &node) {
 
     builder->set_insert_point(While_cond);
     node.cond_exp->accept(*this);
+    if(tmp_val->get_type()->is_integer_type() && tmp_val->get_type()->get_size() > 1) {
+        tmp_val = builder->create_icmp_ne(tmp_val, CONST_INT(0));
+    }
+    else if(tmp_val->get_type()->is_float_type()) {
+        tmp_val = builder->create_fcmp_ne(tmp_val, CONST_FLOAT(0));
+    }
     builder->create_cond_br(tmp_val,While_body,While_end);
 
     builder->set_insert_point(While_body);
