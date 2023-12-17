@@ -189,7 +189,7 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
             node.initializers->accept(*this);//获取初始值
             auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[0]);//常量必然有初值，且初值必然为常数
             auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[0]);
-            if(scope.in_global()) {//全局变量
+            if(scope.in_global()) {//全局常量
                 if(node.btype == SyntaxTree::Type::INT) {//整型
                     if(float_val) {
                         tmp_val = CONST_INT((int)(float_val->get_value()));
@@ -209,7 +209,7 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
                     tmp_val = GlobalVariable::create(node.name, module, INT32_T, true, dynamic_pointer_cast<Constant>(tmp_val));
                 }
             }
-            else {//局部变量
+            else {//局部常量
                 if(node.btype == SyntaxTree::Type::INT) {//整型
                     if(float_val) {
                         tmp_val = CONST_INT((int)(float_val->get_value()));
@@ -327,7 +327,7 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
         scope.pushDim(node.name, array_len_vec);
         if(node.is_constant) {//数组常量
             node.initializers->accept(*this);
-            if(scope.in_global()) {//全局变量
+            if(scope.in_global()) {//全局常量
                 if(node.btype == SyntaxTree::Type::INT) {
                     auto array_type = ArrayType::get(INT32_T, array_len);
                     PtrVec<Constant> init_values;//创建全局数组时，必须全部用常量初始化
@@ -503,6 +503,7 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::LVal &node) {
+    std::cout << "LVal" << std::endl;
     auto lval = scope.find(node.name, false);//找到变量
     auto need_load = !is_assign;//如果不是赋值语句，那就需要load（即拿到lval的值）
     is_assign = false;//取消assign标记，否则如果出现a[n] = b这种赋值语句，会取得n的指针而非n的值
@@ -709,6 +710,7 @@ void IRBuilder::visit(SyntaxTree::EmptyStmt &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::ExprStmt &node) {
+    std::cout << "ExprStmt" << std::endl;
     // 
     // using namespace SyntaxTree;
     // auto UnaryCondExprptr=dynamic_pointer_cast<UnaryCondExpr>(node.exp);
@@ -739,21 +741,22 @@ void IRBuilder::visit(SyntaxTree::ExprStmt &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::UnaryCondExpr &node) {//可能存在问题，暂时先这样写
+    std::cout << "UnaryCondExpr" << std::endl;
     node.rhs->accept(*this);
     if(tmp_val->get_type()->is_integer_type() && tmp_val->get_type()->get_size() > 1) {
-        tmp_val = builder->create_icmp_ne(tmp_val, CONST_INT(0));
+        tmp_val = builder->create_icmp_eq(tmp_val, CONST_INT(0));
     }
     else if(tmp_val->get_type()->is_float_type()) {
-        tmp_val = builder->create_fcmp_ne(tmp_val, CONST_FLOAT(0));
+        tmp_val = builder->create_fcmp_eq(tmp_val, CONST_FLOAT(0));
     }
     else {//bool
         tmp_val = builder->create_zext(tmp_val, INT32_T);
-        tmp_val = builder->create_icmp_ne(tmp_val, CONST_INT(0));
+        tmp_val = builder->create_icmp_eq(tmp_val, CONST_INT(0));
     }
 }
 
 void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
-    
+    std::cout << "BinaryCondExpr" << std::endl;
     auto nowfunc=builder->get_insert_block()->get_parent();
     if(node.op==SyntaxTree::BinaryCondOp::LAND ){//强行使用中间变量result存储and及or表达式计算结果
         Ptr<Value> rexp,lexp,result;
@@ -1022,7 +1025,7 @@ void IRBuilder::visit(SyntaxTree::BinaryExpr &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::UnaryExpr &node) {
-    
+    std::cout << "UnaryExpr" << std::endl;
     node.rhs->accept(*this);
     if(tmp_val) {
         if(node.op == SyntaxTree::UnaryOp::MINUS) {

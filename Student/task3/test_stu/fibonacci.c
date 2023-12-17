@@ -20,7 +20,7 @@ void matrix_mul(int a[][2], int b[][2], int c[][2]) {
 }
 
 int main() {
-    int n = 10;
+    int n = 10000;
     n = n - 2;
     int i, max = 0, mask;
     i = 0;
