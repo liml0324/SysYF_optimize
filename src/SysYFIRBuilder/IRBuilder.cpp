@@ -11,8 +11,8 @@ namespace IR
 // to store state
 bool is_assign;//只有赋值语句需要真正的“左值”
 PtrVec<Value> initValues;//初值列表，为数组准备的
-int initValNum;
-int initValDepth;
+int initValNum; // 这一个InitVal节点内得到的初始值的数量
+int initValDepth; // 当前InitVal深度
 PtrVec<ConstantInt> array_len_vec;//数组长度列表
 PtrVec<SyntaxTree::FuncParam> func_params;//函数参数列表
 Ptr<Value> func_ret_val;//函数返回值（的指针），return时把返回值store到里面
@@ -49,7 +49,7 @@ void IRBuilder::visit(SyntaxTree::Assembly &node) {
 
 void IRBuilder::visit(SyntaxTree::InitVal &node) {
     int num = 0; // 这一个InitVal节点内得到的初始值的数量
-    int len = 1; // 这一层的数组长度
+    int len = 1; // 当前深度应该得到的初始值数目
     initValDepth++;
     for(int i = initValDepth-1; i <= (int)array_len_vec.size()-1; i++) {
         len *= array_len_vec[i]->get_value();
@@ -71,6 +71,7 @@ void IRBuilder::visit(SyntaxTree::InitVal &node) {
             else {
                 num += exp_num;
                 if(exp_num > 0 && exp_num < array_len_vec.back()->get_value()) {
+                    // 遇到像int a[2][3][2]={1,{1,2},1};的{1,{这种未对齐的情况，默认按最低维的长度对齐
                     for(int i = exp_num; i < array_len_vec.back()->get_value(); i++) {
                         initValues.push_back(CONST_INT(0));
                     }
@@ -88,7 +89,7 @@ void IRBuilder::visit(SyntaxTree::InitVal &node) {
             }
             num += array_len_vec.back()->get_value() - exp_num;
         }
-        for(int i = num; i < len; i++) {
+        for(int i = num; i < len; i++) {// 初始值数目不足，用0补齐
             initValues.push_back(CONST_INT(0));
             num++;
         }
