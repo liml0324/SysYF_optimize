@@ -11,6 +11,8 @@ namespace IR
 // to store state
 bool is_assign;//只有赋值语句需要真正的“左值”
 PtrVec<Value> initValues;//初值列表，为数组准备的
+int initValNum;
+int initValDepth;
 PtrVec<ConstantInt> array_len_vec;//数组长度列表
 PtrVec<SyntaxTree::FuncParam> func_params;//函数参数列表
 Ptr<Value> func_ret_val;//函数返回值（的指针），return时把返回值store到里面
@@ -46,34 +48,58 @@ void IRBuilder::visit(SyntaxTree::Assembly &node) {
 // You need to fill them
 
 void IRBuilder::visit(SyntaxTree::InitVal &node) {
+    int num = 0; // 这一个InitVal节点内得到的初始值的数量
+    int len = 1; // 这一层的数组长度
+    initValDepth++;
+    for(int i = initValDepth-1; i <= (int)array_len_vec.size()-1; i++) {
+        len *= array_len_vec[i]->get_value();
+    }
     if(node.isExp) {
         node.expr->accept(*this);
         if(tmp_val) {
             initValues.push_back(tmp_val);
         }
+        initValNum = 1;
     } 
     else {
         int exp_num = 0;
         for(auto &init_val : node.elementList) {
             if(init_val->isExp) {
                 exp_num++;
+                init_val->accept(*this);
             }
             else {
+                num += exp_num;
                 if(exp_num > 0 && exp_num < array_len_vec.back()->get_value()) {
                     for(int i = exp_num; i < array_len_vec.back()->get_value(); i++) {
                         initValues.push_back(CONST_INT(0));
                     }
+                    num += array_len_vec.back()->get_value() - exp_num;
                 }
                 exp_num = 0;
+                init_val->accept(*this);
+                num += initValNum;
             }
-            init_val->accept(*this);
         }
+        num += exp_num;
         if(exp_num > 0 && exp_num < array_len_vec.back()->get_value()) {
             for(int i = exp_num; i < array_len_vec.back()->get_value(); i++) {
                 initValues.push_back(CONST_INT(0));
             }
+            num += array_len_vec.back()->get_value() - exp_num;
+        }
+        for(int i = num; i < len; i++) {
+            initValues.push_back(CONST_INT(0));
+            num++;
+        }
+        initValNum = num;
+    }
+    if(initValDepth == 1) {
+        for(int i = initValues.size()-1; i > len-1; i--) {// 把多余的初始值删掉
+            initValues.pop_back();
         }
     }
+    initValDepth--;
 }
 
 void IRBuilder::visit(SyntaxTree::FuncDef &node) {
