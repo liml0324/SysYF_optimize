@@ -859,6 +859,12 @@ void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
         lexp=tmp_val;
         node.rhs->accept(*this);
         rexp=tmp_val;
+        if(lexp->get_type()->is_integer_type() && lexp->get_type()->get_size()==1) {
+            lexp = builder->create_zext(tmp_val, INT32_T);
+        }
+        if(rexp->get_type()->is_integer_type() && rexp->get_type()->get_size()==1) {
+            rexp = builder->create_zext(tmp_val, INT32_T);
+        }
         if(lexp->get_type()->get_type_id()!=rexp->get_type()->get_type_id()){
             if(lexp->get_type()->is_integer_type()){
                 lexp=builder->create_sitofp(lexp,FLOAT_T);
@@ -991,6 +997,12 @@ void IRBuilder::visit(SyntaxTree::BinaryExpr &node) {
         }   
     }
     else {
+        if(lexp->get_type()->is_integer_type() && lexp->get_type()->get_size()==1) {
+            lexp = builder->create_zext(tmp_val, INT32_T);
+        }
+        if(rexp->get_type()->is_integer_type() && rexp->get_type()->get_size()==1) {
+            rexp = builder->create_zext(tmp_val, INT32_T);
+        }
         if(lexp->get_type()->get_type_id()!=rexp->get_type()->get_type_id()){//强制类型转换
             if(lexp->get_type()->is_integer_type()){
                 lexp=builder->create_sitofp(lexp,FLOAT_T);
