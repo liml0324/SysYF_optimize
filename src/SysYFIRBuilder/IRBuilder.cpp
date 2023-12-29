@@ -1055,6 +1055,9 @@ void IRBuilder::visit(SyntaxTree::UnaryExpr &node) {
     
     node.rhs->accept(*this);
     if(tmp_val) {
+        if(tmp_val->get_type()->is_integer_type() && tmp_val->get_type()->get_size()==1) {
+            tmp_val = builder->create_zext(tmp_val, INT32_T);
+        }
         if(node.op == SyntaxTree::UnaryOp::MINUS) {
             if(tmp_val->get_type()->is_integer_type()) {
                 if(dynamic_pointer_cast<ConstantInt>(tmp_val)) {
