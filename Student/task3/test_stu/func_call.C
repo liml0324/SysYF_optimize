@@ -1,4 +1,4 @@
-// #include <stdio.h>
+ //#include <stdio.h>
 
 float f(float x){
     return x+1;
@@ -11,7 +11,7 @@ float ab(float x){//绝对值函数
 }
 
 int times_power2(int x,int p){
-	while(p){
+	while(p>0){
 		x=x*2;
 		p=p-1;
 	}
@@ -21,7 +21,7 @@ int times_power2(int x,int p){
 float Romberg(float a,float b,float ep,int n){
 	//输入的a，b为积分上下界，ep为误差，M为最大迭代次数，n为开始的梯形积分分段数，f是被积函数 
 	int i,k,j,M;float h,sum;float Rk[1000],Rk1[1000],temp[1000];
-    M=10;
+    M=1000;
 	h=(b-a)/n;sum=0;
 	i = 1;
 	while(i<n){//计算初值 
@@ -33,20 +33,20 @@ float Romberg(float a,float b,float ep,int n){
     k=1;
 	while(k<M&&ab(Rk[k-1]-Rk1[k-2])>=ep){
 		//temp=Rk1;Rk1=Rk;Rk=temp;//更新向量 
-        k=0;
-        while(k<M){
-            temp[k]=Rk1[k];
-            k=k+1;
+        i=0;
+        while(i<M){
+            temp[i]=Rk1[i];
+            i=i+1;
         }
-        k=0;
-        while(k<M){
-            Rk1[k]=Rk[k];
-            k=k+1;
+        i=0;
+        while(i<M){
+            Rk1[i]=Rk[i];
+            i=i+1;
         }
-        k=0;
-        while(k<M){
-            Rk[k]=temp[k];
-            k=k+1;
+        i=0;
+        while(i<M){
+            Rk[i]=temp[i];
+            i=i+1;
         }
 		h=h/2;sum=0;
         i=1;
@@ -70,8 +70,9 @@ float Romberg(float a,float b,float ep,int n){
 }
 
 int main(){
-	// float a = Romberg(0,10,0.0001,4);
-	// printf("%f", a);
+	 //float a = Romberg(0,10,0.0001,4);
+	 //printf("%f", a);
 	int a = Romberg(0,10,0.01,4);
-	return a % 256;
+	
+	return a%256;
 }
