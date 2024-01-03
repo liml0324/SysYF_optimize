@@ -12,11 +12,17 @@ void Mem2Reg::execute(){
         lvalue_connection.clear();
         no_union_set.clear();
         insideBlockForwarding();
+        
         genPhi();
+        
         module->set_print_name();
+        
         valueDefineCounting();
+        
         valueForwarding(func_->get_entry_block());
+        
         removeAlloc();
+        
     }
 }
 
@@ -98,14 +104,20 @@ void Mem2Reg::genPhi(){
 
     std::map<Ptr<BasicBlock>, std::set<Ptr<Value>>> bb_phi_list;
 
+    
     for(auto var: globals){
+        
         auto define_bbs = defined_in_block.find(var)->second;
+        
         PtrVec<BasicBlock> queue;
         queue.assign(define_bbs.begin(), define_bbs.end());
         int iter_pointer = 0;
         for(; iter_pointer < queue.size(); iter_pointer++){
+            
             for(auto bb_domfront: queue[iter_pointer]->get_dom_frontier()){
+                
                 if(bb_phi_list.find(bb_domfront) != bb_phi_list.end()){
+                    
                     auto phis = bb_phi_list.find(bb_domfront);
                     if(phis->second.find(var) == phis->second.end()){
                         phis->second.insert(var);
@@ -117,10 +129,11 @@ void Mem2Reg::genPhi(){
                     }
                 }
                 else{
+                    
                     auto newphi = PhiInst::create_phi(var->get_type()->get_pointer_element_type(), 
                             bb_domfront);
                     newphi->set_lval(var);
-                    bb_domfront->add_instr_begin(newphi);                  
+                    bb_domfront->add_instr_begin(newphi);            
                     queue.push_back(bb_domfront);
                     bb_phi_list.insert({bb_domfront, {var}});
                 }
@@ -197,12 +210,12 @@ void Mem2Reg::valueForwarding(Ptr<BasicBlock> bb){
                         phi->add_phi_pair_operand(new_value, bb);
                     }
                     else{
-                        //std::cout << "undefined value used: " << lvalue->get_name() << "\n";
+                        //
                         // exit(-1);
                     }
                 }
                 else{
-                    //std::cout << "undefined value used: " << lvalue->get_name() << "\n";
+                    //
                     // exit(-1);
                 }
             }
@@ -259,7 +272,7 @@ void Mem2Reg::phiStatistic(){
             if(!inst->is_phi())continue;
             auto phi_value = dynamic_pointer_cast<Value>(inst);
 #ifdef DEBUG
-            std::cout << "phi find: " << phi_value->print() << "\n";
+            
 #endif
             Ptr<Value> reduced_value;
             if(value_map.find(phi_value) != value_map.end()){
@@ -277,8 +290,8 @@ void Mem2Reg::phiStatistic(){
                     auto opr_reduced_value = value_map.find(opr)->second;
                     if(opr_reduced_value != reduced_value){
 #ifdef DEBUG
-                        std::cout << "conflict! " << opr->get_name() << " -> " << opr_reduced_value->get_name();
-                        std::cout << " " << phi_value->get_name() << " -> " << reduced_value->get_name() << "\n";
+                        
+                        
 #endif
                     }
                 }
@@ -287,8 +300,8 @@ void Mem2Reg::phiStatistic(){
                         auto bounded_lval = lvalue_connection.find(opr)->second;
                         if(bounded_lval != reduced_value){
 #ifdef DEBUG
-                            std::cout << "conflict! " << opr->get_name() << " -> " << bounded_lval->get_name();
-                            std::cout << " " << phi_value->get_name() << " -> " << reduced_value->get_name() << "\n";
+                            
+                            
 #endif
                         }
                         else{

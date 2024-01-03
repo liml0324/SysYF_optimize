@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
     bool av = false;
 
     std::string filename = "testcase.sy";
+    // std::string filename = "../Student/task3/test/10_if.sy";
     std::string output_llvm_file = "testcase.ll";
     for (int i = 1; i < argc; ++i) {
         if (argv[i] == std::string("-h") || argv[i] == std::string("--help")) {
@@ -70,6 +71,7 @@ int main(int argc, char *argv[])
         m->set_file_name(filename);
         m->set_print_name();
         if(optimize) {
+            // std::cout << "Optimizing..." << std::endl;
             PassMgr passmgr(m);
             passmgr.addPass<DominateTree>();
             passmgr.addPass<Mem2Reg>();
