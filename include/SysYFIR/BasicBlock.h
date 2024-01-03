@@ -69,6 +69,22 @@ public:
     
     virtual std::string print() override;
 
+        /****************api about dominate tree****************/
+    void set_idom(Ptr<BasicBlock> bb){idom_ = bb;}
+    Ptr<BasicBlock> get_idom(){return idom_;}
+    void add_dom_frontier(Ptr<BasicBlock> bb){dom_frontier_.insert(bb);}
+    void add_rdom_frontier(Ptr<BasicBlock> bb){rdom_frontier_.insert(bb);}
+    void clear_rdom_frontier(){rdom_frontier_.clear();}
+    auto add_rdom(Ptr<BasicBlock> bb){return rdoms_.insert(bb);}
+    void clear_rdom(){rdoms_.clear();}
+    PtrSet<BasicBlock> &get_dom_frontier(){return dom_frontier_;}
+    PtrSet<BasicBlock> &get_rdom_frontier(){return rdom_frontier_;}
+    PtrSet<BasicBlock> &get_rdoms(){return rdoms_;}
+    void set_live_in(PtrSet<Value> in){live_in = in;}
+    void set_live_out(PtrSet<Value> out){live_out = out;}
+    PtrSet<Value>& get_live_in(){return live_in;}
+    PtrSet<Value>& get_live_out(){return live_out;}
+
 private:
     explicit BasicBlock(Ptr<Module> m, const std::string &name ,
                         Ptr<Function> parent );
@@ -78,6 +94,12 @@ private:
     PtrList<BasicBlock> succ_bbs_;
     PtrList<Instruction> instr_list_;
     Ptr<Function> parent_;
+    PtrSet<BasicBlock> dom_frontier_;
+    PtrSet<BasicBlock> rdom_frontier_;
+    PtrSet<BasicBlock> rdoms_;
+    Ptr<BasicBlock> idom_;
+    PtrSet<Value> live_in;
+    PtrSet<Value> live_out;
 };
 
 }

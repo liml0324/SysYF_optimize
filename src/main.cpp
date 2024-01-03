@@ -3,7 +3,12 @@
 #include "SysYFDriver.h"
 #include "SyntaxTreePrinter.h"
 #include "ErrorReporter.h"
+#include "Pass.h"
+#include "DominateTree.h"
+#include "Mem2Reg.h"
+#include "ActiveVar.h"
 
+using namespace SysYF::IR;
 
 void print_help(const std::string& exe_name) {
   std::cout << "Usage: " << exe_name
@@ -20,6 +25,9 @@ int main(int argc, char *argv[])
 
     bool print_ast = false;
     bool print_ir = false;
+    bool optimize = false;
+    bool optimize_all = false;
+    bool av = false;
 
     std::string filename = "testcase.sy";
     std::string output_llvm_file = "testcase.ll";
@@ -39,6 +47,16 @@ int main(int argc, char *argv[])
         else if (argv[i] == std::string("-o")){
             output_llvm_file = argv[++i];
         }
+        else if (argv[i] == std::string("-O2")){
+            optimize_all = true;
+            optimize = true;
+        }
+        else if (argv[i] == std::string("-O")){
+            optimize = true;
+        }
+        else if(argv[i] == std::string("-av")){
+            av = true;
+        }
         else {
             filename = argv[i];
         }
@@ -51,6 +69,23 @@ int main(int argc, char *argv[])
         auto m = builder->getModule();
         m->set_file_name(filename);
         m->set_print_name();
+        if(optimize) {
+            PassMgr passmgr(m);
+            passmgr.addPass<DominateTree>();
+            passmgr.addPass<Mem2Reg>();
+            // if(optimize_all){
+            //     passmgr.addPass<ActiveVar>();
+            //     //  ...
+            // }
+            // else {
+            //     if(av){
+            //         passmgr.addPass<ActiveVar>();
+            //     }
+            //     //  ...
+            // }
+            passmgr.execute();
+            m->set_print_name();
+        }
         auto IR = m->print();
         std::ofstream output_stream;
         output_stream.open(output_llvm_file, std::ios::out);
