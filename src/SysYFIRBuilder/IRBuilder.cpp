@@ -33,6 +33,16 @@ Ptr<Type> INT32PTR_T;
 Ptr<Type> FLOATPTR_T;
 
 
+struct true_false_BB {
+    Ptr<BasicBlock> trueBB = nullptr;
+    Ptr<BasicBlock> falseBB = nullptr;
+};
+std::list<true_false_BB> IF_While_And_Cond_Stack;  // used for Cond
+std::list<true_false_BB> IF_While_Or_Cond_Stack;   // used for Cond
+std::list<true_false_BB> While_Stack;              // used for break and continue
+// used for backpatching
+PtrVec<BasicBlock> cur_basic_block_list;
+
 void IRBuilder::visit(SyntaxTree::Assembly &node) {
     VOID_T = Type::get_void_type(module);
     INT1_T = Type::get_int1_type(module);
@@ -728,6 +738,8 @@ void IRBuilder::visit(SyntaxTree::BlockStmt &node) {
     scope.enter();
     for(auto &stm:node.body){
         stm->accept(*this);
+        if(builder->get_insert_block()->get_terminator() != nullptr)
+            break;
     }
     scope.exit();
 }
@@ -784,74 +796,50 @@ void IRBuilder::visit(SyntaxTree::UnaryCondExpr &node) {//可能存在问题，�
 
 void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
     
+    Ptr<CmpInst> cond_val;
+    Ptr<FCmpInst> f_cond_val;
     auto nowfunc=builder->get_insert_block()->get_parent();
     if(node.op==SyntaxTree::BinaryCondOp::LAND ){//强行使用中间变量result存储and及or表达式计算结果
-        Ptr<Value> rexp,lexp,result;
-        auto lexpBB_and = BasicBlock::create(module, "lexpBB_and"+std::to_string(bb_num++), nowfunc);
-        auto rexpBB_and = BasicBlock::create(module, "rexpBB_and"+std::to_string(bb_num++), nowfunc);
-        auto resultBB_and = BasicBlock::create(module, "resultBB_and"+std::to_string(bb_num++), nowfunc);
-        result=builder->create_alloca(INT1_T);
-        builder->create_br(lexpBB_and);
-        builder->set_insert_point(lexpBB_and);
+        auto trueBB = BasicBlock::create(module, "trueBB_and"+std::to_string(bb_num++), nowfunc);
+        IF_While_And_Cond_Stack.push_back({trueBB, IF_While_Or_Cond_Stack.back().falseBB});
         node.lhs->accept(*this);
-        lexp=tmp_val;
-        // auto lint=dynamic_pointer_cast<IntegerType>(lexp->get_type());
-        if(lexp->get_type()->is_float_type()){//判断lexp返回类型
-            lexp=builder->create_fcmp_ne(lexp, CONST_FLOAT(0));
+        IF_While_And_Cond_Stack.pop_back();
+        cond_val = dynamic_pointer_cast<CmpInst>(tmp_val);
+        f_cond_val = dynamic_pointer_cast<FCmpInst>(tmp_val);
+        if (tmp_val->get_type()->is_integer_type() || cond_val != nullptr) {
+            if (cond_val == nullptr) {
+                cond_val = builder->create_icmp_ne(tmp_val, CONST_INT(0));
+            }
+            builder->create_cond_br(cond_val, trueBB, IF_While_Or_Cond_Stack.back().falseBB);
+        } else if (tmp_val->get_type()->is_float_type() || f_cond_val != nullptr) {
+            if (f_cond_val == nullptr) {
+                f_cond_val = builder->create_fcmp_ne(tmp_val, CONST_FLOAT(0));
+            }
+            builder->create_cond_br(f_cond_val, trueBB, IF_While_Or_Cond_Stack.back().falseBB);
         }
-        else if(lexp->get_type()->is_integer_type() && lexp->get_type()->get_size() > 1){
-            lexp=builder->create_icmp_ne(lexp, CONST_INT(0));
-        }
-        builder->create_store(lexp,result);
-        builder->create_cond_br(lexp,rexpBB_and,resultBB_and);
-        builder->set_insert_point(rexpBB_and);
+        builder->set_insert_point(trueBB);
         node.rhs->accept(*this);
-        rexp=tmp_val;
-        // auto rint=dynamic_pointer_cast<IntegerType>(rexp->get_type());
-        if(rexp->get_type()->is_float_type()){
-            rexp=builder->create_fcmp_ne(rexp, CONST_FLOAT(0));
-        }
-        else if(rexp->get_type()->is_integer_type() && rexp->get_type()->get_size() > 1){
-            rexp=builder->create_icmp_ne(rexp, CONST_INT(0));
-        }
-        builder->create_store(rexp,result);
-        builder->create_br(resultBB_and);
-        builder->set_insert_point(resultBB_and);
-        tmp_val=builder->create_load(result);
     }
     else if(node.op==SyntaxTree::BinaryCondOp::LOR){
-        Ptr<Value> rexp,lexp,result;
-        auto lexpBB_or = BasicBlock::create(module, "lexpBB_or"+std::to_string(bb_num++), nowfunc);
-        auto rexpBB_or = BasicBlock::create(module, "rexpBB_or"+std::to_string(bb_num++), nowfunc);
-        auto resultBB_or = BasicBlock::create(module, "resultBB_or"+std::to_string(bb_num++), nowfunc);
-        result=builder->create_alloca(INT1_T);
-        builder->create_br(lexpBB_or);
-        builder->set_insert_point(lexpBB_or);
+        auto falseBB = BasicBlock::create(module, "trueBB_or"+std::to_string(bb_num++), nowfunc);
+        IF_While_Or_Cond_Stack.push_back({IF_While_Or_Cond_Stack.back().trueBB, falseBB});
         node.lhs->accept(*this);
-        lexp=tmp_val;
-        // auto lint=dynamic_pointer_cast<IntegerType>(lexp->get_type());
-        if(lexp->get_type()->is_float_type()){//判断lexp返回类型
-            lexp=builder->create_fcmp_ne(lexp, CONST_FLOAT(0));
+        IF_While_Or_Cond_Stack.pop_back();
+        cond_val = dynamic_pointer_cast<CmpInst>(tmp_val);
+        f_cond_val = dynamic_pointer_cast<FCmpInst>(tmp_val);
+        if (tmp_val->get_type()->is_integer_type() || cond_val != nullptr) {
+            if (cond_val == nullptr) {
+                cond_val = builder->create_icmp_ne(tmp_val, CONST_INT(0));
+            }
+            builder->create_cond_br(cond_val, IF_While_Or_Cond_Stack.back().trueBB, falseBB);
+        } else if (tmp_val->get_type()->is_float_type() || f_cond_val != nullptr) {
+            if (f_cond_val == nullptr) {
+                f_cond_val = builder->create_fcmp_ne(tmp_val, CONST_FLOAT(0));
+            }
+            builder->create_cond_br(f_cond_val, IF_While_Or_Cond_Stack.back().trueBB, falseBB);
         }
-        else if(lexp->get_type()->is_integer_type() && lexp->get_type()->get_size() > 1){
-            lexp=builder->create_icmp_ne(lexp, CONST_INT(0));
-        }
-        builder->create_store(lexp,result);
-        builder->create_cond_br(lexp,resultBB_or,rexpBB_or);
-        builder->set_insert_point(rexpBB_or);
+        builder->set_insert_point(falseBB);
         node.rhs->accept(*this);
-        rexp=tmp_val;
-        // auto rint=dynamic_pointer_cast<IntegerType>(rexp->get_type());
-        if(rexp->get_type()->is_float_type()){
-            rexp=builder->create_fcmp_ne(rexp, CONST_FLOAT(0));
-        }
-        else if(rexp->get_type()->is_integer_type() && rexp->get_type()->get_size() > 1){
-            rexp=builder->create_icmp_ne(rexp, CONST_INT(0));
-        }
-        builder->create_store(rexp,result);
-        builder->create_br(resultBB_or);
-        builder->set_insert_point(resultBB_or);
-        tmp_val=builder->create_load(result);
     }
     else{//其余表达式正常计算
         Ptr<Value> rexp,lexp;
@@ -1118,81 +1106,137 @@ void IRBuilder::visit(SyntaxTree::FuncCallStmt &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::IfStmt &node) {
-    auto nowfunc=builder->get_insert_block()->get_parent();
+    auto cur_fun = builder->get_insert_block()->get_parent();
+    auto trueBB = BasicBlock::create(module, "trueBB_If"+std::to_string(bb_num++), cur_fun);
+    auto falseBB = BasicBlock::create(module, "falseBB_If"+std::to_string(bb_num++), cur_fun);
+    auto nextBB = BasicBlock::create(module, "nextBB_If"+std::to_string(bb_num++), cur_fun);
+    IF_While_Or_Cond_Stack.push_back({nullptr, nullptr});
+    IF_While_Or_Cond_Stack.back().trueBB = trueBB;
+    if (node.else_statement == nullptr) {
+        IF_While_Or_Cond_Stack.back().falseBB = nextBB;
+    } else {
+        IF_While_Or_Cond_Stack.back().falseBB = falseBB;
+    }
     node.cond_exp->accept(*this);
-    if(tmp_val->get_type()->is_integer_type() && tmp_val->get_type()->get_size() > 1) {
-        tmp_val = builder->create_icmp_ne(tmp_val, CONST_INT(0));
+    IF_While_Or_Cond_Stack.pop_back();
+    auto ret_val = tmp_val;
+    auto cond_val = dynamic_pointer_cast<CmpInst>(ret_val);
+    auto f_cond_val = dynamic_pointer_cast<FCmpInst>(ret_val);
+    Ptr<Value> cond;
+    if (cond_val == nullptr && f_cond_val == nullptr) {
+        if (tmp_val->get_type()->is_integer_type()) {
+            cond_val = builder->create_icmp_ne(tmp_val, CONST_INT(0));
+        } else if (tmp_val->get_type()->is_float_type()) {
+            f_cond_val = builder->create_fcmp_ne(tmp_val, CONST_FLOAT(0));
+        }
     }
-    else if(tmp_val->get_type()->is_float_type()) {
-        tmp_val = builder->create_fcmp_ne(tmp_val, CONST_FLOAT(0));
+    if (cond_val != nullptr) {
+        cond = cond_val;
+    } else {
+        cond = f_cond_val;
     }
-    Ptr<BasicBlock> trueBB = BasicBlock::create(module, "trueBB_if"+std::to_string(bb_num++), nowfunc);    // true分支
-    Ptr<BasicBlock> falseBB = nullptr;
-    Ptr<BasicBlock> endBB = BasicBlock::create(module, "endBB_if"+std::to_string(bb_num++), nowfunc);
-    if(node.else_statement.get()!=NULL){
-        falseBB=BasicBlock::create(module, "falseBB_if"+std::to_string(bb_num++), nowfunc);  // false分支
+    if (node.else_statement == nullptr) {
+        builder->create_cond_br(cond, trueBB, nextBB);
+    } else {
+        builder->create_cond_br(cond, trueBB, falseBB);
     }
-    if(node.else_statement.get()!=NULL)
-        builder->create_cond_br(tmp_val, trueBB, falseBB);
-    else
-        builder->create_cond_br(tmp_val, trueBB, endBB);
+    // cur_basic_block_list.pop_back();
     builder->set_insert_point(trueBB);
-    node.if_statement->accept(*this);
-    builder->create_br(endBB);
-    if(node.else_statement.get()!=NULL){
-        builder->set_insert_point(falseBB);
-        node.else_statement->accept(*this);
-        builder->create_br(endBB);
+    // cur_basic_block_list.push_back(trueBB);
+    if (dynamic_pointer_cast<SyntaxTree::BlockStmt>(node.if_statement)) {
+        node.if_statement->accept(*this);
+    } else {
+        scope.enter();
+        node.if_statement->accept(*this);
+        scope.exit();
     }
-    builder->set_insert_point(endBB);
-    tmp_val=nullptr;
+
+    if (builder->get_insert_block()->get_terminator() == nullptr) {
+        builder->create_br(nextBB);
+    }
+    // cur_basic_block_list.pop_back();
+
+    if (node.else_statement == nullptr) {
+        falseBB->erase_from_parent();
+    } else {
+        builder->set_insert_point(falseBB);
+        // cur_basic_block_list.push_back(falseBB);
+        if (dynamic_pointer_cast<SyntaxTree::BlockStmt>(node.else_statement)) {
+            node.else_statement->accept(*this);
+        } else {
+            scope.enter();
+            node.else_statement->accept(*this);
+            scope.exit();
+        }
+        if (builder->get_insert_block()->get_terminator() == nullptr) {
+            builder->create_br(nextBB);
+        }
+        // cur_basic_block_list.pop_back();
+    }
+
+    builder->set_insert_point(nextBB);
+    // cur_basic_block_list.push_back(nextBB);
+    if (nextBB->get_pre_basic_blocks().size() == 0) {
+        builder->set_insert_point(trueBB);
+        nextBB->erase_from_parent();
+    }
 }
 
 void IRBuilder::visit(SyntaxTree::WhileStmt &node) {
-    Ptr<BasicBlock> While_cond_store=While_cond;
-    Ptr<BasicBlock> While_body_store=While_body;
-    Ptr<BasicBlock> While_end_store=While_end;
-    auto nowfunc=builder->get_insert_block()->get_parent();
-    While_cond=BasicBlock::create(module, "condBB_while"+std::to_string(bb_num++), nowfunc);
-    While_body=BasicBlock::create(module, "bodyBB_while"+std::to_string(bb_num++), nowfunc);
-    While_end=BasicBlock::create(module, "endBB_while"+std::to_string(bb_num++), nowfunc);
-    builder->create_br(While_cond);
-
-    builder->set_insert_point(While_cond);
+    auto cur_fun = builder->get_insert_block()->get_parent();
+    auto whileBB = BasicBlock::create(module, "whileBB"+std::to_string(bb_num++), cur_fun);
+    auto trueBB = BasicBlock::create(module, "trueBB_While"+std::to_string(bb_num++), cur_fun);
+    auto nextBB = BasicBlock::create(module, "nextBB_While"+std::to_string(bb_num++), cur_fun);
+    While_Stack.push_back({whileBB, nextBB});
+    if (builder->get_insert_block()->get_terminator() == nullptr) {
+        builder->create_br(whileBB);
+    }
+    // cur_basic_block_list.pop_back();
+    builder->set_insert_point(whileBB);
+    IF_While_Or_Cond_Stack.push_back({trueBB, nextBB});
     node.cond_exp->accept(*this);
-    if(tmp_val->get_type()->is_integer_type() && tmp_val->get_type()->get_size() > 1) {
-        tmp_val = builder->create_icmp_ne(tmp_val, CONST_INT(0));
+    IF_While_Or_Cond_Stack.pop_back();
+    auto ret_val = tmp_val;
+    auto cond_val = dynamic_pointer_cast<CmpInst>(ret_val);
+    auto f_cond_val = dynamic_pointer_cast<FCmpInst>(ret_val);
+    Ptr<Value> cond;
+    if (cond_val == nullptr && f_cond_val == nullptr) {
+        if (tmp_val->get_type()->is_integer_type()) {
+            cond_val = builder->create_icmp_ne(tmp_val, CONST_INT(0));
+        } else if (tmp_val->get_type()->is_float_type()) {
+            f_cond_val = builder->create_fcmp_ne(tmp_val, CONST_FLOAT(0));
+        }
     }
-    else if(tmp_val->get_type()->is_float_type()) {
-        tmp_val = builder->create_fcmp_ne(tmp_val, CONST_FLOAT(0));
+    if (cond_val != nullptr) {
+        cond = cond_val;
+    } else {
+        cond = f_cond_val;
     }
-    builder->create_cond_br(tmp_val,While_body,While_end);
-
-    builder->set_insert_point(While_body);
-    node.statement->accept(*this);
-    builder->create_br(While_cond);
-
-    builder->set_insert_point(While_end);
-    tmp_val=nullptr;
-    While_cond=While_cond_store;
-    While_body=While_body_store;
-    While_end=While_end_store;
+    builder->create_cond_br(cond, trueBB, nextBB);
+    builder->set_insert_point(trueBB);
+    // cur_basic_block_list.push_back(trueBB);
+    if (dynamic_pointer_cast<SyntaxTree::BlockStmt>(node.statement)) {
+        node.statement->accept(*this);
+    } else {
+        scope.enter();
+        node.statement->accept(*this);
+        scope.exit();
+    }
+    if (builder->get_insert_block()->get_terminator() == nullptr) {
+        builder->create_br(whileBB);
+    }
+    // cur_basic_block_list.pop_back();
+    builder->set_insert_point(nextBB);
+    // cur_basic_block_list.push_back(nextBB);
+    While_Stack.pop_back();
 }
 
 void IRBuilder::visit(SyntaxTree::BreakStmt &node) {
-    auto nowfunc=builder->get_insert_block()->get_parent();
-    Ptr<BasicBlock> after=BasicBlock::create(module, "afterBB_while"+std::to_string(bb_num++), nowfunc);
-    builder->create_br(While_end);//这里插入跳转，要重开一个基本块
-    builder->set_insert_point(after);
-    tmp_val=nullptr;
+    builder->create_br(While_Stack.back().falseBB);
 }
 
 void IRBuilder::visit(SyntaxTree::ContinueStmt &node) {
-    auto nowfunc=builder->get_insert_block()->get_parent();
-    Ptr<BasicBlock> after=BasicBlock::create(module, "afterBB_while"+std::to_string(bb_num++), nowfunc);
-    builder->create_br(While_cond);
-    builder->set_insert_point(after);
-    tmp_val=nullptr;
+    builder->create_br(While_Stack.back().trueBB);
 }
 }
 }

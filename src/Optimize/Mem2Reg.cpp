@@ -206,16 +206,17 @@ void Mem2Reg::valueForwarding(Ptr<BasicBlock> bb){
                 auto lvalue = phi->get_lval();
                 if(value_status.find(lvalue) != value_status.end()){
                     if(value_status.find(lvalue)->second.size() > 0){
-                        Ptr<Value> new_value = *(value_status.find(lvalue)->second.end() - 1);
+                        auto new_value = *(value_status.find(lvalue)->second.end() - 1);
+                        
                         phi->add_phi_pair_operand(new_value, bb);
                     }
                     else{
-                        //
+                        
                         // exit(-1);
                     }
                 }
                 else{
-                    //
+                    
                     // exit(-1);
                 }
             }
