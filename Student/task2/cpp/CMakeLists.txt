@@ -34,3 +34,11 @@ target_link_libraries(
   IRLib
 )
   
+add_executable(
+  test_generator
+  test.cpp
+)
+target_link_libraries(
+  test_generator
+  IRLib
+)

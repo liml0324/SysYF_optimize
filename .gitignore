@@ -2,3 +2,4 @@
 build/
 Student/test/
 a.out
+**/build/*

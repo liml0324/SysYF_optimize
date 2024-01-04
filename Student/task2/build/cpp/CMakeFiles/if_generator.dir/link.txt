@@ -1,1 +1,0 @@
-/usr/bin/c++  -O0 -Wall -g -pedantic CMakeFiles/if_generator.dir/if_gen.cpp.o -o ../if_generator  ../src/SysYFIR/libIRLib.a 

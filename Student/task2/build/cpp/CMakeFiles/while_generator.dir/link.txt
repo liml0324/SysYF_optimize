@@ -1,1 +1,0 @@
-/usr/bin/c++  -O0 -Wall -g -pedantic CMakeFiles/while_generator.dir/while_gen.cpp.o -o ../while_generator  ../src/SysYFIR/libIRLib.a 

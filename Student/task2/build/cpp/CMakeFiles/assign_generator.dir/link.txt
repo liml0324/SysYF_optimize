@@ -1,1 +1,0 @@
-/usr/bin/c++  -O0 -Wall -g -pedantic CMakeFiles/assign_generator.dir/assign_gen.cpp.o -o ../assign_generator  ../src/SysYFIR/libIRLib.a 

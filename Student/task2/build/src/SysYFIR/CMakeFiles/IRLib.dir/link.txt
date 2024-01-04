@@ -1,2 +1,0 @@
-/usr/bin/ar qc libIRLib.a CMakeFiles/IRLib.dir/Type.cpp.o CMakeFiles/IRLib.dir/User.cpp.o CMakeFiles/IRLib.dir/Value.cpp.o CMakeFiles/IRLib.dir/BasicBlock.cpp.o CMakeFiles/IRLib.dir/Constant.cpp.o CMakeFiles/IRLib.dir/Function.cpp.o CMakeFiles/IRLib.dir/GlobalVariable.cpp.o CMakeFiles/IRLib.dir/Instruction.cpp.o CMakeFiles/IRLib.dir/Module.cpp.o CMakeFiles/IRLib.dir/IRPrinter.cpp.o
-/usr/bin/ranlib libIRLib.a
