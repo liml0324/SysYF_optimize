@@ -738,13 +738,13 @@ PhiInst::PhiInst(OpID op, PtrVec<Value> vals, PtrVec<BasicBlock> val_bbs, Ptr<Ty
 
 void PhiInst::init(OpID op, PtrVec<Value> vals, PtrVec<BasicBlock> val_bbs, Ptr<Type> ty, Ptr<BasicBlock> bb)
 {
-    Instruction::init(ty, op, 2*vals.size());
+    this->set_parent(bb);
+    // Instruction::init(ty, op, 2*vals.size());
     for (unsigned int i = 0; i < vals.size(); i++)
     {
         set_operand(2*i, vals[i]);
         set_operand(2*i+1, val_bbs[i]);
     }
-    this->set_parent(bb);
 }
 
 Ptr<PhiInst> PhiInst::create_phi( Ptr<Type> ty, Ptr<BasicBlock> bb)

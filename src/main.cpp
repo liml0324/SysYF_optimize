@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
     bool print_ast = false;
     bool print_ir = false;
-    bool optimize = false;
+    bool optimize = true;
     bool optimize_all = false;
     bool av = false;
 
