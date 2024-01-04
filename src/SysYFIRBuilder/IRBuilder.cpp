@@ -180,7 +180,7 @@ void IRBuilder::visit(SyntaxTree::FuncDef &node) {
         builder->create_store(arg, param_ptr);// 保存传入的参数
         scope.push(param_name, param_ptr);
     }
-    retBB = BasicBlock::create(module, "retBB", func);
+    retBB = BasicBlock::create(module, "ret", func);
     is_func_body = true;// 标记当前基本块是函数体，这样在visit BlockStmt时就不会再enter
     node.body->accept(*this);
     is_func_body = false;
@@ -800,7 +800,7 @@ void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
     Ptr<FCmpInst> f_cond_val;
     auto nowfunc=builder->get_insert_block()->get_parent();
     if(node.op==SyntaxTree::BinaryCondOp::LAND ){//强行使用中间变量result存储and及or表达式计算结果
-        auto trueBB = BasicBlock::create(module, "trueBB_and"+std::to_string(bb_num++), nowfunc);
+        auto trueBB = BasicBlock::create(module, "", nowfunc);
         IF_While_And_Cond_Stack.push_back({trueBB, IF_While_Or_Cond_Stack.back().falseBB});
         node.lhs->accept(*this);
         IF_While_And_Cond_Stack.pop_back();
@@ -821,7 +821,7 @@ void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
         node.rhs->accept(*this);
     }
     else if(node.op==SyntaxTree::BinaryCondOp::LOR){
-        auto falseBB = BasicBlock::create(module, "trueBB_or"+std::to_string(bb_num++), nowfunc);
+        auto falseBB = BasicBlock::create(module, "", nowfunc);
         IF_While_Or_Cond_Stack.push_back({IF_While_Or_Cond_Stack.back().trueBB, falseBB});
         node.lhs->accept(*this);
         IF_While_Or_Cond_Stack.pop_back();
@@ -848,10 +848,10 @@ void IRBuilder::visit(SyntaxTree::BinaryCondExpr &node) {
         node.rhs->accept(*this);
         rexp=tmp_val;
         if(lexp->get_type()->is_integer_type() && lexp->get_type()->get_size()==1) {
-            lexp = builder->create_zext(tmp_val, INT32_T);
+            lexp = builder->create_zext(lexp, INT32_T);
         }
         if(rexp->get_type()->is_integer_type() && rexp->get_type()->get_size()==1) {
-            rexp = builder->create_zext(tmp_val, INT32_T);
+            rexp = builder->create_zext(rexp, INT32_T);
         }
         if(lexp->get_type()->get_type_id()!=rexp->get_type()->get_type_id()){
             if(lexp->get_type()->is_integer_type()){
@@ -986,10 +986,10 @@ void IRBuilder::visit(SyntaxTree::BinaryExpr &node) {
     }
     else {
         if(lexp->get_type()->is_integer_type() && lexp->get_type()->get_size()==1) {
-            lexp = builder->create_zext(tmp_val, INT32_T);
+            lexp = builder->create_zext(lexp, INT32_T);
         }
         if(rexp->get_type()->is_integer_type() && rexp->get_type()->get_size()==1) {
-            rexp = builder->create_zext(tmp_val, INT32_T);
+            rexp = builder->create_zext(rexp, INT32_T);
         }
         if(lexp->get_type()->get_type_id()!=rexp->get_type()->get_type_id()){//强制类型转换
             if(lexp->get_type()->is_integer_type()){
@@ -1107,9 +1107,9 @@ void IRBuilder::visit(SyntaxTree::FuncCallStmt &node) {
 
 void IRBuilder::visit(SyntaxTree::IfStmt &node) {
     auto cur_fun = builder->get_insert_block()->get_parent();
-    auto trueBB = BasicBlock::create(module, "trueBB_If"+std::to_string(bb_num++), cur_fun);
-    auto falseBB = BasicBlock::create(module, "falseBB_If"+std::to_string(bb_num++), cur_fun);
-    auto nextBB = BasicBlock::create(module, "nextBB_If"+std::to_string(bb_num++), cur_fun);
+    auto trueBB = BasicBlock::create(module, "", cur_fun);
+    auto falseBB = BasicBlock::create(module, "", cur_fun);
+    auto nextBB = BasicBlock::create(module, "", cur_fun);
     IF_While_Or_Cond_Stack.push_back({nullptr, nullptr});
     IF_While_Or_Cond_Stack.back().trueBB = trueBB;
     if (node.else_statement == nullptr) {
@@ -1184,9 +1184,9 @@ void IRBuilder::visit(SyntaxTree::IfStmt &node) {
 
 void IRBuilder::visit(SyntaxTree::WhileStmt &node) {
     auto cur_fun = builder->get_insert_block()->get_parent();
-    auto whileBB = BasicBlock::create(module, "whileBB"+std::to_string(bb_num++), cur_fun);
-    auto trueBB = BasicBlock::create(module, "trueBB_While"+std::to_string(bb_num++), cur_fun);
-    auto nextBB = BasicBlock::create(module, "nextBB_While"+std::to_string(bb_num++), cur_fun);
+    auto whileBB = BasicBlock::create(module, "", cur_fun);
+    auto trueBB = BasicBlock::create(module, "", cur_fun);
+    auto nextBB = BasicBlock::create(module, "", cur_fun);
     While_Stack.push_back({whileBB, nextBB});
     if (builder->get_insert_block()->get_terminator() == nullptr) {
         builder->create_br(whileBB);
