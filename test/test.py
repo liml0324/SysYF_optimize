@@ -90,7 +90,7 @@ if __name__ == "__main__":
                 ]
     # you can only modify this to add your testcase
 
-    optimization = "-O"     # -O0 -O1 -O2 -O3 -O4 -Ofast
+    optimization = "-O0"     # -O0 -O1 -O2 -O3 -O4 -Ofast
     fail_dirs = set()
     for TEST_BASE_PATH in TEST_DIRS:
         testcases = {}  # { name: need_input }
