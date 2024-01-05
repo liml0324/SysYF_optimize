@@ -211,12 +211,12 @@ void Mem2Reg::valueForwarding(Ptr<BasicBlock> bb){
                         phi->add_phi_pair_operand(new_value, bb);
                     }
                     else{
-                        
+                        // std::cout << "undefined value used: " << lvalue->get_name() << "\n";
                         // exit(-1);
                     }
                 }
                 else{
-                    
+                    // std::cout << "undefined value used: " << lvalue->get_name() << "\n";
                     // exit(-1);
                 }
             }

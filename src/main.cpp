@@ -75,16 +75,16 @@ int main(int argc, char *argv[])
             PassMgr passmgr(m);
             passmgr.addPass<DominateTree>();
             passmgr.addPass<Mem2Reg>();
-            // if(optimize_all){
-            //     passmgr.addPass<ActiveVar>();
-            //     //  ...
-            // }
-            // else {
-            //     if(av){
-            //         passmgr.addPass<ActiveVar>();
-            //     }
-            //     //  ...
-            // }
+            if(optimize_all){
+                passmgr.addPass<ActiveVar>();
+                //  ...
+            }
+            else {
+                if(av){
+                    passmgr.addPass<ActiveVar>();
+                }
+                //  ...
+            }
             passmgr.execute();
             m->set_print_name();
         }

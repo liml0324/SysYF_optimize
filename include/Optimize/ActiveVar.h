@@ -16,7 +16,7 @@ public:
     const std::string get_name() const override {return name;}
     void dump();
 private:
-    Ptr<Function>func_;
+    Ptr<Function> func_;
     const std::string name = "ActiveVar";
 };
 

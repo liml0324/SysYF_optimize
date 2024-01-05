@@ -1,5 +1,7 @@
- .vscode
+.vscode
 build/
 Student/test/
 a.out
 **/build/*
+active_var.out
+*_copy.*

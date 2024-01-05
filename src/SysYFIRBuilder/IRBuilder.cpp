@@ -13,6 +13,7 @@ bool is_assign;//只有赋值语句需要真正的“左值”
 PtrVec<Value> initValues;//初值列表，为数组准备的
 int initValNum; // 这一个InitVal节点内得到的初始值的数量
 int initValDepth; // 当前InitVal深度
+bool all_zero;//当前InitVal是否全为0
 PtrVec<ConstantInt> array_len_vec;//数组长度列表
 PtrVec<SyntaxTree::FuncParam> func_params;//函数参数列表
 Ptr<Value> func_ret_val;//函数返回值（的指针），return时把返回值store到里面
@@ -68,6 +69,17 @@ void IRBuilder::visit(SyntaxTree::InitVal &node) {
         node.expr->accept(*this);
         if(tmp_val) {
             initValues.push_back(tmp_val);
+        }
+        auto const_int = dynamic_pointer_cast<ConstantInt>(tmp_val);
+        auto const_float = dynamic_pointer_cast<ConstantFloat>(tmp_val);
+        if(const_int && const_int->get_value() != 0) {
+            all_zero = false;
+        }
+        else if(const_float && const_float->get_value() != 0) {
+            all_zero = false;
+        }
+        else if(!dynamic_pointer_cast<Constant>(tmp_val)) {
+            all_zero = false;
         }
         initValNum = 1;
     } 
@@ -363,45 +375,58 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
         }
         scope.pushDim(node.name, array_len_vec);
         if(node.is_constant) {//数组常量
+            all_zero = true;
             node.initializers->accept(*this);
             if(scope.in_global()) {//全局常量
                 if(node.btype == SyntaxTree::Type::INT) {
                     auto array_type = ArrayType::get(INT32_T, array_len);
-                    PtrVec<Constant> init_values;//创建全局数组时，必须全部用常量初始化
-                    for(int i = 0; i < (int)initValues.size(); i++) {//把初始值压入
-                        auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
-                        auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
-                        if(int_val) {
-                            init_values.push_back(CONST_INT(int_val->get_value()));
-                        }
-                        else if(float_val) {
-                            init_values.push_back(CONST_INT((int)(float_val->get_value())));
-                        }
+                    if(all_zero) {
+                        auto initializer = ConstantZero::create(array_type, module);
+                        tmp_val = GlobalVariable::create(node.name, module, array_type, true, initializer);
                     }
-                    for(int i = init_values.size(); i < array_len; i++) {//如果初始值不够，用0补齐
-                        init_values.push_back(CONST_INT(0));
+                    else {
+                        PtrVec<Constant> init_values;//创建全局数组时，必须全部用常量初始化
+                        for(int i = 0; i < (int)initValues.size(); i++) {//把初始值压入
+                            auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
+                            auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
+                            if(int_val) {
+                                init_values.push_back(CONST_INT(int_val->get_value()));
+                            }
+                            else if(float_val) {
+                                init_values.push_back(CONST_INT((int)(float_val->get_value())));
+                            }
+                        }
+                        for(int i = init_values.size(); i < array_len; i++) {//如果初始值不够，用0补齐
+                            init_values.push_back(CONST_INT(0));
+                        }
+                        auto initializer = ConstantArray::create(array_type, init_values);//创建初值数组
+                        tmp_val = GlobalVariable::create(node.name, module, array_type, true, initializer);
                     }
-                    auto initializer = ConstantArray::create(array_type, init_values);//创建初值数组
-                    tmp_val = GlobalVariable::create(node.name, module, array_type, true, initializer);
                 }
                 else if(node.btype == SyntaxTree::Type::FLOAT) {//浮点型也一样
                     auto array_type = ArrayType::get(FLOAT_T, node.array_length.size());
-                    PtrVec<Constant> init_values;
-                    for(int i = 0; i < (int)initValues.size(); i++) {
-                        auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
-                        auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
-                        if(int_val) {
-                            init_values.push_back(CONST_FLOAT((float)(int_val->get_value())));
-                        }
-                        else if(float_val) {
-                            init_values.push_back(CONST_FLOAT(float_val->get_value()));
-                        }
+                    if(all_zero) {
+                        auto initializer = ConstantZero::create(array_type, module);
+                        tmp_val = GlobalVariable::create(node.name, module, array_type, true, initializer);
                     }
-                    for(int i = init_values.size(); i < array_len; i++) {
-                        init_values.push_back(CONST_FLOAT(0));
+                    else {
+                        PtrVec<Constant> init_values;
+                        for(int i = 0; i < (int)initValues.size(); i++) {
+                            auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
+                            auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
+                            if(int_val) {
+                                init_values.push_back(CONST_FLOAT((float)(int_val->get_value())));
+                            }
+                            else if(float_val) {
+                                init_values.push_back(CONST_FLOAT(float_val->get_value()));
+                            }
+                        }
+                        for(int i = init_values.size(); i < array_len; i++) {
+                            init_values.push_back(CONST_FLOAT(0));
+                        }
+                        auto initializer = ConstantArray::create(array_type, init_values);
+                        tmp_val = GlobalVariable::create(node.name, module, array_type, true, initializer);
                     }
-                    auto initializer = ConstantArray::create(array_type, init_values);
-                    tmp_val = GlobalVariable::create(node.name, module, array_type, true, initializer);
                 }
             }
             else {//非全局的常量数组没有对应的API，这里的定义会有问题（ConstantArray无法用变量寻址）
@@ -443,47 +468,60 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
             }
         }
         else {//非常量数组
+            all_zero = true;
             if(node.is_inited) {
                 node.initializers->accept(*this);
             }
             if(scope.in_global()) {//全局数组变量
                 if(node.btype == SyntaxTree::Type::INT) {
                     auto array_type = ArrayType::get(INT32_T, array_len);
-                    PtrVec<Constant> init_values;//初值必为常量
-                    for(int i = 0; i < (int)initValues.size(); i++) {
-                        auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
-                        auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
-                        if(int_val) {
-                            init_values.push_back(CONST_INT(int_val->get_value()));
-                        }
-                        else if(float_val) {
-                            init_values.push_back(CONST_INT((int)(float_val->get_value())));
-                        }
+                    if(all_zero) {
+                        auto initializer = ConstantZero::create(array_type, module);
+                        tmp_val = GlobalVariable::create(node.name, module, array_type, false, initializer);
                     }
-                    for(int i = init_values.size(); i < array_len; i++) {
-                        init_values.push_back(CONST_INT(0));
+                    else {
+                        PtrVec<Constant> init_values;//初值必为常量
+                        for(int i = 0; i < (int)initValues.size(); i++) {
+                            auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
+                            auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
+                            if(int_val) {
+                                init_values.push_back(CONST_INT(int_val->get_value()));
+                            }
+                            else if(float_val) {
+                                init_values.push_back(CONST_INT((int)(float_val->get_value())));
+                            }
+                        }
+                        for(int i = init_values.size(); i < array_len; i++) {
+                            init_values.push_back(CONST_INT(0));
+                        }
+                        auto initializer = ConstantArray::create(array_type, init_values);
+                        tmp_val = GlobalVariable::create(node.name, module, array_type, false, initializer);
                     }
-                    auto initializer = ConstantArray::create(array_type, init_values);
-                    tmp_val = GlobalVariable::create(node.name, module, array_type, false, initializer);
                 }
                 else if(node.btype == SyntaxTree::Type::FLOAT) {
                     auto array_type = ArrayType::get(FLOAT_T, array_len);
-                    PtrVec<Constant> init_values;
-                    for(int i = 0; i < (int)initValues.size(); i++) {
-                        auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
-                        auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
-                        if(int_val) {
-                            init_values.push_back(CONST_FLOAT((float)(int_val->get_value())));
-                        }
-                        else if(float_val) {
-                            init_values.push_back(CONST_FLOAT(float_val->get_value()));
-                        }
+                    if(all_zero) {
+                        auto initializer = ConstantZero::create(array_type, module);
+                        tmp_val = GlobalVariable::create(node.name, module, array_type, false, initializer);
                     }
-                    for(int i = init_values.size(); i < array_len; i++) {
-                        init_values.push_back(CONST_FLOAT(0));
+                    else {
+                        PtrVec<Constant> init_values;
+                        for(int i = 0; i < (int)initValues.size(); i++) {
+                            auto int_val = std::dynamic_pointer_cast<ConstantInt>(initValues[i]);
+                            auto float_val = std::dynamic_pointer_cast<ConstantFloat>(initValues[i]);
+                            if(int_val) {
+                                init_values.push_back(CONST_FLOAT((float)(int_val->get_value())));
+                            }
+                            else if(float_val) {
+                                init_values.push_back(CONST_FLOAT(float_val->get_value()));
+                            }
+                        }
+                        for(int i = init_values.size(); i < array_len; i++) {
+                            init_values.push_back(CONST_FLOAT(0));
+                        }
+                        auto initializer = ConstantArray::create(array_type, init_values);
+                        tmp_val = GlobalVariable::create(node.name, module, array_type, true, initializer);
                     }
-                    auto initializer = ConstantArray::create(array_type, init_values);
-                    tmp_val = GlobalVariable::create(node.name, module, array_type, true, initializer);
                 }
             }
             else {
