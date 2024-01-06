@@ -27,10 +27,7 @@ void ActiveVar::execute() {
         // 那么IN[bb3]中有%op1和%op5，OUT[bb1]中只有%op1，OUT[bb2]中只有%op5
         std::map<Ptr<BasicBlock>, std::map<Ptr<Value>, PtrSet<BasicBlock>>> active_from;
         bool change = true;
-        int round = 0;
         while(change) {
-            
-            
             change = false;
             PtrSet<Value> def_set;// 已经被定值的变量
             for(auto block: func_->get_basic_blocks()) {
@@ -39,7 +36,7 @@ void ActiveVar::execute() {
                 PtrSet<Value> active_out_old;
                 active_in_old.insert(block->get_live_in().begin(), block->get_live_in().end());
                 active_out_old.insert(block->get_live_out().begin(), block->get_live_out().end());
-                block->get_live_in().clear();
+                // block->get_live_in().clear();
                 // 计算IN[block]
                 for(auto inst: block->get_instructions()) {
                     if(inst->is_phi()) {
@@ -47,12 +44,8 @@ void ActiveVar::execute() {
                         auto ops = phi_inst->get_operands();
                         for(int i = 0; i < ops.size(); i += 2) {
                             auto op = ops[i];
-                            if ((   op->get_type()->is_array_type()     ||
-                                    op->get_type()->is_integer_type()   ||
-                                    op->get_type()->is_float_type()     ||
-                                    op->get_type()->is_pointer_type())  &&
-                                    !dynamic_pointer_cast<Constant>(op) &&
-                                    !dynamic_pointer_cast<GlobalVariable>(op)) {
+                            if ((   op->get_type()->is_array_type() || op->get_type()->is_integer_type() || op->get_type()->is_float_type() || op->get_type()->is_pointer_type()) \
+                                    && !dynamic_pointer_cast<Constant>(op) && !dynamic_pointer_cast<GlobalVariable>(op)) {
                                 auto op_block = std::dynamic_pointer_cast<BasicBlock>(ops[i + 1]);
                                 active_from[block][op].insert(op_block);
                                 block->get_live_in().insert(op);
@@ -63,34 +56,35 @@ void ActiveVar::execute() {
                     else {
                         for(auto op: inst->get_operands()) {
                             if(def_set.find(op) != def_set.end()) {
+                                if(block->get_live_in().find(op) != block->get_live_in().end()) {
+                                    block->get_live_in().erase(op);
+                                }
                                 continue;
                             }
-                            if ((   op->get_type()->is_array_type()     ||
-                                    op->get_type()->is_integer_type()   ||
-                                    op->get_type()->is_float_type()     ||
-                                    op->get_type()->is_pointer_type())  &&
-                                    !dynamic_pointer_cast<Constant>(op) &&
-                                    !dynamic_pointer_cast<GlobalVariable>(op)) {// 只考虑局部变量
+                            if ((   op->get_type()->is_array_type() || op->get_type()->is_integer_type() || op->get_type()->is_float_type() || op->get_type()->is_pointer_type()) \
+                                    && !dynamic_pointer_cast<Constant>(op) && !dynamic_pointer_cast<GlobalVariable>(op)) {// 只考虑局部变量
                                 block->get_live_in().insert(op);
                                 for(auto prev_block: block->get_pre_basic_blocks()) {
                                     active_from[block][op].insert(prev_block);
                                 }
                             }
                         }
-                        if(inst->is_void() == false) {
-                            def_set.insert(inst);
-                        }
+                        def_set.insert(inst);
                     }
                 }
                 for(auto out_var: block->get_live_out()) {
                     if(def_set.find(out_var) == def_set.end()) {
                         block->get_live_in().insert(out_var);
-                        
+                    }
+                    else {
+                        if(block->get_live_in().find(out_var) != block->get_live_in().end()) {
+                            block->get_live_in().erase(out_var);
+                        }
                     }
                 }
                 // 计算OUT[block]
                 active_out_old.insert(block->get_live_out().begin(), block->get_live_out().end());
-                block->get_live_out().clear();
+                // block->get_live_out().clear();
                 for(auto succ_block: block->get_succ_basic_blocks()) {
                     for(auto succ_live_in: succ_block->get_live_in()) {
                         if(active_from[succ_block][succ_live_in].find(block) != active_from[succ_block][succ_live_in].end()) {
