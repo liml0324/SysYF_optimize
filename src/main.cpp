@@ -7,6 +7,7 @@
 #include "DominateTree.h"
 #include "Mem2Reg.h"
 #include "ActiveVar.h"
+#include "ConstCalc.h"
 
 using namespace SysYF::IR;
 
@@ -29,8 +30,8 @@ int main(int argc, char *argv[])
     bool optimize_all = false;
     bool av = false;
 
-    std::string filename = "testcase.sy";
-    // std::string filename = "../Student/task3/test/10_if.sy";
+    // std::string filename = "testcase.sy";
+    std::string filename = "../Student/task3/test/03_empty_stmt.sy";
     std::string output_llvm_file = "testcase.ll";
     for (int i = 1; i < argc; ++i) {
         if (argv[i] == std::string("-h") || argv[i] == std::string("--help")) {
@@ -76,6 +77,7 @@ int main(int argc, char *argv[])
             passmgr.addPass<DominateTree>();
             passmgr.addPass<Mem2Reg>();
             if(optimize_all){
+                passmgr.addPass<ConstCalc>();
                 passmgr.addPass<ActiveVar>();
                 //  ...
             }
