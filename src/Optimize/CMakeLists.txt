@@ -7,4 +7,5 @@ add_library(
         ActiveVar.cpp
         Check.cpp
         ConstCalc.cpp
+        DCE.cpp
 )

@@ -8,6 +8,7 @@
 #include "Mem2Reg.h"
 #include "ActiveVar.h"
 #include "ConstCalc.h"
+#include "DCE.h"
 
 using namespace SysYF::IR;
 
@@ -79,6 +80,7 @@ int main(int argc, char *argv[])
             if(optimize_all){
                 passmgr.addPass<ConstCalc>();
                 passmgr.addPass<ActiveVar>();
+                passmgr.addPass<DCE>();
                 //  ...
             }
             else {
