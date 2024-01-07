@@ -31,8 +31,8 @@ int main(int argc, char *argv[])
     bool optimize_all = false;
     bool av = false;
 
-    // std::string filename = "testcase.sy";
-    std::string filename = "../Student/task3/test/03_empty_stmt.sy";
+    std::string filename = "testcase.sy";
+    // std::string filename = "../test/Test_H/Medium_H/max_subsequence_sum.sy";
     std::string output_llvm_file = "testcase.ll";
     for (int i = 1; i < argc; ++i) {
         if (argv[i] == std::string("-h") || argv[i] == std::string("--help")) {
