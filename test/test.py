@@ -3,13 +3,19 @@ import subprocess
 import os
 import time
 
-IRBuild_ptn = '"{}" "-emit-ir" "-o" "{}" "{}" "-O2"'
+IRBuild_ptn = '"{}" "-emit-ir" "-o" "{}" "{}"'
 ExeGen_ptn = '"clang" "{}" "-o" "{}" "{}" "../lib/lib.c"'
 Exe_ptn = '"{}"'
-time_cost = 0
+time_detailed = True
+time_cost_ir = 0
+time_cost_exegen = 0
+time_cost_exe = 0
 
 def eval(EXE_PATH, TEST_BASE_PATH, optimization):
-    global time_cost
+    global time_cost_ir
+    global time_cost_exegen
+    global time_cost_exe
+    global time_detailed
 
     print('===========TEST START===========')
     print('now in {}'.format(TEST_BASE_PATH))
@@ -23,7 +29,11 @@ def eval(EXE_PATH, TEST_BASE_PATH, optimization):
         OUTPUT_PATH = TEST_BASE_PATH + case + '.out'
         need_input = testcases[case]
 
+        # 生成IR
+        time_start_ir = time.time()
         IRBuild_result = subprocess.run(IRBuild_ptn.format(EXE_PATH, LL_PATH, SY_PATH), shell=True, stderr=subprocess.PIPE)
+        time_end_ir = time.time()
+        time_cost_ir += time_end_ir - time_start_ir
         #IRBuild运行成功
         if IRBuild_result.returncode == 0:
             input_option = None
@@ -33,17 +43,20 @@ def eval(EXE_PATH, TEST_BASE_PATH, optimization):
 
             try:
                 # 代码生成
+                time_start_exegen = time.time()
                 res = subprocess.run(ExeGen_ptn.format(optimization, TEST_PATH, LL_PATH), shell=True, stderr=subprocess.PIPE)
+                time_end_exegen = time.time()
+                time_cost_exegen += time_end_exegen - time_start_exegen
                 if res.returncode != 0:
                     dir_succ = False
                     print(res.stderr.decode(), end='')
                     print('\t\033[31mClangExecute Fail\033[0m')
                     continue
                 # 运行代码
-                time_start = time.time()
+                time_start_exe = time.time()
                 result = subprocess.run(Exe_ptn.format(TEST_PATH), shell=True, input=input_option, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                time_end = time.time()
-                time_cost += time_end - time_start
+                time_end_exe = time.time()
+                time_cost_exe += time_end_exe - time_start_exe
                 # 获取标准结果
                 out = result.stdout.split(b'\n')
                 if result.returncode != b'':
@@ -65,7 +78,13 @@ def eval(EXE_PATH, TEST_BASE_PATH, optimization):
                             case_succ = False
                         i = i + 1
                     if case_succ:
-                        print('\t\033[32mPass\033[0m\t Time: {:.4f}s'.format(time_end - time_start))
+                        if(time_detailed):
+                            print('\t\033[32mPass\033[0m\tTime: \tir:{:.4f}s\texegen:{:.4f}s\texe:{:.4f}s'.format(
+                                time_end_ir - time_start_ir,
+                                time_end_exegen - time_start_exegen,
+                                time_end_exe - time_start_exe))
+                        else:
+                            print('\t\033[32mPass\033[0m')
                     else:
                         print('\t\033[31mWrong Answer\033[0m')
             except Exception as _:
@@ -135,5 +154,7 @@ if __name__ == "__main__":
         print("\t\033[31mTest Fail\033[0m in dirs {}".format(fail_dir_str))
     else:
         print("\t\033[32mAll Tests Passed\033[0m")
-    print('Total time cost: {:.4f}s'.format(time_cost))
+    print('Total IRBuild time cost: {:.4f}s'.format(time_cost_ir))
+    print('Total ExeGen time cost: {:.4f}s'.format(time_cost_exegen))
+    print('Total Exe time cost: {:.4f}s'.format(time_cost_exe))
         
