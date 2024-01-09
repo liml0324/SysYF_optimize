@@ -20,7 +20,7 @@ void RDominateTree::execute() {
     }
 }
 
-void RDominateTree::get_post_order(Ptr<BasicBlock> bb, std::set<Ptr<BasicBlock>> &visited) {
+void RDominateTree::get_post_order(Ptr<BasicBlock> bb, PtrSet<BasicBlock> &visited) {
     visited.insert(bb);
     auto parents = bb->get_pre_basic_blocks();
     for(auto parent : parents){

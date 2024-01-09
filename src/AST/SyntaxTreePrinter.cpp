@@ -289,7 +289,7 @@ void SyntaxTreePrinter::visit(WhileStmt &node)
     std::cout << "(";
     node.cond_exp->accept(*this);
     std::cout << ")"<< std::endl;
-    if(dynamic_cast<BlockStmt*>(node.statement.get())){
+    if(dynamic_pointer_cast<BlockStmt>(node.statement)){
         node.statement->accept(*this);
     }
     else{

@@ -48,6 +48,9 @@ public:
         // type cast bewteen float and singed integer
         fptosi,
         sitofp,
+        // LIR instructions
+        cmpbr,
+        mov_const,
     };
     inline const Ptr<BasicBlock> get_parent() const { return parent_; }
     inline Ptr<BasicBlock> get_parent() { return parent_; }
@@ -117,6 +120,9 @@ public:
     bool is_zext() { return op_id_ == zext; }
     bool is_fptosi() { return op_id_ == fptosi; }
     bool is_sitofp() { return op_id_ == sitofp; }
+
+    bool is_cmpbr() { return op_id_ == cmpbr; }
+    bool is_mov_const() { return op_id_ == mov_const; }
 
     bool isBinary()
     {
@@ -426,6 +432,45 @@ public:
 
 private:
     Ptr<Value> l_val_;
+
+};
+
+class CmpBrInst : public Instruction
+{
+public:
+    using CmpOp = CmpInst::CmpOp;
+
+private:
+    CmpBrInst(CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false,
+            Ptr<BasicBlock >bb);
+
+public:
+    static Ptr<CmpBrInst> create_cmpbr(CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false,
+                               Ptr<BasicBlock >bb, Ptr<Module>m);
+
+    CmpOp get_cmp_op() { return cmp_op_; }
+
+    bool is_cmp_br() const;
+
+    virtual std::string print() override;
+
+private:
+    CmpOp cmp_op_;
+
+    void assertValid();
+};
+
+
+class MovConstInst : public Instruction
+{
+private:
+    MovConstInst(Ptr<Type> ty, Ptr<ConstantInt>const_val, Ptr<BasicBlock >bb);
+
+public:
+    static Ptr<MovConstInst > create_mov_const(Ptr<ConstantInt>const_val, Ptr<BasicBlock >bb);
+    Ptr<ConstantInt> get_const() { return dynamic_pointer_cast<ConstantInt>(this->get_operand(0)); }
+
+    virtual std::string print() override;
 
 };
 

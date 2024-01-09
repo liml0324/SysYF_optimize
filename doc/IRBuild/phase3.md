@@ -33,7 +33,7 @@ using std::static_pointer_cast;
 using std::dynamic_pointer_cast;
 using std::const_pointer_cast;
 ```
-static_pointer_cast和dynamic_pointer_cast用于智能指针的类型转换，隐式完成了拆包、类型转换、重新包装和内存控制块维护，const_pointer_cast在转换时去除const属性，含义和使用方法类似于static_cast、dynamic_cast和const_cast：
+static_pointer_cast和dynamic_pointer_cast用于智能指针的类型转换，隐式完成了拆包、类型转换、重新包装和内存控制块维护，const_pointer_cast在转换时去除const属性，含义和使用方法类似于static_cast、dynamic_pointer_cast和const_cast：
 ```cpp
 std::vector<std::shared_ptr<Duck>> ducks;
 ducks.push_back(std::static_pointer_cast<Duck>(std::make_shared<EdibleDuck>()));

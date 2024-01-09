@@ -8,4 +8,6 @@ add_library(
         Check.cpp
         ConstCalc.cpp
         DCE.cpp
+        LIR.cpp
+        MovConst.cpp
 )
