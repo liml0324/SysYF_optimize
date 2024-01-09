@@ -42,7 +42,7 @@ int seed[3] = {19971231, 19981013, 1000000000 + 7};
 int staticvalue = 0;
 
 int rand(){
-    staticvalue = staticPtr<Value> seed[0] + seed[1];
+    staticvalue = staticvalue * seed[0] + seed[1];
     staticvalue = staticvalue % seed[2];
     if (staticvalue < 0) staticvalue = seed[2] + staticvalue;
     return staticvalue;
