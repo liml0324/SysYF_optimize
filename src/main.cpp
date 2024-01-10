@@ -98,12 +98,14 @@ int main(int argc, char *argv[])
         m->set_file_name(filename);
         m->set_print_name();
         if(optimize || emit_assembly){
-            PassMgr passmgr(std::shared_ptr<Module>(m.get()));
+            PassMgr passmgr(m);
             passmgr.addPass<DominateTree>();
             passmgr.addPass<Mem2Reg>();
             if(optimize_all){
                 // passmgr.addPass<ComSubExprEli>();
+                passmgr.addPass<ConstCalc>();
                 passmgr.addPass<ActiveVar>();
+                passmgr.addPass<DCE>();
             }
             else {
                 if(cse){
@@ -122,7 +124,7 @@ int main(int argc, char *argv[])
         }
         if(emit_assembly){
             CodeGen coder = CodeGen();
-            auto asmcode = coder.module_gen(std::shared_ptr<Module>(m.get()));
+            auto asmcode = coder.module_gen(m);
             if(output_file == "-"){
                 std::cout << asmcode;
             }

@@ -3,7 +3,7 @@ import subprocess
 import os
 import time
 
-IRBuild_ptn = '"{}" "-emit-ir" "-o" "{}" "{}"'
+IRBuild_ptn = '"{}" "-emit-ir" "-o" "{}" "{}" "-O2"'
 ExeGen_ptn = '"clang" "{}" "-o" "{}" "{}" "../lib/lib.c"'
 Exe_ptn = '"{}"'
 time_detailed = True

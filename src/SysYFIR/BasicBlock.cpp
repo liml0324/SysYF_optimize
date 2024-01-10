@@ -68,6 +68,10 @@ const Ptr<Instruction> BasicBlock::get_terminator() const
     case Instruction::ret:
         return instr_list_.back();
         break;
+
+    case Instruction::cmpbr:
+        return instr_list_.back();
+        break;
     
     case Instruction::br:
         return instr_list_.back();

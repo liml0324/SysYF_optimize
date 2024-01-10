@@ -33,6 +33,9 @@ Module::Module(std::string name)
     instr_id2string_.insert({ Instruction::zext, "zext" });
     instr_id2string_.insert({ Instruction::fptosi, "fptosi" });
     instr_id2string_.insert({ Instruction::sitofp, "sitofp" });
+
+    instr_id2string_.insert({ Instruction::cmpbr, "icmpbr" });
+    instr_id2string_.insert({ Instruction::mov_const, "mov_const" });
 }
 
 void Module::init(std::string name) {

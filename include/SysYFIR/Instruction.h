@@ -85,6 +85,8 @@ public:
             case zext: return "zext"; break;
             case fptosi: return "fptosi"; break;
             case sitofp: return "sitofp"; break;
+            case cmpbr: return "icmpbr"; break;
+            case mov_const: return "mov_const"; break;
         
         default: return ""; break;
         }
@@ -92,7 +94,7 @@ public:
 
 
 
-    bool is_void() { return ((op_id_ == ret) || (op_id_ == br) || (op_id_ == store) || (op_id_ == call && this->get_type()->is_void_type())); }
+    bool is_void() { return ((op_id_ == ret) ||(op_id_ == cmpbr) || (op_id_ == br) || (op_id_ == store) || (op_id_ == call && this->get_type()->is_void_type())); }
 
     bool is_phi() { return op_id_ == phi; }
     bool is_store() { return op_id_ == store; }
@@ -131,7 +133,7 @@ public:
                 (get_num_operand() == 2);
     }
 
-    bool isTerminator() { return is_br() || is_ret(); }
+    bool isTerminator() { return is_br() || is_cmpbr() || is_ret(); }
 
     void set_id(int id){id_ = id;}
     int get_id() const{return id_;}
@@ -441,8 +443,8 @@ public:
     using CmpOp = CmpInst::CmpOp;
 
 private:
-    CmpBrInst(CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false,
-            Ptr<BasicBlock >bb);
+    explicit CmpBrInst(OpID opid, CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false, Ptr<BasicBlock >bb);
+    void init(OpID opid, CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false, Ptr<BasicBlock >bb);
 
 public:
     static Ptr<CmpBrInst> create_cmpbr(CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false,
@@ -457,14 +459,15 @@ public:
 private:
     CmpOp cmp_op_;
 
-    void assertValid();
+    void assertValid(){};
 };
 
 
 class MovConstInst : public Instruction
 {
 private:
-    MovConstInst(Ptr<Type> ty, Ptr<ConstantInt>const_val, Ptr<BasicBlock >bb);
+    explicit MovConstInst(OpID opid, Ptr<Type> ty, Ptr<ConstantInt>const_val, Ptr<BasicBlock >bb);
+    void init(OpID opid, Ptr<Type> ty, Ptr<ConstantInt>const_val, Ptr<BasicBlock >bb);
 
 public:
     static Ptr<MovConstInst > create_mov_const(Ptr<ConstantInt>const_val, Ptr<BasicBlock >bb);

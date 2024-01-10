@@ -192,6 +192,10 @@ namespace IR{
         Ptr<IR2asm::label>newlabel;
         std::string label_str;
         for(auto bb: linear_fun_bb){
+        if(bb->get_terminator()==nullptr){
+            auto inst = bb->get_instructions();
+            std::cout<<"b"<<std::endl;
+        }
             if(bb != fun->get_entry_block() && !bb->get_terminator()->is_ret()){
                 label_str = "bb" + std::to_string(func_no) + "_" + std::to_string(bb_no);
                 newlabel = Ptr<IR2asm::label>(new IR2asm::label(label_str));
