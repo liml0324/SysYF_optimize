@@ -25,6 +25,9 @@ void BasicBlock::init(Ptr<Module> m, const std::string &name = "",
                       Ptr<Function> parent = nullptr)
 {
     parent_->add_basic_block(dynamic_pointer_cast<BasicBlock>(shared_from_this()));
+    if(name=="entry") {
+        this->universal = false;
+    }
 }
 
 Ptr<Module> BasicBlock::get_module()

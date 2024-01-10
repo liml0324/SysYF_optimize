@@ -85,6 +85,14 @@ public:
     PtrSet<Value>& get_live_in(){return live_in;}
     PtrSet<Value>& get_live_out(){return live_out;}
 
+    /****************api about available expression****************/
+    void set_avail_expr_in(PtrSet<Value> in){avail_expr_in = in;}
+    void set_avail_expr_out(PtrSet<Value> out){avail_expr_out = out; universal = false;}
+    PtrSet<Value>& get_avail_expr_in(){return avail_expr_in;}
+    PtrSet<Value>& get_avail_expr_out(){return avail_expr_out;}
+    bool out_is_universal(){return universal;}
+
+
 private:
     explicit BasicBlock(Ptr<Module> m, const std::string &name ,
                         Ptr<Function> parent );
@@ -100,6 +108,9 @@ private:
     Ptr<BasicBlock> idom_;
     PtrSet<Value> live_in;
     PtrSet<Value> live_out;
+    PtrSet<Value> avail_expr_in;
+    PtrSet<Value> avail_expr_out;
+    bool universal = true;
 };
 
 }
