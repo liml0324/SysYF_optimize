@@ -1,0 +1,11 @@
+Function: main, 1 loops
+Back edges: 
+label32 -> label10
+Loop 0: 
+Have 0 sub loops
+Have 0 parent loops
+Blocks: 
+label10
+label13
+label20
+label32

@@ -14,6 +14,7 @@
 #include "Module.h"
 #include "BasicBlock.h"
 #include "Type.h"
+#include "Loop.h"
 
 namespace SysYF
 {
@@ -56,6 +57,12 @@ public:
     void set_unused_reg_num(std::set<int>& set){unused_reg_num_ = set;}
     std::set<int>& get_unused_reg_num(){return unused_reg_num_;}
 
+    void add_loop(Ptr<Loop> loop) { loops_.push_back(loop); }
+    PtrVec<Loop>& get_loops() { return loops_; }
+    void clear_loops() { loops_.clear(); }
+    void set_back_edges(std::vector<std::pair<Ptr<BasicBlock>, Ptr<BasicBlock>>> &back_edges) { back_edges_ = back_edges; }
+    std::vector<std::pair<Ptr<BasicBlock>, Ptr<BasicBlock>>> &get_back_edges() { return back_edges_; }
+
     void set_instr_name();
     std::string print();
 
@@ -66,6 +73,8 @@ private:
 
 private:
     PtrList<BasicBlock> basic_blocks_;    // basic blocks
+    PtrVec<Loop> loops_;
+    std::vector<std::pair<Ptr<BasicBlock>, Ptr<BasicBlock>>> back_edges_;
     PtrList<Argument> arguments_;         // arguments
     std::vector<PtrSet<Value>> vreg_set_;
     Ptr<Module> parent_;

@@ -15,5 +15,7 @@ private:
     Ptr<Function> func_;
     const std::string name = "LocalCSE";
 };
+
+bool compare_inst(Ptr<Instruction> a, Ptr<Instruction> b);
 }
 }

@@ -9,6 +9,8 @@
 #include "ActiveVar.h"
 #include "ConstCalc.h"
 #include "DCE.h"
+#include "LocalCSE.h"
+#include "FindLoop.h"
 
 using namespace SysYF::IR;
 
@@ -79,6 +81,9 @@ int main(int argc, char *argv[])
             passmgr.addPass<Mem2Reg>();
             if(optimize_all){
                 passmgr.addPass<ConstCalc>();
+                passmgr.addPass<LocalCSE>();
+                passmgr.addPass<ActiveVar>();
+                passmgr.addPass<FindLoop>();
                 passmgr.addPass<ActiveVar>();
                 passmgr.addPass<DCE>();
                 //  ...

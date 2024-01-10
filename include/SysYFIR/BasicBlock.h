@@ -92,6 +92,9 @@ public:
     PtrSet<Value>& get_avail_expr_out(){return avail_expr_out;}
     bool out_is_universal(){return universal;}
 
+    /****************api about loop****************/
+    int get_num(){return num_;}
+    void set_num(int num){num_ = num;}
 
 private:
     explicit BasicBlock(Ptr<Module> m, const std::string &name ,
@@ -111,6 +114,7 @@ private:
     PtrSet<Value> avail_expr_in;
     PtrSet<Value> avail_expr_out;
     bool universal = true;
+    int num_;
 };
 
 }
