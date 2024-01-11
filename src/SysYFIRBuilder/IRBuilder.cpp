@@ -787,33 +787,6 @@ void IRBuilder::visit(SyntaxTree::EmptyStmt &node) {
 }
 
 void IRBuilder::visit(SyntaxTree::ExprStmt &node) {
-    
-    // 
-    // using namespace SyntaxTree;
-    // auto UnaryCondExprptr=dynamic_pointer_cast<UnaryCondExpr>(node.exp);
-    // auto BinaryCondExprptr=dynamic_pointer_cast<BinaryCondExpr>(node.exp);
-    // auto BinaryExprptr=dynamic_pointer_cast<BinaryExpr>(node.exp);
-    // auto UnaryExprptr=dynamic_pointer_cast<UnaryExpr>(node.exp);
-    // auto IfStmtptr=dynamic_pointer_cast<IfStmt>(node.exp);
-    // auto WhileStmtptr=dynamic_pointer_cast<WhileStmt>(node.exp);
-    // if(UnaryCondExprptr.get()!=NULL){
-    //     UnaryCondExprptr->accept(*this);
-    // }
-    // else if(BinaryCondExprptr.get()!=NULL){
-    //     BinaryCondExprptr->accept(*this);
-    // }
-    // else if(BinaryExprptr.get()!=NULL){
-    //     BinaryExprptr->accept(*this);
-    // }
-    // else if(UnaryExprptr.get()!=NULL){
-    //     UnaryExprptr->accept(*this);
-    // }
-    // else if(IfStmtptr.get()!=NULL){
-    //     IfStmtptr->accept(*this);
-    // }
-    // else if(WhileStmtptr.get()!=NULL){
-    //     WhileStmtptr->accept(*this);
-    // }
     node.exp->accept(*this);
 }
 

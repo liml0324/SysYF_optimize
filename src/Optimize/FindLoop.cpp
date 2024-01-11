@@ -31,6 +31,7 @@ void FindLoop::execute() {
             func->add_loop(loop);
         }
         find_inner_loop(func);
+        get_loop_entry(func);
     }
     dump();
 }
@@ -88,6 +89,7 @@ void FindLoop::dump() {
         }
         for(auto &loop : func->get_loops()) {
             f << "Loop " << num++ << ": " << std::endl;
+            f << "Entry: " << loop->get_loop_entry()->get_name() << std::endl;
             f << "Have " << loop->get_sub_loops().size() << " sub loops" << std::endl;
             f << "Have " << loop->get_parent_loops().size() << " parent loops" << std::endl;
             f << "Blocks: " << std::endl;
@@ -122,6 +124,35 @@ void find_inner_loop(Ptr<Function> func) {
                 loop1->add_parent_loop(loop2);
                 loop2->add_sub_loop(loop1);
             }
+        }
+    }
+}
+
+void get_loop_entry(Ptr<Function> func) {
+    for(auto loop : func->get_loops()) {
+        bool is_entry = true;
+        for(auto block : loop->get_blocks()) {
+            for(auto block2 : loop->get_blocks()) {
+                if(block == block2) {
+                    continue;
+                }
+                auto idom = block2->get_idom();
+                while(idom && idom != idom->get_idom()) {
+                    if(idom == block) {
+                        break;
+                    }
+                    idom = idom->get_idom();
+                }
+                if(idom != block) {
+                    is_entry = false;
+                    break;
+                }
+            }
+            if (is_entry) {
+                loop->set_loop_entry(block);
+                break;
+            }
+            is_entry = true;
         }
     }
 }

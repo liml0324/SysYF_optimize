@@ -30,6 +30,8 @@ public:
     void clear_blocks() { blocks.clear(); }
     void clear_sub_loops() { sub_loops.clear(); }
     void clear_parent_loops() { parent_loops.clear(); }
+    void set_loop_entry(Ptr<BasicBlock> block) { loop_entry_ = block; }
+    Ptr<BasicBlock> get_loop_entry() { return loop_entry_; }
     bool is_empty() { return blocks.empty(); }
 private:
     Loop() = default;
@@ -37,6 +39,7 @@ private:
     PtrSet<BasicBlock> blocks;
     PtrSet<Loop> sub_loops;
     PtrSet<Loop> parent_loops;
+    Ptr<BasicBlock> loop_entry_;
 };
 }
 }

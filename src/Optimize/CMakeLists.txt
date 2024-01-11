@@ -10,4 +10,5 @@ add_library(
         DCE.cpp
         LocalCSE.cpp
         FindLoop.cpp
+        LoopCodeMotion.cpp
 )

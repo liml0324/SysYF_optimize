@@ -2,6 +2,7 @@ Function: main, 1 loops
 Back edges: 
 label32 -> label10
 Loop 0: 
+Entry: label10
 Have 0 sub loops
 Have 0 parent loops
 Blocks: 
