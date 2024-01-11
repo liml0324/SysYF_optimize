@@ -8,6 +8,7 @@ add_library(
         Check.cpp
         ConstCalc.cpp
         DCE.cpp
+        DBE.cpp
         LocalCSE.cpp
         FindLoop.cpp
         LoopCodeMotion.cpp

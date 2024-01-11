@@ -11,7 +11,7 @@ namespace IR
 class ActiveVar : public Pass
 {
 public:
-    ActiveVar(Ptr<Module>module) : Pass(module) {}
+    ActiveVar(Ptr<Module> &module) : Pass(module) {}
     void execute() final;
     const std::string get_name() const override {return name;}
     void dump();

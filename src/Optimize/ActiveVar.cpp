@@ -20,6 +20,11 @@ void ActiveVar::execute() {
             
             /*you need to finish this function*/
         }
+
+        for(auto block : func->get_basic_blocks()) {
+            block->get_live_in().clear();
+            block->get_live_out().clear();
+        }
         
             
         // 由于phi指令的存在，需要记录每个变量可能的活跃性来源
@@ -38,7 +43,9 @@ void ActiveVar::execute() {
                 active_out_old.insert(block->get_live_out().begin(), block->get_live_out().end());
                 // block->get_live_in().clear();
                 // 计算IN[block]
+                
                 for(auto inst: block->get_instructions()) {
+                    
                     if(inst->is_phi()) {
                         auto phi_inst = std::dynamic_pointer_cast<PhiInst>(inst);
                         auto ops = phi_inst->get_operands();
@@ -107,6 +114,7 @@ void ActiveVar::execute() {
             }
         }
     }
+    
 
     //  请不要修改该代码，在被评测时不要删除该代码
     dump();

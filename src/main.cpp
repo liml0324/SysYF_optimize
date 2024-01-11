@@ -9,6 +9,7 @@
 #include "ActiveVar.h"
 #include "ConstCalc.h"
 #include "DCE.h"
+#include "DBE.h"
 #include "LocalCSE.h"
 #include "FindLoop.h"
 #include "LoopCodeMotion.h"
@@ -35,7 +36,7 @@ int main(int argc, char *argv[])
     bool av = false;
 
     std::string filename = "testcase.sy";
-    // std::string filename = "../test/Test_H/Medium_H/max_subsequence_sum.sy";
+    // std::string filename = "../test/Test/Medium/if_test.sy";
     std::string output_llvm_file = "testcase.ll";
     for (int i = 1; i < argc; ++i) {
         if (argv[i] == std::string("-h") || argv[i] == std::string("--help")) {
@@ -88,6 +89,13 @@ int main(int argc, char *argv[])
                 passmgr.addPass<LoopCodeMotion>();
                 passmgr.addPass<ActiveVar>();
                 passmgr.addPass<DCE>();
+                passmgr.addPass<DBE>();
+                passmgr.addPass<ActiveVar>();
+                passmgr.addPass<DCE>();
+                passmgr.addPass<DBE>();
+                passmgr.addPass<ActiveVar>();
+                passmgr.addPass<DCE>();
+                //这里多删除几次，一次可能删不干净
                 //  ...
             }
             else {
