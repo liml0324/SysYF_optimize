@@ -13,10 +13,14 @@ void LoopCodeMotion::execute() {
             func_ = func;
         }
         for(auto loop : func->get_loops()) {
-            PtrSet<Instruction> defs;
-            for(auto block : loop->get_blocks()) {
-                defs.insert(block->get_instructions().begin(), block->get_instructions().end());
+            PtrVec<Instruction> movable_insts;
+            find_movable_insts(loop, movable_insts);
+            if(movable_insts.empty()) {
+                continue;
             }
+            // else {
+            //     std::cout << "find movable" << std::endl;
+            // }
             auto loop_entry = loop->get_loop_entry();
             Ptr<BasicBlock> loop_pre_bb = nullptr;
             for(auto pred : loop_entry->get_pre_basic_blocks()) {
@@ -81,8 +85,6 @@ void LoopCodeMotion::execute() {
                                 phi->replace_all_use_with(new_phi);
                                 loop_entry->delete_instr(phi);
                                 loop_entry->add_instr_begin(new_phi);
-                                defs.insert(new_phi);
-                                defs.erase(phi);
                             }
                             else {// 这种情况需要把原来的phi拆成2部分，一部分在entry里，一部分在pre里
                                 auto pre_phi = PhiInst::create_phi(phi->get_type(), loop_pre_bb);
@@ -98,40 +100,64 @@ void LoopCodeMotion::execute() {
                                 phi->replace_all_use_with(entry_phi);
                                 loop_entry->delete_instr(phi);
                                 loop_entry->add_instr_begin(entry_phi);
-                                defs.insert(entry_phi);
-                                defs.erase(phi);
                             }
                         }
                     }
                 }
             }
             std::set<std::pair<Ptr<Instruction>, Ptr<BasicBlock>>> dels;
-            for(auto block : loop->get_blocks()) {
-                for(auto inst : block->get_instructions()) {
-                    if(inst->is_alloca() || inst->is_br() || inst->is_call() || inst->is_load() || inst->is_phi()) {
-                        continue;
+            for(auto inst : movable_insts) {
+                auto br = loop_pre_bb->get_terminator();
+                auto block = inst->get_parent();
+                loop_pre_bb->delete_instr(br);
+                loop_pre_bb->add_instruction(inst);
+                loop_pre_bb->add_instruction(br);
+                dels.insert({inst, block});
+                inst->set_parent(loop_pre_bb);
+            }
+            for(auto pair : dels) {
+                pair.second->delete_instr(pair.first);
+            }
+        }
+    }
+}
+void find_movable_insts(Ptr<Loop> loop, PtrVec<Instruction> &movable_insts) {
+    PtrSet<Instruction> defs;
+    for(auto block : loop->get_blocks()) {
+        defs.insert(block->get_instructions().begin(), block->get_instructions().end());
+    }
+    for(auto block : loop->get_blocks()) {
+        for(auto inst : block->get_instructions()) {
+            if(inst->is_alloca() || inst->is_br() || inst->is_call() || inst->is_load() || inst->is_phi()) {
+                continue;
+            }
+            bool movable = true;
+            for(auto op : inst->get_operands()) {
+                auto inst_ = dynamic_pointer_cast<Instruction>(op);
+                auto gv = dynamic_pointer_cast<GlobalVariable>(op);
+                if(inst_ && defs.find(inst_) != defs.end()) {
+                    movable = false;
+                    break;
+                }
+                else if(inst_ && inst_->is_load()) {
+                    auto load = std::dynamic_pointer_cast<LoadInst>(inst_);
+                    auto ptr = load->get_operand(0);
+                    if(dynamic_pointer_cast<GlobalVariable>(ptr)) {// load全局变量
+                        movable = false;
+                        break;
                     }
-                    bool movable = true;
-                    for(auto op : inst->get_operands()) {
-                        auto inst_ = dynamic_pointer_cast<Instruction>(op);
-                        if(!inst_)  continue;
-                        if(defs.find(inst_) != defs.end()) {
+                    auto ptr_inst = dynamic_pointer_cast<Instruction>(ptr);
+                    if(ptr_inst) {
+                        auto ptr = ptr_inst->get_operand(0);
+                        if(dynamic_pointer_cast<GlobalVariable>(ptr)) {// load全局变量
                             movable = false;
                             break;
                         }
                     }
-                    if(movable) {
-                        auto br = loop_pre_bb->get_terminator();
-                        loop_pre_bb->delete_instr(br);
-                        loop_pre_bb->add_instruction(inst);
-                        loop_pre_bb->add_instruction(br);
-                        dels.insert({inst, block});
-                        inst->set_parent(loop_pre_bb);
-                    }
                 }
             }
-            for(auto pair : dels) {
-                pair.second->delete_instr(pair.first);
+            if(movable) {
+                movable_insts.push_back(inst);
             }
         }
     }

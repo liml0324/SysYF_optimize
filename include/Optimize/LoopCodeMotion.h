@@ -15,6 +15,6 @@ private:
     const std::string name_ = "LoopCodeMotion";
     Ptr<Function> func_;
 };
-
+void find_movable_insts(Ptr<Loop> loop, PtrVec<Instruction> &movable_insts);
 }
 }

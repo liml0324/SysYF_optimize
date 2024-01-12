@@ -1,9 +1,9 @@
-int pure_func(int a, int b){
-    return a+b;
-}
+int s = 1, k = 2;
 
 int main() {
-    int j = pure_func(1, 2);
-    int k = pure_func(1, 2);
-    return j+k;
+    int i = 0;
+    while(i < 10) {
+        i = s + k + i;
+    }
+    return i;
 }
