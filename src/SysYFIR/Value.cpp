@@ -33,6 +33,9 @@ void Value::replace_all_use_with(Ptr<Value> new_val)
         assert(val && "new_val is not a user");
 #endif
         val->set_operand(use.arg_no_, new_val);
+        if(new_val.get() != this) {
+            new_val->add_use(use.val_, use.arg_no_);
+        }
     }
     if(new_val.get() != this) {
         use_list_.clear();
