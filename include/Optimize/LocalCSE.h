@@ -17,5 +17,6 @@ private:
 };
 
 bool compare_inst(Ptr<Instruction> a, Ptr<Instruction> b);
+bool compare_op(Ptr<Value> op1, Ptr<Value> op2);
 }
 }

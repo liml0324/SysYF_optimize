@@ -47,18 +47,18 @@ bool compare_inst(Ptr<Instruction> a, Ptr<Instruction> b) {
     }
 
     if(a->is_add() || a->is_fadd()) {
-        if(a->get_operand(0) == b->get_operand(0) && a->get_operand(1) == b->get_operand(1)) {
+        if(compare_op(a->get_operand(0), b->get_operand(0)) && compare_op(a->get_operand(1), b->get_operand(1))) {
             return true;
         }
-        if(a->get_operand(0) == b->get_operand(1) && a->get_operand(1) == b->get_operand(0)) {
+        if(compare_op(a->get_operand(0), b->get_operand(1)) && compare_op(a->get_operand(1), b->get_operand(0))) {
             return true;
         }
     }
     else if(a->is_mul() || a->is_fmul()) {
-        if(a->get_operand(0) == b->get_operand(0) && a->get_operand(1) == b->get_operand(1)) {
+        if(compare_op(a->get_operand(0), b->get_operand(0)) && compare_op(a->get_operand(1), b->get_operand(1))) {
             return true;
         }
-        if(a->get_operand(0) == b->get_operand(1) && a->get_operand(1) == b->get_operand(0)) {
+        if(compare_op(a->get_operand(0), b->get_operand(1)) && compare_op(a->get_operand(1), b->get_operand(0))) {
             return true;
         }
     }
@@ -68,7 +68,7 @@ bool compare_inst(Ptr<Instruction> a, Ptr<Instruction> b) {
             return false;
         }
         for(int i = 0; i < a->get_num_operand(); i++) {
-            if(a->get_operand(i) != b->get_operand(i)) {
+            if(!compare_op(a->get_operand(i), b->get_operand(i))) {
                 return false;
             }
         }
@@ -76,11 +76,29 @@ bool compare_inst(Ptr<Instruction> a, Ptr<Instruction> b) {
     }
     else {
         for(int i = 0; i < a->get_num_operand(); i++) {
-            if(a->get_operand(i) != b->get_operand(i)) {
+            if(!compare_op(a->get_operand(i), b->get_operand(i))) {
                 return false;
             }
         }
         return true;
+    }
+}
+bool compare_op(Ptr<Value> op1, Ptr<Value> op2) {
+    if(op1->get_type()->get_type_id() != op2->get_type()->get_type_id()) {
+        return false;
+    }
+    auto const_int1 = dynamic_pointer_cast<ConstantInt>(op1);
+    auto const_int2 = dynamic_pointer_cast<ConstantInt>(op2);
+    auto const_float1 = dynamic_pointer_cast<ConstantFloat>(op1);
+    auto const_float2 = dynamic_pointer_cast<ConstantFloat>(op2);
+    if(const_int1 && const_int2) {
+        return const_int1->get_value() == const_int2->get_value();
+    }
+    else if(const_float1 && const_float2) {
+        return const_float1->get_value() == const_float2->get_value();
+    }
+    else {
+        return op1 == op2;
     }
 }
 }

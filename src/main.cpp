@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     bool av = false;
 
     std::string filename = "testcase.sy";
-    // std::string filename = "../test/Test/Medium/if_test.sy";
+    // std::string filename = "../Student/task3/test_stu/test.c";
     std::string output_llvm_file = "testcase.ll";
     for (int i = 1; i < argc; ++i) {
         if (argv[i] == std::string("-h") || argv[i] == std::string("--help")) {

@@ -1,10 +1,9 @@
-void pure_func(int a[]){
-    a[0] = 1;
-    return;
+int pure_func(int a, int b){
+    return a+b;
 }
 
 int main() {
-    int a[2];
-    pure_func(a);
-    return a[0];
+    int j = pure_func(1, 2);
+    int k = pure_func(1, 2);
+    return j+k;
 }
