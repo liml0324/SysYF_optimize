@@ -34,6 +34,9 @@ void Value::replace_all_use_with(Ptr<Value> new_val)
 #endif
         val->set_operand(use.arg_no_, new_val);
     }
+    if(new_val.get() != this) {
+        use_list_.clear();
+    }
 }
 
 void Value::remove_use(Ptr<Value> val)
