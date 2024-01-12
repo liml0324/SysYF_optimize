@@ -31,6 +31,8 @@ void User::set_operand(unsigned i, Ptr<Value> v)
     assert(i < num_ops_ && "set_operand out of index");
 #endif
     // assert(operands_[i] == nullptr && "ith operand is not null");
+    // if(operands_[i] != nullptr)
+    //     operands_[i]->remove_use(shared_from_this());
     operands_[i] = v;  
     v->add_use(shared_from_this(), i);
 }

@@ -104,6 +104,7 @@ void DBE::execute() {
                                     continue;
                                 }
                                 phi->set_operand(i+1, prev);
+                                block->remove_use(phi);
                             }
                         }
                         succ->remove_pre_basic_block(block);

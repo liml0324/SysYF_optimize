@@ -32,6 +32,12 @@ void FindLoop::execute() {
         }
         find_inner_loop(func);
         get_loop_entry(func);
+        merge_loop(func);
+        for(auto &loop : func->get_loops()) {
+            loop->clear_parent_loops();
+            loop->clear_sub_loops();
+        }
+        find_inner_loop(func);
     }
     dump();
 }
@@ -154,6 +160,27 @@ void get_loop_entry(Ptr<Function> func) {
             }
             is_entry = true;
         }
+    }
+}
+
+void merge_loop(Ptr<Function> func) {
+    std::vector<int> del;
+    for(int i = 0; i < func->get_loops().size(); i++) {
+        auto loop = func->get_loops()[i];
+        for(int j = i + 1; j < func->get_loops().size(); j++) {
+            auto loop1 = func->get_loops()[j];
+            if(loop->get_loop_entry() == loop1->get_loop_entry() \
+                && loop->get_sub_loops().find(loop1) == loop->get_sub_loops().end() \
+                && loop->get_parent_loops().find(loop1) == loop->get_parent_loops().end()) {
+                auto blocks = loop->get_blocks();
+                blocks.insert(loop1->get_blocks().begin(), loop1->get_blocks().end());
+                loop->set_blocks(blocks);
+                del.push_back(j);
+            }
+        }
+    }
+    for(auto loop : del) {
+        func->remove_loop(loop);
     }
 }
 }

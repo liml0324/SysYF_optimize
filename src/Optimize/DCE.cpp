@@ -25,16 +25,19 @@ void DCE::execute() {
                         continue;
                     }
                 }
-                bool used_in_block = false;
-                for(auto &inst2: block->get_instructions()) {
-                    for(auto op: inst2->get_operands()) {
-                        if(op == inst) {
-                            used_in_block = true;
-                            break;
-                        }
-                    }
-                }
-                if(!used_in_block && block->get_live_out().find(inst) == block->get_live_out().end()) {
+                // bool used_in_block = false;
+                // for(auto &inst2: block->get_instructions()) {
+                //     for(auto op: inst2->get_operands()) {
+                //         if(op == inst) {
+                //             used_in_block = true;
+                //             break;
+                //         }
+                //     }
+                // }
+                // if(!used_in_block && block->get_live_out().find(inst) == block->get_live_out().end()) {
+                //     block->delete_instr(inst);
+                // }
+                if(inst->get_use_list().empty()) {
                     block->delete_instr(inst);
                 }
             }

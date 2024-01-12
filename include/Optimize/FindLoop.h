@@ -27,5 +27,6 @@ private:
 const std::string fldump = "find_loop.out";
 void find_inner_loop(Ptr<Function> func);
 void get_loop_entry(Ptr<Function> func);
+void merge_loop(Ptr<Function> func);
 }
 }

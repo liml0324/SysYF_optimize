@@ -59,6 +59,7 @@ public:
 
     void add_loop(Ptr<Loop> loop) { loops_.push_back(loop); }
     PtrVec<Loop>& get_loops() { return loops_; }
+    void remove_loop(int pos) { loops_.erase(loops_.begin() + pos); }
     void clear_loops() { loops_.clear(); }
     void set_back_edges(std::vector<std::pair<Ptr<BasicBlock>, Ptr<BasicBlock>>> &back_edges) { back_edges_ = back_edges; }
     std::vector<std::pair<Ptr<BasicBlock>, Ptr<BasicBlock>>> &get_back_edges() { return back_edges_; }

@@ -31,13 +31,13 @@ int main(int argc, char *argv[])
     auto builder = SysYF::IR::IRBuilder::create();
 
     bool print_ast = false;
-    bool print_ir = false;
-    bool optimize = false;
+    bool print_ir = true;
+    bool optimize = true;
     bool optimize_all = false;
     bool av = false;
 
-    std::string filename = "testcase.sy";
-    // std::string filename = "../test/Test_H/Hard_H/bitset.sy";
+    // std::string filename = "testcase.sy";
+    std::string filename = "../test/Test_H/Medium_H/assign_after_continue.sy";
     std::string output_llvm_file = "testcase.ll";
     for (int i = 1; i < argc; ++i) {
         if (argv[i] == std::string("-h") || argv[i] == std::string("--help")) {
@@ -86,18 +86,15 @@ int main(int argc, char *argv[])
                 passmgr.addPass<ConstCalc>();
                 passmgr.addPass<FindPureFunc>();
                 passmgr.addPass<LocalCSE>();
-                passmgr.addPass<ActiveVar>();
                 passmgr.addPass<FindLoop>();
                 passmgr.addPass<LoopCodeMotion>();
-                passmgr.addPass<ActiveVar>();
-                passmgr.addPass<DCE>();
-                passmgr.addPass<DBE>();
-                passmgr.addPass<ActiveVar>();
-                passmgr.addPass<DCE>();
-                passmgr.addPass<DBE>();
-                passmgr.addPass<ActiveVar>();
-                passmgr.addPass<DCE>();
                 //这里多删除几次，一次可能删不干净
+                passmgr.addPass<DCE>();
+                passmgr.addPass<DBE>();
+                passmgr.addPass<DCE>();
+                passmgr.addPass<DBE>();
+                passmgr.addPass<DCE>();
+                passmgr.addPass<ActiveVar>();
                 //  ...
             }
             else {
