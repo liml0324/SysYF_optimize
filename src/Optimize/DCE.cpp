@@ -16,8 +16,14 @@ void DCE::execute() {
         for(auto &block : func->get_basic_blocks()) {
             PtrVec<Instruction> insts(block->get_instructions().begin(), block->get_instructions().end());
             for(auto inst: insts) {
-                if(inst->is_br() || inst->is_ret() || inst->is_call() || inst->is_store()) {
+                if(inst->is_br() || inst->is_ret() || inst->is_store()) {
                     continue;
+                }
+                if(inst->is_call()) {
+                    auto call_func = dynamic_pointer_cast<Function>(inst->get_operand(0));
+                    if(!call_func || !call_func->is_pure()) {
+                        continue;
+                    }
                 }
                 bool used_in_block = false;
                 for(auto &inst2: block->get_instructions()) {

@@ -63,6 +63,9 @@ public:
     void set_back_edges(std::vector<std::pair<Ptr<BasicBlock>, Ptr<BasicBlock>>> &back_edges) { back_edges_ = back_edges; }
     std::vector<std::pair<Ptr<BasicBlock>, Ptr<BasicBlock>>> &get_back_edges() { return back_edges_; }
 
+    void set_pure(bool p) { pure = p; }
+    bool is_pure() { return pure; }
+
     void set_instr_name();
     std::string print();
 
@@ -80,6 +83,7 @@ private:
     Ptr<Module> parent_;
     std::set<int> unused_reg_num_;
     unsigned seq_cnt_;
+    bool pure;
     // unsigned num_args_;
     // We don't need this, all value inside function should be unnamed
     // std::map<std::string, Ptr<Value>> sym_table_;   // Symbol table of args/instructions

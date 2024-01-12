@@ -16,6 +16,7 @@ Function::Function(Ptr<FunctionType> ty, const std::string &name, Ptr<Module> pa
 void Function::init(Ptr<FunctionType> ty, const std::string &name, Ptr<Module> parent) {
     parent_->add_function(dynamic_pointer_cast<Function>(shared_from_this()));
     build_args();
+    pure = true;
 }
 
 Ptr<Function> Function::create(Ptr<FunctionType> ty, const std::string &name, Ptr<Module> parent)

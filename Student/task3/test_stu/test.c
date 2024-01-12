@@ -1,6 +1,10 @@
+void pure_func(int a[]){
+    a[0] = 1;
+    return;
+}
+
 int main() {
-    if(3 > 2){
-        return 1;
-    }
-    return 0;
+    int a[2];
+    pure_func(a);
+    return a[0];
 }

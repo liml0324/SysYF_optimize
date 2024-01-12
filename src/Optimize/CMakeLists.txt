@@ -12,4 +12,5 @@ add_library(
         LocalCSE.cpp
         FindLoop.cpp
         LoopCodeMotion.cpp
+        FindPureFunc.cpp
 )
