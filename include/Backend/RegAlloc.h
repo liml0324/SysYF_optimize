@@ -52,8 +52,8 @@ struct cmp_interval{
 
 struct cmp_interval_by_end{
     bool operator()(const Ptr<Interval> a, const Ptr<Interval> b) const {
-        auto a_to = (*(a->range_list.end()))->to;
-        auto b_to = (*(b->range_list.end()))->to;
+        auto a_to = (*(a->range_list.rbegin()))->to;
+        auto b_to = (*(b->range_list.rbegin()))->to;
         if(a_to!=b_to){
             return a_to < b_to;
         }else{
