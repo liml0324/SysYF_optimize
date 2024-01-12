@@ -91,7 +91,7 @@ void DBE::execute() {
                         prev->add_succ_basic_block(succ);
                         succ->add_pre_basic_block(prev);
 
-                        for(auto &inst: succ->get_instructions()) {
+                        for(auto &inst: succ->get_instructions()) {// 后继的前驱发生了改变，需要更新phi
                             if(!(inst->is_phi())) {
                                 break;
                             }
@@ -103,7 +103,7 @@ void DBE::execute() {
                                 if(op_block != block) {
                                     continue;
                                 }
-                                phi->set_operand(i+1, prev);
+                                phi->set_operand(i+1, prev);// 将block对应的操作数修改为它的前驱即可
                                 block->remove_use(phi);
                             }
                         }

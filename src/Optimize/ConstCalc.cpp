@@ -191,7 +191,7 @@ void ConstCalc::execute() {
                             true_bb->remove_pre_basic_block(block);
                             del_bb = true_bb;
                         }
-                        for(auto &inst: del_bb->get_instructions()) {
+                        for(auto &inst: del_bb->get_instructions()) {// 删除phi指令中对应前驱块的操作数
                             if(!inst->is_phi()) {
                                 break;
                             }
@@ -203,7 +203,7 @@ void ConstCalc::execute() {
                                 if(op_block != block) {
                                     continue;
                                 }
-                                if(phi->get_num_operand() == 4) {
+                                if(phi->get_num_operand() == 4) {// 如果原本就只有两对操作数，那么直接用另一对中的Value替换即可
                                     Ptr<Value> new_op;
                                     if(i == 0) {
                                         new_op = phi->get_operand(2);
