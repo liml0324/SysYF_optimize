@@ -6,8 +6,8 @@ import time
 IRBuild_ptn = '"{}" "-emit-ir" "-o" "{}" "{}" "{}"'
 ExeGen_ptn = '"clang" "{}" "-o" "{}" "{}" "../lib/lib.c"'
 Exe_ptn = '"{}"'
-IR_Optimiazation = "-O"
-time_detailed = True
+IR_Optimiazation = "-O2"
+time_detailed = False
 time_cost_ir = 0
 time_cost_exegen = 0
 time_cost_exe = 0
@@ -86,6 +86,7 @@ def eval(EXE_PATH, TEST_BASE_PATH, optimization):
                                 time_end_exe - time_start_exe))
                         else:
                             print('\t\033[32mPass\033[0m')
+                            pass
                     else:
                         print('\t\033[31mWrong Answer\033[0m')
             except Exception as _:
@@ -114,12 +115,12 @@ if __name__ == "__main__":
     # you can only modify this to add your testcase
     # 测试目录
     TEST_DIRS = [
-                # './Test_H/Easy_H/',
-                # './Test_H/Medium_H/',
+                './Test_H/Easy_H/',
+                './Test_H/Medium_H/',
                 './Test_H//Hard_H/',
-                # './Test/Easy/',
-                # './Test/Medium/',
-                # './Test/Hard/'
+                './Test/Easy/',
+                './Test/Medium/',
+                './Test/Hard/'
                 # './performance-cases/'
                 ]
     # you can only modify this to add your testcase
@@ -157,7 +158,7 @@ if __name__ == "__main__":
         print("\t\033[31mTest Fail\033[0m in dirs {}".format(fail_dir_str))
     else:
         print("\t\033[32mAll Tests Passed\033[0m")
-    print('Total IRBuild time cost: {:.4f}s'.format(time_cost_ir))
-    print('Total ExeGen time cost: {:.4f}s'.format(time_cost_exegen))
-    print('Total Exe time cost: {:.4f}s'.format(time_cost_exe))
+    # print('Total IRBuild time cost: {:.4f}s'.format(time_cost_ir))
+    # print('Total ExeGen time cost: {:.4f}s'.format(time_cost_exegen))
+    # print('Total Exe time cost: {:.4f}s'.format(time_cost_exe))
         

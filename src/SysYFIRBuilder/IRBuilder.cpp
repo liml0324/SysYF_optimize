@@ -334,6 +334,14 @@ void IRBuilder::visit(SyntaxTree::VarDef &node) {
                             }
                         }
                     }
+                    else {
+                        if(node.btype == SyntaxTree::Type::INT) {
+                            builder->create_store(CONST_INT(0), tmp_val);
+                        }
+                        else if(node.btype == SyntaxTree::Type::FLOAT) {
+                            builder->create_store(CONST_FLOAT(0), tmp_val);
+                        }
+                    }
                 }
                 else if(node.btype == SyntaxTree::Type::FLOAT) {//浮点型也一样
                     tmp_val = builder->create_alloca(FLOAT_T);

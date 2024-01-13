@@ -7,6 +7,10 @@ namespace SysYF
 {
 namespace IR
 {
+bool less_than(Ptr<Loop> a, Ptr<Loop> b) {
+    return a->get_blocks().size() < b->get_blocks().size();
+}
+
 void FindLoop::execute() {
     for(auto &func : module->get_functions()) {
         if(func->get_basic_blocks().empty()) {
@@ -38,6 +42,7 @@ void FindLoop::execute() {
             loop->clear_sub_loops();
         }
         find_inner_loop(func);
+        std::sort(func->get_loops().begin(), func->get_loops().end(), less_than);
     }
     dump();
 }
@@ -104,10 +109,6 @@ void FindLoop::dump() {
             }
         }
     }
-}
-
-bool less_than(Ptr<Loop> a, Ptr<Loop> b) {
-    return a->get_blocks().size() < b->get_blocks().size();
 }
 
 void find_inner_loop(Ptr<Function> func) {

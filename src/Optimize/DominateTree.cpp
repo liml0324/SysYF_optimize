@@ -16,6 +16,7 @@ void DominateTree::execute() {
 }
 
 void DominateTree::get_post_order(Ptr<BasicBlock>bb,PtrSet<BasicBlock>& visited) {
+    // 按后序遍历编号
     visited.insert(bb);
     auto children = bb->get_succ_basic_blocks();
     for(auto child : children){
@@ -29,6 +30,7 @@ void DominateTree::get_post_order(Ptr<BasicBlock>bb,PtrSet<BasicBlock>& visited)
 }
 
 void DominateTree::get_revserse_post_order(Ptr<Function>f) {
+    // 倒过来的后序
     doms.clear();
     reverse_post_order.clear();
     bb2int.clear();
@@ -43,11 +45,12 @@ void DominateTree::get_bb_idom(Ptr<Function>f) {
     get_revserse_post_order(f);
 
     auto root = f->get_entry_block();
-    auto root_id = bb2int[root];
+    auto root_id = bb2int[root];// 这里的编号仍然是按后序遍历编的号
+    // 除入口外，初始支配节点均为空
     for(int i = 0;i < root_id;i++){
         doms.push_back(nullptr);
     }
-
+    //入口的支配节点为自己
     doms.push_back(root);
 
     bool changed = true;
@@ -60,12 +63,15 @@ void DominateTree::get_bb_idom(Ptr<Function>f) {
             auto preds = bb->get_pre_basic_blocks();
             Ptr<BasicBlock> new_idom = nullptr;
             for(auto pred_bb:preds){
+                // 有前驱节点支配节点已知，直接取该前驱节点
                 if(doms[bb2int[pred_bb]] != nullptr){
                     new_idom = pred_bb;
                     break;
                 }
             }
             for(auto pred_bb:preds){
+                // 有别的前驱节点支配节点已知，取前驱与当前直接支配节点的最近公共支配祖先
+                // 这是因为直接支配节点一定支配它的所有前驱，所有前驱的公共支配节点一定支配它
                 if(doms[bb2int[pred_bb]] != nullptr){
                     new_idom = intersect(pred_bb,new_idom);
                 }
@@ -101,6 +107,8 @@ Ptr<BasicBlock> DominateTree::intersect(Ptr<BasicBlock>b1, Ptr<BasicBlock>b2) {
     auto finger1 = b1;
     auto finger2 = b2;
     while(finger1!=finger2){
+        // 后序遍历编号，编号大的是祖先
+        // 所以寻找公共支配祖先时，编号小的先往上走
         while(bb2int[finger1]<bb2int[finger2]){
             finger1 = doms[bb2int[finger1]];
         }

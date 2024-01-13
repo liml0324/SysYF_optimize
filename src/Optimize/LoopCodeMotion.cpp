@@ -66,13 +66,13 @@ void LoopCodeMotion::execute() {
                     for(int i = 0; i < phi->get_num_operand(); i+=2) {
                         auto op = phi->get_operand(i);
                         auto op_block = std::dynamic_pointer_cast<BasicBlock>(phi->get_operand(i+1));
-                        if(loop->get_blocks().find(op_block) != loop->get_blocks().end()) {
+                        if(loop->get_blocks().find(op_block) != loop->get_blocks().end()) {// 这一对操作数包含循环内的基本块，留在循环入口
                             in_entry.insert({op, op_block});
                         }
-                        else {
+                        else {// 这一对操作数用到了循环外的基本块，应该被移到循环前的新基本块里
                             in_pre.insert({op, op_block});
                         }
-                        if(in_entry.empty()) {// 没有用到循环内的基本块
+                        if(in_entry.empty()) {// 没有用到循环内的基本块，直接移到pre中
                             loop_entry->delete_instr(phi);
                             loop_pre_bb->add_instr_begin(phi);
                         }
@@ -128,10 +128,16 @@ void find_movable_insts(Ptr<Loop> loop, PtrVec<Instruction> &movable_insts) {
     }
     for(auto block : loop->get_blocks()) {
         for(auto inst : block->get_instructions()) {
-            if(inst->is_alloca() || inst->is_br() || inst->is_call() || inst->is_load() || inst->is_phi()) {
+            if(inst->is_alloca() || inst->is_br() || inst->is_load() || inst->is_phi()) {
                 continue;
             }
             bool movable = true;
+            if(inst->is_call()) {
+                auto call_func = std::dynamic_pointer_cast<Function>(inst->get_operand(0));
+                if(!call_func || !call_func->is_pure()) {
+                    movable = false;
+                }
+            }
             for(auto op : inst->get_operands()) {
                 auto inst_ = dynamic_pointer_cast<Instruction>(op);
                 auto gv = dynamic_pointer_cast<GlobalVariable>(op);
@@ -139,21 +145,9 @@ void find_movable_insts(Ptr<Loop> loop, PtrVec<Instruction> &movable_insts) {
                     movable = false;
                     break;
                 }
-                else if(inst_ && inst_->is_load()) {
-                    auto load = std::dynamic_pointer_cast<LoadInst>(inst_);
-                    auto ptr = load->get_operand(0);
-                    if(dynamic_pointer_cast<GlobalVariable>(ptr)) {// load全局变量
-                        movable = false;
-                        break;
-                    }
-                    auto ptr_inst = dynamic_pointer_cast<Instruction>(ptr);
-                    if(ptr_inst) {
-                        auto ptr = ptr_inst->get_operand(0);
-                        if(dynamic_pointer_cast<GlobalVariable>(ptr)) {// load全局变量
-                            movable = false;
-                            break;
-                        }
-                    }
+                else if(gv && !gv->is_const()) {
+                    movable = false;
+                    break;
                 }
             }
             if(movable) {
