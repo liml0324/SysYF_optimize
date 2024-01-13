@@ -39,9 +39,9 @@ namespace IR{
         //由于限制，所有顶点都至多有一条出边，所以，按逆拓扑先处理无出度顶点后，剩余图为若干圈的并集
         //为没有出边的顶点赋值
         std::set<Ptr<IR2asm::Location>,cmp_out_num> dec_out_vec;
-        while(depend_graph[*(dec_out_vec.begin())].size()==1){
+        auto cur_dst=*(dec_out_vec.begin());
+        while(depend_graph[cur_dst].size()==1){
             //找到了无出度的顶点
-            auto cur_dst=*(dec_out_vec.begin());
             auto cur_src=depend_graph[cur_dst][0];
             if(cur_src!=nullptr){
                 //有入度
@@ -50,6 +50,7 @@ namespace IR{
                 for(auto it=src_out_list.begin();it!=src_out_list.end();it++){
                     if(*it==cur_dst){
                         src_out_list.erase(it);
+                        (*it)->out_deg--;
                         break;
                     }
                 }
@@ -58,6 +59,7 @@ namespace IR{
             }
             depend_graph.erase(cur_dst);
             dec_out_vec.erase(dec_out_vec.begin());
+            cur_dst=*(dec_out_vec.begin());
         }
         //获取空闲寄存器
         auto reg_tmp_2=Ptr<IR2asm::Location>(new IR2asm::RegLoc(10));

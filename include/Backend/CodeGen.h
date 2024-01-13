@@ -23,7 +23,7 @@ class CodeGen{
     std::pair<std::set<int>, std::set<int>> used_reg;
     // std::map<int, std::vector<Ptr<Value>>> reg2value;
     std::map<Ptr<Value>, Ptr<Interval>> reg_map;
-    static std::map<Ptr<IR2asm::Location>,PtrVec<IR2asm::Location>> depend_graph;
+    std::map<Ptr<IR2asm::Location>,PtrVec<IR2asm::Location>> depend_graph;
     int func_no = 0;
     int bb_no = 0;
     int label_no = 0;
@@ -83,7 +83,7 @@ public:
     std::string phi_union(Ptr<BasicBlock> bb, Ptr<Instruction> br_inst);
     std::string single_data_move(Ptr<IR2asm::Location> src_loc, Ptr<IR2asm::Location> target_loc, Ptr<IR2asm::Reg>reg_tmp, std::string cmpop = "");
     std::string data_move(PtrVec<IR2asm::Location> &src, std::vector<Ptr<IR2asm::Location>> &dst, std::string cmpop = "");
-    std::map<Ptr<IR2asm::Location>,PtrVec<IR2asm::Location>> CodeGen::create_dep_graph(PtrVec<IR2asm::Location> &src,PtrVec<IR2asm::Location> &dst);
+    std::map<Ptr<IR2asm::Location>,PtrVec<IR2asm::Location>> create_dep_graph(PtrVec<IR2asm::Location> &src,PtrVec<IR2asm::Location> &dst);
     Ptr<IR2asm::Reg>get_asm_reg(Ptr<Value>val){
         if ((reg_map).find(val) != reg_map.end())
             return Ptr<IR2asm::Reg>(new IR2asm::Reg((reg_map).find(val)->second->reg_num));
@@ -99,8 +99,8 @@ public:
 private:
     struct cmp_out_num{
         bool operator()(const Ptr<IR2asm::Location> a, const Ptr<IR2asm::Location> b) const {
-            auto a_size=depend_graph[a].size();
-            auto b_size=depend_graph[b].size();
+            auto a_size=a->out_deg;
+            auto b_size=b->out_deg;
             if(a_size!=b_size) return a_size<b_size;
             else return a->get_code()<b->get_code();
         }
