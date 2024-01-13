@@ -31,8 +31,8 @@ int main(int argc, char *argv[])
     auto builder = SysYF::IR::IRBuilder::create();
 
     bool print_ast = false;
-    bool print_ir = true;
-    bool optimize = true;
+    bool print_ir = false;
+    bool optimize = false;
     bool optimize_all = false;
     bool av = false;
 

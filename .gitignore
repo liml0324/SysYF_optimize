@@ -4,4 +4,5 @@ Student/test/
 a.out
 **/build/*
 active_var.out
+find_loop.out
 *_copy.*
