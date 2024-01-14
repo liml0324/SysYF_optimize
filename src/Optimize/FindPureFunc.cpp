@@ -19,7 +19,9 @@ void FindPureFunc::execute() {
         PtrSet<Value> pointer_set;
         for(auto arg : args) {
             if(arg->get_type()->is_pointer_type()) {
-                pointer_set.insert(arg);
+                func->set_pure(false);
+                break;
+                // pointer_set.insert(arg);
             }
         }
         if(!func->is_pure()) {
@@ -37,16 +39,16 @@ void FindPureFunc::execute() {
                         break;
                     }
                 }
-                else if(inst->is_store()) {
-                    auto gep = dynamic_pointer_cast<GetElementPtrInst>(inst->get_operand(1));
-                    if(gep) {
-                        auto base = gep->get_operand(0);
-                        if(pointer_set.find(base) != pointer_set.end()) {
-                            func->set_pure(false);
-                            break;
-                        }
-                    }
-                }
+                // else if(inst->is_store()) {
+                //     auto gep = dynamic_pointer_cast<GetElementPtrInst>(inst->get_operand(1));
+                //     if(gep) {
+                //         auto base = gep->get_operand(0);
+                //         if(pointer_set.find(base) != pointer_set.end()) {
+                //             func->set_pure(false);
+                //             break;
+                //         }
+                //     }
+                // }
                 for(auto op : inst->get_operands()) {
                     if(dynamic_pointer_cast<GlobalVariable>(op)) {
                         func->set_pure(false);
@@ -62,6 +64,12 @@ void FindPureFunc::execute() {
             }
         }
     }
+
+    // for(auto func : this->module->get_functions()) {
+    //     if(func->is_pure()) {
+    //         std::cout << func->get_name() << std::endl;
+    //     }
+    // }
 }
 }
 }

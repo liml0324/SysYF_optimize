@@ -107,28 +107,31 @@ void LoopCodeMotion::execute() {
             }
             std::set<std::pair<Ptr<Instruction>, Ptr<BasicBlock>>> dels;
             for(auto inst : movable_insts) {
+                // std::cout << inst->print() << std::endl;
                 auto br = loop_pre_bb->get_terminator();
                 auto block = inst->get_parent();
-                loop_pre_bb->delete_instr(br);
-                loop_pre_bb->add_instruction(inst);
-                loop_pre_bb->add_instruction(br);
-                dels.insert({inst, block});
+                block->delete_instr_without_remove_use(inst);
+                auto term_pos = loop_pre_bb->find_instruction(br);
+                loop_pre_bb->add_instruction(term_pos, inst);
+                // dels.insert({inst, block});
                 inst->set_parent(loop_pre_bb);
+                // std::cout << loop_pre_bb->print() << std::endl;
             }
-            for(auto pair : dels) {
-                pair.second->delete_instr(pair.first);
-            }
+            // for(auto pair : dels) {
+            //     pair.second->delete_instr(pair.first);
+            // }
         }
     }
 }
 void find_movable_insts(Ptr<Loop> loop, PtrVec<Instruction> &movable_insts) {
     PtrSet<Instruction> defs;
+    PtrSet<Instruction> movable_insts_set;
     for(auto block : loop->get_blocks()) {
         defs.insert(block->get_instructions().begin(), block->get_instructions().end());
     }
     for(auto block : loop->get_blocks()) {
         for(auto inst : block->get_instructions()) {
-            if(inst->is_alloca() || inst->is_br() || inst->is_load() || inst->is_phi()) {
+            if(inst->is_alloca() || inst->is_br() || inst->is_load() || inst->is_phi() || inst->is_store()) {
                 continue;
             }
             bool movable = true;
@@ -141,7 +144,7 @@ void find_movable_insts(Ptr<Loop> loop, PtrVec<Instruction> &movable_insts) {
             for(auto op : inst->get_operands()) {
                 auto inst_ = dynamic_pointer_cast<Instruction>(op);
                 auto gv = dynamic_pointer_cast<GlobalVariable>(op);
-                if(inst_ && defs.find(inst_) != defs.end()) {
+                if(inst_ && defs.find(inst_) != defs.end() && movable_insts_set.find(inst_) == movable_insts_set.end()) {
                     movable = false;
                     break;
                 }
@@ -152,6 +155,7 @@ void find_movable_insts(Ptr<Loop> loop, PtrVec<Instruction> &movable_insts) {
             }
             if(movable) {
                 movable_insts.push_back(inst);
+                movable_insts_set.insert(inst);
             }
         }
     }

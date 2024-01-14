@@ -61,6 +61,11 @@ void BasicBlock::delete_instr( Ptr<Instruction> instr )
     instr->remove_use_of_ops();
 }
 
+void BasicBlock::delete_instr_without_remove_use( Ptr<Instruction> instr )
+{
+    instr_list_.remove(instr);
+}
+
 const Ptr<Instruction> BasicBlock::get_terminator() const
 {
     if (instr_list_.empty()){

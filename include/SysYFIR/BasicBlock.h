@@ -59,6 +59,7 @@ public:
     PtrList<Instruction>::iterator find_instruction(Ptr<Instruction> instr);
 
     void delete_instr(Ptr<Instruction> instr);
+    void delete_instr_without_remove_use(Ptr<Instruction> instr);
 
     bool empty() { return instr_list_.empty(); }
 
