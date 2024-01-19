@@ -159,6 +159,16 @@ namespace IR{
                     i++;
                     continue;
                 }
+                else if(dynamic_pointer_cast<ConstantFloat>(arg)){
+                    regcode += IR2asm::space;
+                    regcode += "ldr ";
+                    regcode += IR2asm::Reg(i).get_code();
+                    regcode += ", =";
+                    regcode += std::to_string(dynamic_pointer_cast<ConstantFloat>(arg)->get_value());
+                    regcode += IR2asm::endl;
+                    i++;
+                    continue;
+                }
                 auto reg = (reg_map).find(arg)->second->reg_num;
                 Ptr<IR2asm::Reg> preg;
                 if(reg >= 0){
