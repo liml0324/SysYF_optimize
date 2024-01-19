@@ -58,6 +58,13 @@ namespace IR{
         for(auto it=depend_graph.begin();it!=depend_graph.end();it++){
             dec_out_vec.insert(it->first);
         }
+        #ifdef test_phi
+            //print_dev_out_vec
+            std::cout<<"dec_out_vec:"<<std::endl;
+            for(auto it=dec_out_vec.begin();it!=dec_out_vec.end();it++){
+                std::cout<<(*it)->get_code()<<" "<<(*it)->out_deg<<std::endl;
+            }
+        #endif
         auto cur_dst=*(dec_out_vec.begin());
         while(cur_dst!=nullptr&&depend_graph[cur_dst].size()==1){
             //找到了无出度的顶点
@@ -69,7 +76,7 @@ namespace IR{
                 for(auto it=src_out_list.begin();it!=src_out_list.end();it++){
                     if(*it==cur_dst){
                         src_out_list.erase(it);
-                        (*it)->out_deg--;
+                        cur_src->out_deg--;
                         break;
                     }
                 }
@@ -81,10 +88,26 @@ namespace IR{
             #endif
             depend_graph.erase(cur_dst);
             dec_out_vec.erase(dec_out_vec.begin());
+            if(cur_src!=nullptr){
+                for(auto it=dec_out_vec.begin();it!=dec_out_vec.end();it++){
+                    if(*it==cur_src){
+                        dec_out_vec.erase(it);
+                        break;
+                    }
+                }
+                dec_out_vec.insert(cur_src);
+            }
             if(dec_out_vec.empty())
                 cur_dst=nullptr;
             else
                 cur_dst=*(dec_out_vec.begin());
+            #ifdef test_phi
+                //print_dev_out_vec
+                std::cout<<"dec_out_vec:"<<std::endl;
+                for(auto it=dec_out_vec.begin();it!=dec_out_vec.end();it++){
+                    std::cout<<(*it)->get_code()<<" "<<(*it)->out_deg<<std::endl;
+                }
+            #endif
         }
         #ifdef test_phi
             if(!depend_graph.empty()){
