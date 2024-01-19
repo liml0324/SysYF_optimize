@@ -43,6 +43,7 @@ namespace IR2asm{
     std::string b(Ptr<Location> label);
     std::string br(Ptr<Location> label);
     std::string cmp(Ptr<Reg> rs, Operand2* opr2);
+    std::string fcmp(Ptr<Reg> rs, Operand2* opr2);
     std::string add(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2);
     std::string sub(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2);
     std::string r_sub(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2);

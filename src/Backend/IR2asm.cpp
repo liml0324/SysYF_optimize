@@ -172,6 +172,17 @@ std::string cmp(Ptr<Reg> rs, Operand2* opr2) {
     return asmstr;
 }
 
+std::string fcmp(Ptr<Reg> rs, Operand2* opr2) {
+    std::string asmstr;
+    asmstr += space;
+    asmstr += "fcmp ";
+    asmstr += rs->get_code();
+    asmstr += ", ";
+    asmstr += opr2->get_code();
+    asmstr += endl;
+    return asmstr;
+}
+
 std::string add(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2){
     std::string asmstr;
     asmstr += space;

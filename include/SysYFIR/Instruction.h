@@ -50,6 +50,7 @@ public:
         sitofp,
         // LIR instructions
         cmpbr,
+        fcmpbr,
         mov_const,
     };
     inline const Ptr<BasicBlock> get_parent() const { return parent_; }
@@ -86,6 +87,7 @@ public:
             case fptosi: return "fptosi"; break;
             case sitofp: return "sitofp"; break;
             case cmpbr: return "icmpbr"; break;
+            case fcmpbr: return "fcmpbr"; break;
             case mov_const: return "mov_const"; break;
         
         default: return ""; break;
@@ -94,7 +96,7 @@ public:
 
 
 
-    bool is_void() { return ((op_id_ == ret) ||(op_id_ == cmpbr) || (op_id_ == br) || (op_id_ == store) || (op_id_ == call && this->get_type()->is_void_type())); }
+    bool is_void() { return ((op_id_ == ret) ||(op_id_ == cmpbr)||(op_id_ == fcmpbr) || (op_id_ == br) || (op_id_ == store) || (op_id_ == call && this->get_type()->is_void_type())); }
 
     bool is_phi() { return op_id_ == phi; }
     bool is_store() { return op_id_ == store; }
@@ -124,6 +126,7 @@ public:
     bool is_sitofp() { return op_id_ == sitofp; }
 
     bool is_cmpbr() { return op_id_ == cmpbr; }
+    bool is_fcmpbr() { return op_id_ == fcmpbr; }
     bool is_mov_const() { return op_id_ == mov_const; }
 
     bool isBinary()
@@ -133,7 +136,7 @@ public:
                 (get_num_operand() == 2);
     }
 
-    bool isTerminator() { return is_br() || is_cmpbr() || is_ret(); }
+    bool isTerminator() { return is_br() || is_cmpbr()||is_fcmpbr() || is_ret(); }
 
     void set_id(int id){id_ = id;}
     int get_id() const{return id_;}
@@ -462,6 +465,30 @@ private:
     void assertValid(){};
 };
 
+class FCmpBrInst : public Instruction
+{
+public:
+    using CmpOp = FCmpInst::CmpOp;
+
+private:
+    explicit FCmpBrInst(OpID opid, CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false, Ptr<BasicBlock >bb);
+    void init(OpID opid, CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false, Ptr<BasicBlock >bb);
+
+public:
+    static Ptr<FCmpBrInst> create_fcmpbr(CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false,
+                               Ptr<BasicBlock >bb, Ptr<Module>m);
+
+    CmpOp get_fcmp_op() { return cmp_op_; }
+
+    bool is_fcmp_br() const;
+
+    virtual std::string print() override;
+
+private:
+    CmpOp cmp_op_;
+
+    void assertValid(){};
+};
 
 class MovConstInst : public Instruction
 {

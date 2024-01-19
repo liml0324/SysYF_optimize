@@ -76,8 +76,8 @@ bb0_6:
     ldr r7, =4
     mul r8, r2, r7
     add r0, r3, r8
-    str r0, [sp, #32]
-    ldr r0, [sp, #32]
+    str r0, [sp, #44]
+    ldr r0, [sp, #44]
     ldr r7, [r0]
     ldr r0, [sp, #129]
     str r7, [r0]
@@ -99,25 +99,25 @@ litpool0_0:
     mul r3, r8, r7
     str r0, [sp]
     add r0, r2, r3
-    str r0, [sp, #117]
-    ldr r0, [sp, #117]
+    str r0, [sp, #109]
+    ldr r0, [sp, #109]
     ldr r7, [r0]
     sub r8, r4, #1
     ldr r3, =200
     mul r2, r8, r3
     add r0, r2, r6
-    str r0, [sp, #20]
+    str r0, [sp, #28]
     add r3, r4, #0
     ldr r8, Addr0_0
     ldr r2, =4
     mul r0, r3, r2
+    str r0, [sp, #77]
+    ldr r0, [sp, #77]
+    add r0, r8, r0
     str r0, [sp, #81]
     ldr r0, [sp, #81]
-    add r0, r8, r0
-    str r0, [sp, #85]
-    ldr r0, [sp, #85]
     ldr r2, [r0]
-    ldr r0, [sp, #20]
+    ldr r0, [sp, #28]
     sub r3, r0, r2
     add r8, r3, #0
     ldr r2, Addr0_3
@@ -132,8 +132,8 @@ litpool0_0:
     add r8, r4, #0
     ldr r2, Addr0_1
     ldr r0, =4
-    str r0, [sp, #4]
-    ldr r0, [sp, #4]
+    str r0, [sp, #121]
+    ldr r0, [sp, #121]
     mul r0, r8, r0
     str r0, [sp, #97]
     ldr r0, [sp, #97]
@@ -145,7 +145,7 @@ litpool0_0:
     cmp r7, r2
     ldr r0, =0
     ldrgt r0, =1
-    str r0, [sp, #36]
+    str r0, [sp, #48]
     cmp r7, r2
     ldr r0, [sp]
     bgt bb0_9
@@ -153,30 +153,30 @@ litpool0_0:
 bb0_8:
     str r0, [sp]
     add r0, r6, #1
-    str r0, [sp, #73]
+    str r0, [sp, #85]
     ldr r0, [sp]
     Mov r5, r8
-    ldr r6, [sp, #73]
+    ldr r6, [sp, #85]
     Mov r9, r3
     b bb0_3
 bb0_9:
     str r0, [sp]
     ldr r0, =200
-    str r0, [sp, #4]
-    ldr r0, [sp, #4]
+    str r0, [sp, #121]
+    ldr r0, [sp, #121]
     mul r3, r4, r0
     add r8, r3, r6
     add r0, r8, #0
-    str r0, [sp, #45]
+    str r0, [sp, #57]
     ldr r3, Addr0_3
     ldr r8, =4
-    ldr r0, [sp, #45]
+    ldr r0, [sp, #57]
     mul r0, r0, r8
-    str r0, [sp, #109]
-    ldr r0, [sp, #109]
+    str r0, [sp, #105]
+    ldr r0, [sp, #105]
     add r0, r3, r0
-    str r0, [sp, #77]
-    ldr r0, [sp, #77]
+    str r0, [sp, #69]
+    ldr r0, [sp, #69]
     str r7, [r0]
     ldr r0, [sp]
     b bb0_11
@@ -185,19 +185,19 @@ bb0_10:
     mul r8, r4, r3
     str r0, [sp]
     add r0, r8, r6
-    str r0, [sp, #61]
-    ldr r0, [sp, #61]
+    str r0, [sp, #73]
+    ldr r0, [sp, #73]
     add r3, r0, #0
     ldr r8, Addr0_3
     ldr r0, =4
     str r0, [sp, #4]
     ldr r0, [sp, #4]
     mul r0, r3, r0
-    str r0, [sp, #37]
-    ldr r0, [sp, #37]
+    str r0, [sp, #32]
+    ldr r0, [sp, #32]
     add r0, r8, r0
-    str r0, [sp, #41]
-    ldr r0, [sp, #41]
+    str r0, [sp, #36]
+    ldr r0, [sp, #36]
     str r2, [r0]
     ldr r0, [sp]
     b bb0_11
@@ -226,31 +226,31 @@ bb0_13:
     ldr r8, =4
     str r0, [sp]
     mul r0, r5, r8
+    str r0, [sp, #40]
+    ldr r0, [sp, #40]
+    add r0, r9, r0
     str r0, [sp, #49]
     ldr r0, [sp, #49]
-    add r0, r9, r0
-    str r0, [sp, #53]
-    ldr r0, [sp, #53]
     ldr r5, [r0]
     sub r8, r7, #1
     ldr r9, =200
     mul r0, r8, r9
-    str r0, [sp, #105]
-    ldr r0, [sp, #105]
-    add r0, r0, r6
     str r0, [sp, #113]
     ldr r0, [sp, #113]
+    add r0, r0, r6
+    str r0, [sp, #117]
+    ldr r0, [sp, #117]
     add r8, r0, #0
     ldr r9, Addr0_3
     ldr r0, =4
     str r0, [sp, #4]
     ldr r0, [sp, #4]
     mul r0, r8, r0
-    str r0, [sp, #57]
-    ldr r0, [sp, #57]
+    str r0, [sp, #53]
+    ldr r0, [sp, #53]
     add r0, r9, r0
-    str r0, [sp, #65]
-    ldr r0, [sp, #65]
+    str r0, [sp, #61]
+    ldr r0, [sp, #61]
     ldr r8, [r0]
     cmp r5, r8
     ldr r9, =0
@@ -268,11 +268,11 @@ bb0_14:
     ldr r5, =4
     str r0, [sp]
     mul r0, r8, r5
-    str r0, [sp, #69]
-    ldr r0, [sp, #69]
+    str r0, [sp, #65]
+    ldr r0, [sp, #65]
     add r0, r9, r0
-    str r0, [sp, #28]
-    ldr r0, [sp, #28]
+    str r0, [sp, #24]
+    ldr r0, [sp, #24]
     ldr r8, [r0]
     ldr r0, [sp]
     b bb0_18
@@ -312,9 +312,9 @@ bb0_16:
     ldr r0, [sp, #121]
     mul r9, r0, r8
     add r0, r5, r9
-    str r0, [sp, #24]
+    str r0, [sp, #20]
     ldr r8, =0
-    ldr r0, [sp, #24]
+    ldr r0, [sp, #20]
     str r8, [r0]
     ldr r0, [sp]
     Mov r5, r6
