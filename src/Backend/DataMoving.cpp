@@ -25,6 +25,7 @@
 
 namespace SysYF{
 namespace IR{
+    // #define test_phi
     std::string CodeGen::data_move(PtrVec<IR2asm::Location> &src,
                                    PtrVec<IR2asm::Location> &dst,
                                    std::string cmpop){
@@ -36,17 +37,35 @@ namespace IR{
         //建立有向依赖图
         depend_graph.clear();
         depend_graph=create_dep_graph(src,dst);
+        #ifdef test_phi
+            //print src dst
+            for(int i=0;i<src.size();i++){
+                std::cout<<src[i]->get_code()<<"->"<<dst[i]->get_code()<<std::endl;
+            }
+            //print 图
+            for(auto it=depend_graph.begin();it!=depend_graph.end();it++){
+                std::cout<<it->first->get_code()<<":";
+                for(auto it2=it->second.begin();it2!=it->second.end();it2++){
+                    if(*it2==nullptr)std::cout<<"nullptr ";
+                    else std::cout<<(*it2)->get_code()<<" ";
+                }
+                std::cout<<std::endl;
+            }
+        #endif
         //由于限制，所有顶点都至多有一条出边，所以，按逆拓扑先处理无出度顶点后，剩余图为若干圈的并集
         //为没有出边的顶点赋值
         std::set<Ptr<IR2asm::Location>,cmp_out_num> dec_out_vec;
+        for(auto it=depend_graph.begin();it!=depend_graph.end();it++){
+            dec_out_vec.insert(it->first);
+        }
         auto cur_dst=*(dec_out_vec.begin());
-        while(depend_graph[cur_dst].size()==1){
+        while(cur_dst!=nullptr&&depend_graph[cur_dst].size()==1){
             //找到了无出度的顶点
             auto cur_src=depend_graph[cur_dst][0];
             if(cur_src!=nullptr){
                 //有入度
                 code+=single_data_move(cur_src,cur_dst,reg_tmp,cmpop);
-                auto src_out_list=depend_graph[cur_src];
+                PtrVec<IR2asm::Location>& src_out_list=depend_graph[cur_src];
                 for(auto it=src_out_list.begin();it!=src_out_list.end();it++){
                     if(*it==cur_dst){
                         src_out_list.erase(it);
@@ -57,10 +76,28 @@ namespace IR{
             }else{
                 //无入度
             }
+            #ifdef test_phi
+                std::cout<<"cur_dst:"<<cur_dst->get_code()<<std::endl;
+            #endif
             depend_graph.erase(cur_dst);
             dec_out_vec.erase(dec_out_vec.begin());
-            cur_dst=*(dec_out_vec.begin());
+            if(dec_out_vec.empty())
+                cur_dst=nullptr;
+            else
+                cur_dst=*(dec_out_vec.begin());
         }
+        #ifdef test_phi
+            if(!depend_graph.empty()){
+                for(auto it=depend_graph.begin();it!=depend_graph.end();it++){
+                    std::cout<<it->first->get_code()<<":";
+                    for(auto it2=it->second.begin();it2!=it->second.end();it2++){
+                        if(*it2==nullptr)std::cout<<"nullptr ";
+                        else std::cout<<(*it2)->get_code()<<" ";
+                    }
+                    std::cout<<std::endl;
+                }
+            }
+        #endif
         //获取空闲寄存器
         auto reg_tmp_2=Ptr<IR2asm::Location>(new IR2asm::RegLoc(10));//To Be Opmized(可以入栈)
         //找环，直到所有顶点都被赋值
@@ -152,6 +189,7 @@ namespace IR{
             if(cur_src!=cur_dst){
                 depend_graph[cur_src].push_back(cur_dst);
                 depend_graph[cur_dst][0]=cur_src;
+                cur_src->out_deg++;
             }
         }
         return depend_graph;

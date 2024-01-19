@@ -10,12 +10,16 @@ time_detailed = True
 time_cost_ir = 0
 time_cost_exegen = 0
 time_cost_exe = 0
+pass_num=0
+total_num=0
 
 def Gen(EXE_PATH, TEST_BASE_PATH, optimization):
     global time_cost_ir
     global time_cost_exegen
     global time_cost_exe
     global time_detailed
+    global pass_num
+    global total_num
 
     print('===========TEST START===========')
     print('now in {}'.format(TEST_BASE_PATH))
@@ -33,7 +37,9 @@ def Gen(EXE_PATH, TEST_BASE_PATH, optimization):
         # time_end_ir = time.time()
         # time_cost_ir += time_end_ir - time_start_ir
         #IRBuild运行成功
+        total_num+=1
         if IRBuild_result.returncode == 0:
+            pass_num+=1
             print('\t\033[32mIRBuild Success\033[0m')
         else:
             dir_succ = False
@@ -93,4 +99,5 @@ if __name__ == "__main__":
         print("\t\033[31mTest Fail\033[0m in dirs {}".format(fail_dir_str))
     else:
         print("\t\033[32mAll Tests Passed\033[0m")
+    print("\t\033[32mPass Rate: {}/{}\033[0m".format(pass_num,total_num))
         
