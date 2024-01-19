@@ -16,8 +16,12 @@ namespace IR{
         if(dynamic_pointer_cast<ConstantInt>(init)){
             return (dynamic_pointer_cast<ConstantInt>(init)->get_value() == 0);
         }
+        else if(dynamic_pointer_cast<ConstantFloat>(init)){
+            return (dynamic_pointer_cast<ConstantFloat>(init)->get_value() == 0);
+        }
         else{
             auto initalizer = dynamic_pointer_cast<ConstantArray>(init);
+            if(initalizer==nullptr) std::cout<<"nullptr"<<std::endl;
             int init_size = initalizer->get_size_of_array();
             for(int i = 0; i < init_size; i++){
                 Ptr<Constant> init_iter = initalizer->get_element_value(i);
@@ -85,7 +89,12 @@ namespace IR{
                 code += IR2asm::space;
                 if(!isarray){
                     code += ".long ";
-                    code += std::to_string(dynamic_pointer_cast<ConstantInt>(initializer)->get_value());
+                    if(dynamic_pointer_cast<ConstantFloat>(initializer)){
+                        code += std::to_string(dynamic_pointer_cast<ConstantFloat>(initializer)->get_value());
+                    }
+                    else if(dynamic_pointer_cast<ConstantInt>(initializer)){
+                        code += std::to_string(dynamic_pointer_cast<ConstantInt>(initializer)->get_value());
+                    }
                     code += IR2asm::endl;
                     code += IR2asm::space;
                 }
@@ -102,7 +111,12 @@ namespace IR{
                         for(int i = 0; i < init_size; i++){
                             Ptr<Constant> init_iter = initalizer_->get_element_value(i);
                             code += ".long ";
-                            code += std::to_string(dynamic_pointer_cast<ConstantInt>(init_iter)->get_value());
+                            if(dynamic_pointer_cast<ConstantFloat>(initializer)){
+                                code += std::to_string(dynamic_pointer_cast<ConstantFloat>(initializer)->get_value());
+                            }
+                            else if(dynamic_pointer_cast<ConstantInt>(initializer)){
+                                code += std::to_string(dynamic_pointer_cast<ConstantInt>(initializer)->get_value());
+                            }
                             code += IR2asm::endl;
                             code += IR2asm::space;
                         }

@@ -19,9 +19,12 @@
 
 namespace SysYF{
 namespace IR{
+// #define stack_test
 int CodeGen::stack_space_allocation(Ptr<Function>fun)
 {
-    std::cout<<"stack_space_allocation"<<std::endl;
+    #ifdef stack_test
+        std::cout<<"stack_space_allocation"<<std::endl;
+    #endif
     int size = 0;
 
     // std::map<Ptr<Value>, Interval *> CodeGen::reg_map
@@ -44,7 +47,9 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
         }
     }
     arg_offset+=reg_size;
-    std::cout<<"arg_offset:"<<arg_offset<<std::endl;
+    #ifdef stack_test
+        std::cout<<"arg_offset:"<<arg_offset<<std::endl;
+    #endif
     offset+=arg_offset;
     //局部数组分配（遍历alloca语句）
     for(auto inst:fun->get_entry_block()->get_instructions()){
@@ -53,7 +58,9 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
             offset += inst->get_operand(0)->get_type()->get_size();
         }
     }
-    std::cout<<"offset after vec:"<<offset<<std::endl;
+    #ifdef stack_test
+        std::cout<<"offset after vec:"<<offset<<std::endl;
+    #endif
     //溢出的局部变量分配(_reg_map中)
     for(auto reg: *_reg_map){
         if(reg.second->reg_num==-1){
@@ -61,7 +68,9 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
             offset += reg.first->get_type()->get_size();
         }
     }
-    std::cout<<"offset after reg:"<<offset<<std::endl;
+    #ifdef stack_test
+        std::cout<<"offset after reg:"<<offset<<std::endl;
+    #endif
     //临时变量分配
     if(have_temp_reg){
         offset+=temp_reg_store_num*reg_size;
@@ -73,8 +82,85 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
     
     size=offset-arg_offset;
     //返回分配的总空间的大小（字节数）
-    std::cout<<"size:"<<size<<std::endl;
+    #ifdef stack_test
+        std::cout<<"size:"<<size<<std::endl;
+    #endif
     return size;
+        
+    // int size = 0;
+
+    // // std::map<Value *, Interval *> CodeGen::reg_map
+    // auto _reg_map = &reg_map;   // Hint: use this to get register for values
+    
+
+    // // std::map<Value *, IR2asm::Regbase *> CodeGen::stack_map
+    // stack_map.clear();          // You need to fill in this container to finish allocation
+
+    // // std::vector<IR2asm::Regbase *> CodeGen::arg_on_stack
+    // arg_on_stack.clear();       // You need to maintain this information, the order is the same as parameter
+
+    // /* TODO：put your code here */
+    // int offset = 0;
+    
+    // /* caller saved reg */
+    // if(have_func_call){
+    //   offset += caller_saved_reg_num * reg_size;
+    // }
+
+    // /* temp_reg_store_num */
+    // if(have_temp_reg){
+    //   offset += temp_reg_store_num * reg_size;
+    // }
+
+    // /* local array */
+    // for(auto inst : fun->get_entry_block()->get_instructions()){
+      
+    //   if(inst->is_alloca()){
+    //     stack_map[inst] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
+    //     offset += inst->get_type()->get_size();
+    //   }
+    // }
+
+    // /* statistic */
+    // int stack_time = 0;
+    // for(auto inter : *_reg_map){
+    //     if(inter.second->reg_num == -1){
+    //       stack_map[inter.first] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
+    //       offset += inter.first->get_type()->get_size();
+    //       for(auto range : inter.second->range_list){
+    //         stack_time += range->to - range->from;
+    //       }
+    //     }
+    // }
+    // std::cout << "@" << fun->get_name() << ": " << std::endl;
+    // std::cout << "total time on stack: " << stack_time << std::endl;
+
+    // /* alooc space for args */
+    // int arg_on_stack_offset = (used_reg.second.size() + 1)* reg_size;
+    // for(auto arg : fun->get_args()){
+    //   /* arg by reg */
+    //   if(arg->get_arg_no() < 4){
+    //     stack_map[arg] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
+    //     offset += reg_size;
+    //   }
+    //   /* arg by stack */
+    //   else if(arg->get_arg_no() == 4){
+    //     arg_on_stack_offset += offset;
+    //     // arg_on_stack.push_back(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), arg_on_stack_offset));
+    //     stack_map[arg] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), arg_on_stack_offset));
+    //     arg_on_stack_offset += arg->get_type()->get_size();
+        
+
+    //   }
+    //   else{
+    //     // arg_on_stack.push_back(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), arg_on_stack_offset));
+    //     stack_map[arg] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), arg_on_stack_offset));
+    //     arg_on_stack_offset += arg->get_type()->get_size();
+    //   }
+    // }
+    // size += offset;
+
+    // return size;
 }
 }
 }
