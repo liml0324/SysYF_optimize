@@ -8,6 +8,7 @@
     
 namespace SysYF{
 namespace IR{
+    //callee_save:{used_reg.second,lr}
     std::string CodeGen::callee_reg_store(Ptr<Function> fun){
         std::string code;
         if(used_reg.second.empty())return IR2asm::space + "push {lr}" + IR2asm::endl;
@@ -42,10 +43,12 @@ namespace IR{
         return code;
     }
 
+    //修改sp
     std::string CodeGen::callee_stack_operation_in(Ptr<Function> fun, int stack_size){
         int remain_stack_size = stack_size;
         std::string code;
         code += IR2asm::space;
+        //有函数，fp<-sp
         if(have_func_call){
             code += "mov ";
             code += IR2asm::Reg(IR2asm::frame_ptr).get_code();
@@ -53,6 +56,7 @@ namespace IR{
             code += IR2asm::endl;
             code += IR2asm::space;
         }
+        //sp+=stack_size
         if(remain_stack_size <= 127 && remain_stack_size > -128){
             code += "sub sp, sp, #";
             code += std::to_string(remain_stack_size);

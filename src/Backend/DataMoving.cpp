@@ -62,7 +62,7 @@ namespace IR{
             cur_dst=*(dec_out_vec.begin());
         }
         //获取空闲寄存器
-        auto reg_tmp_2=Ptr<IR2asm::Location>(new IR2asm::RegLoc(10));
+        auto reg_tmp_2=Ptr<IR2asm::Location>(new IR2asm::RegLoc(10));//To Be Opmized(可以入栈)
         //找环，直到所有顶点都被赋值
         while(!depend_graph.empty()){
             //找到一个环(1<-2<-3<-4<-...)

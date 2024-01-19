@@ -22,7 +22,7 @@ class CodeGen{
     std::map<Ptr<Function>, PtrSet<GlobalVariable>> global_variable_use;
     std::pair<std::set<int>, std::set<int>> used_reg;
     // std::map<int, std::vector<Ptr<Value>>> reg2value;
-    std::map<Ptr<Value>, Ptr<Interval>> reg_map;
+    std::map<Ptr<Value>, Ptr<Interval>> reg_map;//当前函数的寄存器分配方案
     std::map<Ptr<IR2asm::Location>,PtrVec<IR2asm::Location>> depend_graph;
     int func_no = 0;
     int bb_no = 0;

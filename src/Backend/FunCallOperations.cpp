@@ -256,6 +256,9 @@ namespace IR{
         return memcode + regcode;
     }
 
+    //被调用者将寄存器与分配做适配
+    //其他溢出的寄存器（arg）
+    //临时寄存器（包括lr）
     std::string CodeGen::callee_arg_move(Ptr<Function> fun){
         std::string save_code;
         std::string code;
@@ -268,10 +271,13 @@ namespace IR{
         for(auto arg: fun->get_args()){
             if(reg_map.find(arg) != reg_map.end()){
                 int target = reg_map[arg]->reg_num;
+                //就在原位上
                 if(target == arg->get_arg_no())continue;
+                //需要交换寄存器：conflict_src_reg（分配的位置不在正确位置上，且在r0-r3的寄存器编号）
                 if(target >= 0 && target < arg_num)conflict_src_reg.insert(target);
             }
         }
+        //r0-r3中冲突的入栈（分配的位置不在正确位置上，且在r0-r3的寄存器编号）
         if(!conflict_src_reg.empty()){
             save_code += IR2asm::space + "STMDB SP, {";
             for(auto reg: conflict_src_reg){
@@ -282,19 +288,24 @@ namespace IR{
             save_code += IR2asm::Reg(*(conflict_src_reg.rbegin())).get_code() + "}" + IR2asm::endl;
         }
         int conflict_store_size = conflict_src_reg.size() * reg_size;
+        //冲突寄存器的新位置记录在conflict_reg_loc中
         for(auto reg: conflict_src_reg){
             conflict_reg_loc.insert({reg,Ptr<IR2asm::Regbase>( new IR2asm::Regbase(IR2asm::sp, size - conflict_store_size))});
             size += reg_size;
         }
         for(auto arg: fun->get_args()){
             int reg;
+            //reg是分配到的寄存器编号
             if(reg_map.find(arg) != reg_map.end()){
                 reg = reg_map[arg]->reg_num;
             }
             else continue;
             if(arg->get_arg_no() < 4){
                 if(arg->get_arg_no() == reg)continue;
+                //（分配的位置不在正确位置上，且第0-3个参数）
                 if(reg >= 0){
+                    //conflict_src_reg中未找到（第0-3个参数且不在r0-r3的寄存器编号）
+                    //直接搬到分配的位置上
                     if(conflict_src_reg.find(arg->get_arg_no()) == conflict_src_reg.end()){
                         code += IR2asm::space;
                         code += "Mov ";
@@ -303,6 +314,8 @@ namespace IR{
                         code += IR2asm::Reg(arg->get_arg_no()).get_code();
                         code += IR2asm::endl;
                     }
+                    //conflict_src_reg找到（第0-3个参数且在r0-r3的寄存器编号）
+                    //从conflict_reg_loc中搬到分配的位置上
                     else{
                         code += IR2asm::space;
                         code += "Ldr ";
@@ -312,6 +325,7 @@ namespace IR{
                         code += IR2asm::endl;
                     }
                 }
+                //入栈的0-3号寄存器
                 else{
                     code += IR2asm::safe_store(Ptr<IR2asm::Reg>(new IR2asm::Reg(arg->get_arg_no())),
                                                stack_map[arg],
@@ -319,8 +333,11 @@ namespace IR{
                                                long_func);
                 }
             }
+            //第4个以后的参数
             else{
+                //在栈上的保持不变
                 if(reg < 0)continue;
+                //分配到寄存器的取到寄存器中
                 code += IR2asm::safe_load(Ptr<IR2asm::Reg>(new IR2asm::Reg(reg)),
                                         //   arg_on_stack[arg->get_arg_no() - 4],
                                           stack_map[arg],
