@@ -15,7 +15,7 @@ std::string ldr_const(Ptr<Reg> rd, Ptr<IR2asm::constant>val, std::string cmpop) 
     return asmstr;
 }
 
-std::string mov(Ptr<Reg> rd, Operand2 *opr2) {
+std::string mov(Ptr<Reg> rd, Ptr<Operand2> opr2) {
     std::string asmstr;
     asmstr += space;
     asmstr += "mov ";
@@ -86,9 +86,9 @@ std::string getelementptr(Ptr<Reg> rd, Ptr<Location> ptr){
     if(regbase){
         if (regbase->get_offset() >= (1<<8) || regbase->get_offset() < 0) {
             asmstr += ldr_const(rd, Ptr<IR2asm::constant>(new IR2asm::constant(regbase->get_offset())));
-            asmstr += add(rd, Ptr<IR2asm::Reg>(&regbase->get_reg()), new Operand2(*rd));
+            asmstr += add(rd, Ptr<IR2asm::Reg>(new IR2asm::Reg(regbase->get_reg())),Ptr<Operand2>(new Operand2(*rd)));
         } else {
-            asmstr += add(rd, Ptr<IR2asm::Reg>(&regbase->get_reg()), new Operand2(regbase->get_offset()));
+            asmstr += add(rd, Ptr<IR2asm::Reg>(new IR2asm::Reg(regbase->get_reg())),Ptr<Operand2>(new Operand2(regbase->get_offset())));
         }
     }
     else{
@@ -161,7 +161,7 @@ std::string b(Ptr<Location>addr) {
     return asmstr;
 }
 
-std::string cmp(Ptr<Reg> rs, Operand2* opr2) {
+std::string cmp(Ptr<Reg> rs, Ptr<Operand2> opr2) {
     std::string asmstr;
     asmstr += space;
     asmstr += "cmp ";
@@ -172,7 +172,7 @@ std::string cmp(Ptr<Reg> rs, Operand2* opr2) {
     return asmstr;
 }
 
-std::string fcmp(Ptr<Reg> rs, Operand2* opr2) {
+std::string fcmp(Ptr<Reg> rs, Ptr<Operand2> opr2) {
     std::string asmstr;
     asmstr += space;
     asmstr += "fcmp ";
@@ -183,7 +183,7 @@ std::string fcmp(Ptr<Reg> rs, Operand2* opr2) {
     return asmstr;
 }
 
-std::string add(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2){
+std::string add(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
     std::string asmstr;
     asmstr += space;
     asmstr += "add ";
@@ -196,7 +196,7 @@ std::string add(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2){
     return asmstr;
 }
 
-std::string sub(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2){
+std::string sub(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
     std::string asmstr;
     asmstr += space;
     asmstr += "sub ";
@@ -209,7 +209,7 @@ std::string sub(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2){
     return asmstr;
 }
 
-std::string r_sub(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2){
+std::string r_sub(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
     std::string asmstr;
     asmstr += space;
     asmstr += "rsb ";
@@ -248,7 +248,7 @@ std::string sdiv(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Reg> rt){
     return asmstr;
 }
 
-std::string srem(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2){
+std::string srem(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
     std::string asmstr;
     asmstr += space;
     asmstr += "srem ";

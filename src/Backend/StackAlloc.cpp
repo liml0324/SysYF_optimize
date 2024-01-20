@@ -53,9 +53,10 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
     offset+=arg_offset;
     //局部数组分配（遍历alloca语句）
     for(auto inst:fun->get_entry_block()->get_instructions()){
-        if(inst->get_instr_type() == Instruction::alloca){
+        if(inst->is_alloca()){
             stack_map[inst] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
-            offset += inst->get_operand(0)->get_type()->get_size();
+            auto alloca_inst=dynamic_pointer_cast<AllocaInst>(inst);
+            offset += alloca_inst->get_alloca_type()->get_size();
         }
     }
     #ifdef stack_test
