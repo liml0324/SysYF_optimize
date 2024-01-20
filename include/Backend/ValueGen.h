@@ -117,15 +117,18 @@ enum ShiftOp{
     class constant: public Value{
         private:
             int value_;
+            bool is_float=false;
+            float float_value_;
 
         public:
-            explicit constant(int val):value_(val){}
+            explicit constant(int val,bool is_float=false,float float_val=0):value_(val),is_float(is_float),float_value_(float_val){}
             ~constant(){}
             bool is_const() final {return true;}
             bool is_reg() final {return false;}
-            int get_val(){return value_;}
-            std::string get_code(){return "#" + std::to_string(value_);}
-            std::string get_num(){return std::to_string(value_);}
+            bool is_float_const() {return is_float;}
+            int get_val(){if(is_float) return float_value_; else return value_;}
+            std::string get_code(){if(is_float) return "#" + std::to_string(float_value_); else return "#" + std::to_string(value_);}
+            std::string get_num(){if(is_float) return std::to_string(float_value_); else return std::to_string(value_);}
     };
 
     class RegLoc: public Location{

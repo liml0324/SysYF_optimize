@@ -60,13 +60,6 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
     #endif
     offset+=arg_offset;
     //局部数组分配（遍历alloca语句）
-    for(auto inst:fun->get_entry_block()->get_instructions()){
-        if(inst->is_alloca()){
-            stack_map[inst] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
-            auto alloca_inst=dynamic_pointer_cast<AllocaInst>(inst);
-            offset += alloca_inst->get_alloca_type()->get_size();
-        }
-    }
     for(auto block:fun->get_basic_blocks()){
         for(auto inst:block->get_instructions()){
             if(inst->is_alloca()){
@@ -147,12 +140,13 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
     // }
 
     // /* local array */
-    // for(auto inst : fun->get_entry_block()->get_instructions()){
-      
-    //   if(inst->is_alloca()){
-    //     stack_map[inst] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
-    //     offset += inst->get_type()->get_size();
-    //   }
+    // for(auto block:fun->get_basic_blocks()){
+    //     for(auto inst:block->get_instructions()){
+    //         if(inst->is_alloca()){
+    //             stack_map[inst] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
+    //             offset += inst->get_type()->get_size();
+    //         }
+    //     }
     // }
 
     // /* statistic */

@@ -7,7 +7,9 @@ namespace IR2asm{
 std::string ldr_const(Ptr<Reg> rd, Ptr<IR2asm::constant>val, std::string cmpop) {
     std::string asmstr;
     asmstr += space;
-    asmstr += "ldr" + cmpop + " ";
+    if(val->is_float_const())
+            asmstr += "VLDR" + cmpop + " ";
+    else    asmstr += "ldr" + cmpop + " ";
     asmstr += rd->get_code();
     asmstr += ", =";
     asmstr += val->get_num();
@@ -196,10 +198,36 @@ std::string add(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
     return asmstr;
 }
 
+std::string fadd(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
+    std::string asmstr;
+    asmstr += space;
+    asmstr += "fadd ";
+    asmstr += rd->get_code();
+    asmstr += ", ";
+    asmstr += rs->get_code();
+    asmstr += ", ";
+    asmstr += opr2->get_code();
+    asmstr += endl;
+    return asmstr;
+}
+
 std::string sub(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
     std::string asmstr;
     asmstr += space;
     asmstr += "sub ";
+    asmstr += rd->get_code();
+    asmstr += ", ";
+    asmstr += rs->get_code();
+    asmstr += ", ";
+    asmstr += opr2->get_code();
+    asmstr += endl;
+    return asmstr;
+}
+
+std::string fsub(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
+    std::string asmstr;
+    asmstr += space;
+    asmstr += "fsub ";
     asmstr += rd->get_code();
     asmstr += ", ";
     asmstr += rs->get_code();
@@ -222,7 +250,7 @@ std::string r_sub(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
     return asmstr;
 }
 
-std::string mul(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Reg> rt){
+std::string mul(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> rt){
     std::string asmstr;
     asmstr += space;
     asmstr += "mul ";
@@ -235,10 +263,36 @@ std::string mul(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Reg> rt){
     return asmstr;
 }
 
-std::string sdiv(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Reg> rt){
+std::string fmul(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> rt){
+    std::string asmstr;
+    asmstr += space;
+    asmstr += "fmul ";
+    asmstr += rd->get_code();
+    asmstr += ", ";
+    asmstr += rs->get_code();
+    asmstr += ", ";
+    asmstr += rt->get_code();
+    asmstr += endl;
+    return asmstr;
+}
+
+std::string sdiv(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> rt){
     std::string asmstr;
     asmstr += space;
     asmstr += "sdiv ";
+    asmstr += rd->get_code();
+    asmstr += ", ";
+    asmstr += rs->get_code();
+    asmstr += ", ";
+    asmstr += rt->get_code();
+    asmstr += endl;
+    return asmstr;
+}
+
+std::string fdiv(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> rt){
+    std::string asmstr;
+    asmstr += space;
+    asmstr += "fdiv ";
     asmstr += rd->get_code();
     asmstr += ", ";
     asmstr += rs->get_code();
@@ -370,6 +424,28 @@ std::string safe_store(Ptr<Reg> rd, Ptr<Location> addr, int sp_extra_ofst, bool 
             asmstr += store(rd, addr, cmpop);
         }
     }
+    return asmstr;
+}
+
+std::string fptosi(Ptr<Reg> rd, Ptr<Reg> rs){
+    std::string asmstr;
+    asmstr += space;
+    asmstr += "VCVT.S32.F32 ";
+    asmstr += rd->get_code();
+    asmstr += ", ";
+    asmstr += rs->get_code();
+    asmstr += endl;
+    return asmstr;
+}
+
+std::string sitofp(Ptr<Reg> rd, Ptr<Reg> rs){
+    std::string asmstr;
+    asmstr += space;
+    asmstr += "VCVT.F32.S32 ";
+    asmstr += rd->get_code();
+    asmstr += ", ";
+    asmstr += rs->get_code();
+    asmstr += endl;
     return asmstr;
 }
 }

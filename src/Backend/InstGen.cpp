@@ -87,13 +87,128 @@ namespace IR{
             case Instruction::mul: {
                     auto op1 = inst->get_operand(0);
                     auto op2 = inst->get_operand(1);
-                    code += IR2asm::mul(get_asm_reg(inst), get_asm_reg(op1), get_asm_reg(op2));
+                    auto const_op1 = dynamic_pointer_cast<ConstantInt>(op1);
+                    auto const_op2 = dynamic_pointer_cast<ConstantInt>(op2);
+                    Ptr<Value>operand1;
+                    Ptr<IR2asm::Operand2> operand2;
+                    if (const_op1) {
+                        operand1 = op2;
+                        operand2 =Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_op1->get_value()));
+                    } else {
+                        operand1 = op1;
+                        if (const_op2) {
+                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(const_op2->get_value()));
+                        } else {
+                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(*get_asm_reg(op2)));
+                        }
+                    }
+                    code += IR2asm::mul(get_asm_reg(inst), get_asm_reg(operand1), operand2);
                 }
                 break;
             case Instruction::sdiv: { // divide constant can be optimized
                     auto op1 = inst->get_operand(0);
                     auto op2 = inst->get_operand(1);
-                    code += IR2asm::sdiv(get_asm_reg(inst), get_asm_reg(op1), get_asm_reg(op2));
+                    auto const_op1 = dynamic_pointer_cast<ConstantInt>(op1);
+                    auto const_op2 = dynamic_pointer_cast<ConstantInt>(op2);
+                    Ptr<Value>operand1;
+                    Ptr<IR2asm::Operand2> operand2;
+                    if (const_op1) {
+                        operand1 = op2;
+                        operand2 =Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_op1->get_value()));
+                    } else {
+                        operand1 = op1;
+                        if (const_op2) {
+                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(const_op2->get_value()));
+                        } else {
+                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(*get_asm_reg(op2)));
+                        }
+                    }
+                    code += IR2asm::sdiv(get_asm_reg(inst), get_asm_reg(operand1), operand2);
+                }
+                break;
+            case Instruction::fadd: {
+                    auto op1 = inst->get_operand(0);
+                    auto op2 = inst->get_operand(1);
+                    auto const_op1 = dynamic_pointer_cast<ConstantFloat>(op1);
+                    auto const_op2 = dynamic_pointer_cast<ConstantFloat>(op2);
+                    Ptr<Value>operand1;
+                    Ptr<IR2asm::Operand2> operand2;
+                    if (const_op1) {
+                        operand1 = op2;
+                        operand2 =Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_op1->get_value()));
+                    } else {
+                        operand1 = op1;
+                        if (const_op2) {
+                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(const_op2->get_value()));
+                        } else {
+                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(*get_asm_reg(op2)));
+                        }
+                    }
+                    code += IR2asm::fadd(get_asm_reg(inst), get_asm_reg(operand1), operand2);
+                }
+                break;
+            case Instruction::fsub: {
+                    auto op1 = inst->get_operand(0);
+                    auto op2 = inst->get_operand(1);
+                    auto const_op1 = dynamic_pointer_cast<ConstantFloat>(op1);
+                    auto const_op2 = dynamic_pointer_cast<ConstantFloat>(op2);
+                    Ptr<Value>operand1;
+                    Ptr<IR2asm::Operand2> operand2;
+                    if (const_op1) {
+                        operand1 = op2;
+                        operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_op1->get_value()));
+                        code += IR2asm::r_sub(get_asm_reg(inst), get_asm_reg(operand1), operand2);
+                    } else {
+                        operand1 = op1;
+                        if (const_op2) {
+                            operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_op2->get_value()));
+                        } else {
+                            operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(*get_asm_reg(op2)));
+                        }
+                        code += IR2asm::fsub(get_asm_reg(inst), get_asm_reg(operand1), operand2);
+                    }
+                }
+                break;
+            case Instruction::fmul: {
+                    auto op1 = inst->get_operand(0);
+                    auto op2 = inst->get_operand(1);
+                    auto const_op1 = dynamic_pointer_cast<ConstantFloat>(op1);
+                    auto const_op2 = dynamic_pointer_cast<ConstantFloat>(op2);
+                    Ptr<Value>operand1;
+                    Ptr<IR2asm::Operand2> operand2;
+                    if (const_op1) {
+                        operand1 = op2;
+                        operand2 =Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_op1->get_value()));
+                    } else {
+                        operand1 = op1;
+                        if (const_op2) {
+                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(const_op2->get_value()));
+                        } else {
+                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(*get_asm_reg(op2)));
+                        }
+                    }
+                    code += IR2asm::fmul(get_asm_reg(inst), get_asm_reg(operand1), operand2);
+                }
+                break;
+            case Instruction::fdiv: { // divide constant can be optimized
+                    auto op1 = inst->get_operand(0);
+                    auto op2 = inst->get_operand(1);
+                    auto const_op1 = dynamic_pointer_cast<ConstantFloat>(op1);
+                    auto const_op2 = dynamic_pointer_cast<ConstantFloat>(op2);
+                    Ptr<Value>operand1;
+                    Ptr<IR2asm::Operand2> operand2;
+                    if (const_op1) {
+                        operand1 = op2;
+                        operand2 =Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_op1->get_value()));
+                    } else {
+                        operand1 = op1;
+                        if (const_op2) {
+                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(const_op2->get_value()));
+                        } else {
+                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(*get_asm_reg(op2)));
+                        }
+                    }
+                    code += IR2asm::fdiv(get_asm_reg(inst), get_asm_reg(operand1), operand2);
                 }
                 break;
             case Instruction::srem: // srem -> sdiv and msub
@@ -293,6 +408,140 @@ namespace IR{
                     }
                 }
                 break;
+            case Instruction::fcmp: {
+                    auto cmp_inst = dynamic_pointer_cast<FCmpInst>(inst);
+                    auto cond1 = inst->get_operand(0);
+                    auto cond2 = inst->get_operand(1);
+                    auto cmp_op = cmp_inst->get_cmp_op();
+                    auto const_cond1 = dynamic_pointer_cast<ConstantFloat>(cond1);
+                    auto const_cond2 = dynamic_pointer_cast<ConstantFloat>(cond2);
+                    Ptr<IR2asm::Reg>operand1;
+                    Ptr<IR2asm::Operand2> operand2;
+                    switch (cmp_op)
+                    {
+                        case FCmpInst::CmpOp::EQ: {
+                            if (const_cond1) {
+                                operand1 = get_asm_reg(cond2);
+                                operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_cond1->get_value()));
+                            } else {
+                                operand1 = get_asm_reg(cond1);
+                                if (const_cond2) {
+                                    operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_cond2->get_value()));
+                                } else {
+                                    operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(*get_asm_reg(cond2)));
+                                }
+                            }
+                            code += IR2asm::fcmp(operand1, operand2);
+                            code += IR2asm::ldr_const(get_asm_reg(inst), Ptr<IR2asm::constant>(new IR2asm::constant(0)));
+                            code += IR2asm::ldr_const(get_asm_reg(inst), Ptr<IR2asm::constant>(new IR2asm::constant(1)), "eq");
+                        }
+                        break;
+                        case FCmpInst::CmpOp::NE: {
+                            if (const_cond1) {
+                                operand1 = get_asm_reg(cond2);
+                                operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_cond1->get_value()));
+                            } else {
+                                operand1 = get_asm_reg(cond1);
+                                if (const_cond2) {
+                                    operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_cond2->get_value()));
+                                } else {
+                                    operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(*get_asm_reg(cond2)));
+                                }
+                            }
+                            code += IR2asm::fcmp(operand1, operand2);
+                            code += IR2asm::ldr_const(get_asm_reg(inst), Ptr<IR2asm::constant>(new IR2asm::constant(0)));
+                            code += IR2asm::ldr_const(get_asm_reg(inst),Ptr<IR2asm::constant>( new IR2asm::constant(1)), "ne");
+                        }
+                        break;
+                        case FCmpInst::CmpOp::GT: {
+                            if (const_cond1) {
+                                operand1 = get_asm_reg(cond2);
+                                operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_cond1->get_value()));
+                            } else {
+                                operand1 = get_asm_reg(cond1);
+                                if (const_cond2) {
+                                    operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_cond2->get_value()));
+                                } else {
+                                    operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(*get_asm_reg(cond2)));
+                                }
+                            }
+                            code += IR2asm::fcmp(operand1, operand2);
+                            code += IR2asm::ldr_const(get_asm_reg(inst), Ptr<IR2asm::constant>(new IR2asm::constant(0)));
+                            if (const_cond1) {
+                                code += IR2asm::ldr_const(get_asm_reg(inst),Ptr<IR2asm::constant>( new IR2asm::constant(1)), "le");
+                            } else {
+                                code += IR2asm::ldr_const(get_asm_reg(inst), Ptr<IR2asm::constant>(new IR2asm::constant(1)), "gt");
+                            }
+                        }
+                        break;
+                        case FCmpInst::CmpOp::GE: {
+                            if (const_cond1) {
+                                operand1 = get_asm_reg(cond2);
+                                operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_cond1->get_value()));
+                            } else {
+                                operand1 = get_asm_reg(cond1);
+                                if (const_cond2) {
+                                    operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_cond2->get_value()));
+                                } else {
+                                    operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(*get_asm_reg(cond2)));
+                                }
+                            }
+                            code += IR2asm::fcmp(operand1, operand2);
+                            code += IR2asm::ldr_const(get_asm_reg(inst),Ptr<IR2asm::constant>( new IR2asm::constant(0)));
+                            if (const_cond1) {
+                                code += IR2asm::ldr_const(get_asm_reg(inst),Ptr<IR2asm::constant>( new IR2asm::constant(1)), "lt");
+                            } else {
+                                code += IR2asm::ldr_const(get_asm_reg(inst),Ptr<IR2asm::constant>( new IR2asm::constant(1)), "ge");
+                            }
+                        }
+                        break;
+                        case FCmpInst::CmpOp::LT: {
+                            if (const_cond1) {
+                                operand1 = get_asm_reg(cond2);
+                                operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_cond1->get_value()));
+                            } else {
+                                operand1 = get_asm_reg(cond1);
+                                if (const_cond2) {
+                                    operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_cond2->get_value()));
+                                } else {
+                                    operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(*get_asm_reg(cond2)));
+                                }
+                            }
+                            code += IR2asm::fcmp(operand1, operand2);
+                            code += IR2asm::ldr_const(get_asm_reg(inst),Ptr<IR2asm::constant>( new IR2asm::constant(0)));
+                            if (const_cond1) {
+                                code += IR2asm::ldr_const(get_asm_reg(inst),Ptr<IR2asm::constant>( new IR2asm::constant(1)), "ge");
+                            } else {
+                                code += IR2asm::ldr_const(get_asm_reg(inst), Ptr<IR2asm::constant>(new IR2asm::constant(1)), "lt");
+                            }
+                        }
+                        break;
+                        case FCmpInst::CmpOp::LE: {
+                            if (const_cond1) {
+                                operand1 = get_asm_reg(cond2);
+                                operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_cond1->get_value()));
+                            } else {
+                                operand1 = get_asm_reg(cond1);
+                                if (const_cond2) {
+                                    operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_cond2->get_value()));
+                                } else {
+                                    operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(*get_asm_reg(cond2)));
+                                }
+                            }
+                            code += IR2asm::fcmp(operand1, operand2);
+                            code += IR2asm::ldr_const(get_asm_reg(inst), Ptr<IR2asm::constant>(new IR2asm::constant(0)));
+                            if (const_cond1) {
+                                code += IR2asm::ldr_const(get_asm_reg(inst),Ptr<IR2asm::constant>( new IR2asm::constant(1)), "gt");
+                            } else {
+                                code += IR2asm::ldr_const(get_asm_reg(inst),Ptr<IR2asm::constant>( new IR2asm::constant(1)), "le");
+                            }
+                        }
+                        break;
+                        default:
+                        break;
+                    }
+                }
+                break;
             case Instruction::phi:  // has done before
                 break;
             case Instruction::call:
@@ -462,7 +711,6 @@ namespace IR{
                     }
                 }
                 break;
-            
             case Instruction::fcmpbr: {
                     auto fcmpbr_inst = dynamic_pointer_cast<FCmpBrInst>(inst);
                     auto cond1 = inst->get_operand(0);
@@ -605,8 +853,21 @@ namespace IR{
                     code += IR2asm::ldr_const(get_asm_reg(inst), Ptr<IR2asm::constant>(new IR2asm::constant(const_val)));
                 }
                 break;
-                default:
-                    break;
+            case Instruction::fptosi:{
+                    auto fptosi_inst = dynamic_pointer_cast<FpToSiInst>(inst);
+                    auto reg=fptosi_inst->get_operand(0);
+                    code += IR2asm::fptosi(get_asm_reg(reg),get_asm_reg(reg));
+                }
+                break;
+            case Instruction::sitofp:{
+                    auto sitofp_inst = dynamic_pointer_cast<SiToFpInst>(inst);
+                    auto reg=sitofp_inst->get_operand(0);
+                    code += IR2asm::sitofp(get_asm_reg(reg),get_asm_reg(reg));
+                }
+                break;
+            default:
+                std::cout<<"invalid type: "<<inst->get_instr_op_name()<<std::endl;
+                break;
         }
         return code;
     }

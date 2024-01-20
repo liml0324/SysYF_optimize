@@ -7,6 +7,9 @@ my_sum:
     push {r4, r5, r6, lr}
     sub sp, sp, #16
     add r2, r0, #5
+    VCVT.F32.S32 r2, r2
+    fsub r4, r3, r1
+    VCVT.S32.F32 r4, r4
     push {r0}
     ldr r0, Addr0_0
     str r5, [r0]
@@ -36,6 +39,7 @@ main:
     bl my_sum
     ldr r1, Addr1_0
     ldr r1, [r1]
+    VCVT.F32.S32 r1, r1
     STM SP, {r0, r2, r3}
     ldr r0, =7
     ldr r1, [sp, #4]

@@ -47,14 +47,20 @@ namespace IR2asm{
     std::string add(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2);
     std::string sub(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2);
     std::string r_sub(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2);
-    std::string mul(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Reg> rt);
-    std::string sdiv(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Reg> rt);
+    std::string mul(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> rt);
+    std::string sdiv(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> rt);
     std::string srem(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2);
+    std::string fadd(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2);
+    std::string fsub(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2);
+    std::string fmul(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> rt);
+    std::string fdiv(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> rt);
     std::string load(Ptr<Reg> rd, Ptr<Location> addr, std::string cmpop = "");
     std::string safe_load(Ptr<Reg> rd, Ptr<Location> addr, int sp_extra_ofst, bool long_func, std::string cmpop = "");
     std::string store(Ptr<Reg> rs, Ptr<Location> addr, std::string cmpop = "");
     std::string safe_store(Ptr<Reg> rd, Ptr<Location> addr, int sp_extra_ofst, bool long_func, std::string cmpop = "");
     std::string call(Ptr<label> fun);
+    std::string fptosi(Ptr<Reg> rd, Ptr<Reg> rs);
+    std::string sitofp(Ptr<Reg> rd, Ptr<Reg> rs);
 }
 }
 }

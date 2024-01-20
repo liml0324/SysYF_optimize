@@ -26,9 +26,9 @@ bb0_1:
     add r1, r3, r9
     ldr r2, =2
     sdiv r4, r1, r2
-    Mov r10, r3
-    Mov r3, r4
-    Mov r4, r10
+    Mov r10, r4
+    Mov r4, r3
+    Mov r3, r10
     b bb0_0
 bb0_2:
     b bb0_3
