@@ -5,7 +5,7 @@
     .type counting_sort, %function
 counting_sort:
     push {r4, r5, r6, r7, r8, r9, lr}
-    sub sp, sp, #72
+    sub sp, sp, #112
     Ldr r1, =0
     b bb0_0
 bb0_0:
@@ -19,7 +19,7 @@ bb0_0:
     b bb0_2
 bb0_1:
     add r7, r1, #0
-    add r6, sp, #4
+    add r6, sp, #44
     ldr r3, =4
     mul r8, r7, r3
     add r9, r6, r8
@@ -46,7 +46,7 @@ bb0_4:
     add r6, r9, r3
     ldr r7, [r6]
     add r4, r7, #0
-    add r8, sp, #4
+    add r8, sp, #44
     ldr r2, =4
     mul r3, r4, r2
     add r9, r8, r3
@@ -57,7 +57,7 @@ bb0_4:
     add r3, r7, r4
     ldr r8, [r3]
     add r2, r8, #0
-    add r6, sp, #4
+    add r6, sp, #44
     ldr r4, =4
     mul r7, r2, r4
     add r3, r6, r7
@@ -84,25 +84,25 @@ litpool0_0:
     b bb0_8
 bb0_7:
     add r9, r7, #0
-    add r8, sp, #4
+    add r8, sp, #44
     ldr r2, =4
     mul r6, r9, r2
     add r3, r8, r6
     add r4, r7, #0
-    add r2, sp, #4
+    add r2, sp, #44
     ldr r9, =4
     mul r6, r4, r9
     add r8, r2, r6
     ldr r9, [r8]
     sub r4, r7, #1
     add r6, r4, #0
-    add r2, sp, #4
+    add r2, sp, #44
     ldr r8, =4
     mul r4, r6, r8
     str r0, [sp]
     add r0, r2, r4
-    str r0, [sp, #56]
-    ldr r0, [sp, #56]
+    str r0, [sp, #96]
+    ldr r0, [sp, #96]
     ldr r8, [r0]
     add r6, r9, r8
     str r6, [r3]
@@ -131,7 +131,7 @@ bb0_10:
     add r2, r4, r6
     ldr r8, [r2]
     add r9, r8, #0
-    add r6, sp, #4
+    add r6, sp, #44
     ldr r4, =4
     mul r2, r9, r4
     add r8, r6, r2
@@ -142,16 +142,16 @@ bb0_10:
     mul r4, r9, r6
     str r0, [sp]
     add r0, r2, r4
-    str r0, [sp, #48]
-    ldr r0, [sp, #48]
+    str r0, [sp, #88]
+    ldr r0, [sp, #88]
     ldr r6, [r0]
     add r9, r6, #0
-    add r4, sp, #4
+    add r4, sp, #44
     ldr r2, =4
     mul r6, r9, r2
     add r0, r4, r6
-    str r0, [sp, #52]
-    ldr r0, [sp, #52]
+    str r0, [sp, #92]
+    ldr r0, [sp, #92]
     ldr r2, [r0]
     sub r9, r2, #1
     str r9, [r8]
@@ -163,7 +163,7 @@ bb0_10:
     add r6, r2, r9
     ldr r8, [r6]
     add r4, r8, #0
-    add r9, sp, #4
+    add r9, sp, #44
     ldr r2, =4
     mul r6, r4, r2
     add r8, r9, r6
@@ -179,8 +179,8 @@ bb0_10:
     ldr r6, =4
     mul r9, r4, r6
     add r0, r8, r9
-    str r0, [sp, #44]
-    ldr r0, [sp, #44]
+    str r0, [sp, #84]
+    ldr r0, [sp, #84]
     ldr r6, [r0]
     str r6, [r2]
     sub r4, r3, #1
@@ -194,7 +194,7 @@ bb0_12:
     .pool
 litpool0_1:
     ldr r0, =0
-    add sp, sp, #72
+    add sp, sp, #112
     pop {r4, r5, r6, r7, r8, r9, lr}
     bx lr
     .pool

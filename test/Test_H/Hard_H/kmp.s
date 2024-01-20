@@ -102,14 +102,15 @@ bb0_7:
 KMP:
     push {r4, r5, r6, r7, r8, r9, r11, lr}
     mov r11, sp
-    ldr lr, =16420
+    ldr lr, =32804
     sub sp, sp, lr
     add r2, r0, #0
     ldr r3, =0
     ldr r4, =4
     mul r5, r3, r4
     add r6, r2, r5
-    add r7, sp, #4
+    ldr r7, =16388
+    add r7, sp, r7
     ldr r8, =0
     ldr r9, =4
     mul r3, r8, r9
@@ -181,7 +182,8 @@ litpool1_0:
     b bb1_7
 bb1_4:
     add r4, r5, #0
-    add r3, sp, #4
+    ldr r3, =16388
+    add r3, sp, r3
     ldr r9, =4
     mul r7, r4, r9
     add r6, r3, r7
@@ -302,9 +304,10 @@ litpool2_0:
 main:
     push {r4, r5, r6, r7, r8, r9, r11, lr}
     mov r11, sp
-    ldr lr, =32804
+    ldr lr, =65572
     sub sp, sp, lr
-    add r0, sp, #4
+    ldr r0, =32772
+    add r0, sp, r0
     ldr r1, =0
     ldr r2, =4
     mul r3, r1, r2
@@ -312,7 +315,7 @@ main:
     mov r0, r4
     bl read_str
     mov r5, r0
-    ldr r6, =16388
+    ldr r6, =49156
     add r6, sp, r6
     ldr r7, =0
     ldr r8, =4
@@ -323,12 +326,13 @@ main:
     bl read_str
     LDM SP, {r1, r2}
     mov r2, r0
-    add r3, sp, #4
+    ldr r3, =32772
+    add r3, sp, r3
     ldr r0, =0
     ldr r4, =4
     mul r7, r0, r4
     add r8, r3, r7
-    ldr r9, =16388
+    ldr r9, =49156
     add r9, sp, r9
     ldr r6, =0
     ldr r1, =4

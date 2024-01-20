@@ -49,6 +49,14 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
     arg_offset+=reg_size;
     #ifdef stack_test
         std::cout<<"arg_offset:"<<arg_offset<<std::endl;
+        for(auto i:stack_map){
+            if(i.second==nullptr)
+                std::cout<<i.first->print()<<":nullptr"<<std::endl;
+            else
+                std::cout<<i.first->print()<<":"<<i.second->get_code()<<std::endl;
+        }
+        if(stack_map.size()==0)
+            std::cout<<"stack_map empty"<<std::endl;
     #endif
     offset+=arg_offset;
     //局部数组分配（遍历alloca语句）
@@ -59,8 +67,25 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
             offset += alloca_inst->get_alloca_type()->get_size();
         }
     }
+    for(auto block:fun->get_basic_blocks()){
+        for(auto inst:block->get_instructions()){
+            if(inst->is_alloca()){
+                stack_map[inst] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
+                auto alloca_inst=dynamic_pointer_cast<AllocaInst>(inst);
+                offset += alloca_inst->get_alloca_type()->get_size();
+            }
+        }
+    }
     #ifdef stack_test
-        std::cout<<"offset after vec:"<<offset<<std::endl;
+        std::cout<<"offset after arr:"<<offset<<std::endl;
+        for(auto i:stack_map){
+            if(i.second==nullptr)
+                std::cout<<i.first->print()<<":nullptr"<<std::endl;
+            else
+                std::cout<<i.first->print()<<":"<<i.second->get_code()<<std::endl;
+        }
+        if(stack_map.size()==0)
+            std::cout<<"stack_map empty"<<std::endl;
     #endif
     //溢出的局部变量分配(_reg_map中)
     for(auto reg: *_reg_map){
@@ -71,6 +96,14 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
     }
     #ifdef stack_test
         std::cout<<"offset after reg:"<<offset<<std::endl;
+        for(auto i:stack_map){
+            if(i.second==nullptr)
+                std::cout<<i.first->print()<<":nullptr"<<std::endl;
+            else
+                std::cout<<i.first->print()<<":"<<i.second->get_code()<<std::endl;
+        }
+        if(stack_map.size()==0)
+            std::cout<<"stack_map empty"<<std::endl;
     #endif
     //临时变量分配
     if(have_temp_reg){

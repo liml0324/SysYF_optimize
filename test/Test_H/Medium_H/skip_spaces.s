@@ -6,7 +6,7 @@
 main:
     push {r4, r5, r6, r7, r8, r9, r11, lr}
     mov r11, sp
-    ldr lr, =436
+    ldr lr, =836
     sub sp, sp, lr
     Ldr r0, =0
     b bb0_0
@@ -26,7 +26,8 @@ bb0_0:
     b bb0_2
 bb0_1:
     add r4, r0, #0
-    add r3, sp, #4
+    ldr r3, =404
+    add r3, sp, r3
     ldr r1, =4
     mul r7, r4, r1
     add r2, r3, r7
@@ -55,7 +56,8 @@ bb0_3:
 bb0_4:
     sub r9, r6, #1
     add r4, r9, #0
-    add r1, sp, #4
+    ldr r1, =404
+    add r1, sp, r1
     ldr r3, =4
     mul r7, r4, r3
     add r2, r1, r7

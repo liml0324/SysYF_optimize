@@ -116,27 +116,27 @@ bb0_2:
 main:
     push {r4, r5, r6, r7, r8, r9, r11, lr}
     mov r11, sp
-    sub sp, sp, #44
-    add r0, sp, #4
+    sub sp, sp, #52
+    add r0, sp, #12
     ldr r1, =0
     ldr r2, =4
     mul r3, r1, r2
     add r4, r0, r3
     ldr r5, =1
     str r5, [r4]
-    add r6, sp, #8
+    add r6, sp, #16
     ldr r7, =0
     ldr r8, =4
     mul r9, r7, r8
     add r1, r6, r9
     ldr r2, =1
     str r2, [r1]
-    add r3, sp, #4
+    add r3, sp, #12
     ldr r0, =0
     ldr r4, =4
     mul r5, r0, r4
     add r7, r3, r5
-    add r8, sp, #8
+    add r8, sp, #16
     ldr r9, =0
     ldr r6, =4
     mul r1, r9, r6
@@ -148,12 +148,12 @@ main:
     ldr r3, [sp, #4]
     bl exgcd
     LDMIB SP, {r2}
-    add r4, sp, #4
+    add r4, sp, #12
     ldr r5, =0
     ldr r3, =4
     mul r9, r5, r3
     add r6, r4, r9
-    add r8, sp, #4
+    add r8, sp, #12
     ldr r1, =0
     ldr r7, =4
     mul r2, r1, r7
@@ -171,7 +171,7 @@ main:
     mul r1, r4, r9
     sub r3, r2, r1
     str r3, [r6]
-    add r7, sp, #4
+    add r7, sp, #12
     ldr r8, =0
     ldr r5, =4
     mul r4, r8, r5

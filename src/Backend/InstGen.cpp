@@ -305,6 +305,16 @@ namespace IR{
                         code += IR2asm::safe_load(get_asm_reg(inst), addr, sp_extra_ofst, long_func);
                     } else if (dynamic_pointer_cast<AllocaInst>(base_addr)) {
                         auto addr = stack_map[base_addr];
+                        if(addr==nullptr){
+                            std::cout<<"stack of "<<base_addr->print()<<" :nullptr"<<std::endl;
+                            std::cout<<"stack:"<<std::endl;
+                            for(auto i:stack_map){
+                                if(i.second==nullptr)
+                                    std::cout<<i.first->print()<<":nullptr"<<std::endl;
+                                else
+                                    std::cout<<i.first->print()<<":"<<i.second->get_code()<<std::endl;
+                            }
+                        }
                         code += IR2asm::getelementptr(get_asm_reg(inst), addr);
                     } else {
                         auto addr = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(*get_asm_reg(base_addr), 0));
