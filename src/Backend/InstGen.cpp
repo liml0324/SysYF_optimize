@@ -16,6 +16,7 @@ namespace IR{
         switch (instr_type)
         {
             case Instruction::ret:
+                // std::cout<<inst->print()<<std::endl;
                 if (inst->get_operands().empty()) {
                     //code += IR2asm::ret();
                 } else {

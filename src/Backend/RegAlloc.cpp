@@ -251,13 +251,13 @@ void RegAlloc::walk_intervals() {
             current->reg_num = -1;
         }
     }
-    // for(auto inter:interval_list){
-    //     std::cout<<inter->val->get_name()<<":"<<std::endl;
-    //     std::cout<<"\t-"<<inter->reg_num<<std::endl;
-    //     for(auto range: inter->range_list){
-    //         std::cout<<"\t"<<range->from<<":"<<range->to<<std::endl;
-    //     }
-    // }
+    for(auto inter:interval_list){
+        std::cout<<inter->val->get_name()<<":"<<std::endl;
+        std::cout<<"\t-"<<inter->reg_num<<std::endl;
+        for(auto range: inter->range_list){
+            std::cout<<"\t"<<range->from<<":"<<range->to<<std::endl;
+        }
+    }
 }
 
 

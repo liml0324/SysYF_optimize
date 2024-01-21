@@ -58,7 +58,7 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
             if(inst->is_alloca()){
                 stack_map[inst] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
                 auto alloca_inst=dynamic_pointer_cast<AllocaInst>(inst);
-                offset += alloca_inst->get_alloca_type()->get_size();//alloca_inst->get_type()->get_size();
+                offset += alloca_inst->get_alloca_type()->get_size();
             }
         }
     }
