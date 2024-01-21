@@ -10,12 +10,16 @@ time_detailed = True
 time_cost_ir = 0
 time_cost_exegen = 0
 time_cost_exe = 0
+pass_num=0
+total_num=0
 
 def eval(TEST_BASE_PATH, optimization):
     global time_cost_ir
     global time_cost_exegen
     global time_cost_exe
     global time_detailed
+    global pass_num
+    global total_num
 
     print('===========TEST START===========')
     print('now in {}'.format(TEST_BASE_PATH))
@@ -30,6 +34,8 @@ def eval(TEST_BASE_PATH, optimization):
         if not os.path.isfile(S_PATH):
             continue
         print('Case %s:' % case, end='')
+        
+        total_num+=1
 
         input_option = None
         if need_input:
@@ -79,7 +85,8 @@ def eval(TEST_BASE_PATH, optimization):
                     #         time_end_exegen - time_start_exegen,
                     #         time_end_exe - time_start_exe))
                     # else:
-                        print('\t\033[32mPass\033[0m')
+                    print('\t\033[32mPass\033[0m')
+                    pass_num+=1
                 else:
                     print('\t\033[31mWrong Answer\033[0m')
         except Exception as _:
@@ -102,12 +109,18 @@ if __name__ == "__main__":
     # you can only modify this to add your testcase
     # 测试目录
     TEST_DIRS = [
-                './test/Test_H/Easy_H/',
-                './test/Test_H/Medium_H/',
-                './test/Test_H//Hard_H/',
-                './test/Test/Easy/',
-                './test/Test/Medium/',
-                './test/Test/Hard/'
+                # './test/Test_H/Easy_H/',
+                # './test/Test_H/Medium_H/',
+                # './test/Test_H/Hard_H/',
+                # './test/Test/Easy/',
+                # './test/Test/Medium/',
+                # './test/Test/Hard/'
+                './test/int_only_test/Test_H/Easy_H/',
+                './test/int_only_test/Test_H/Medium_H/',
+                './test/int_only_test/Test_H/Hard_H/',
+                './test/int_only_test/Test/Easy/',
+                './test/int_only_test/Test/Medium/',
+                './test/int_only_test/Test/Hard/'
                 ]
     # you can only modify this to add your testcase
 
@@ -139,4 +152,4 @@ if __name__ == "__main__":
         print("\t\033[31mTest Fail\033[0m in dirs {}".format(fail_dir_str))
     else:
         print("\t\033[32mAll Tests Passed\033[0m")
-        
+    print("\t\033[32mPass Rate: {}/{}\033[0m".format(pass_num,total_num))

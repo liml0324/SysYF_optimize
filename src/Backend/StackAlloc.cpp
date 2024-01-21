@@ -38,35 +38,26 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
 
     /* TODO：put your code here */
     int offset=0;
-    //参数分配
-    int arg_offset=0;
-    for(auto arg:fun->get_args()){
-        if(arg->get_arg_no()>=4){
-            stack_map[arg]=Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::sp,arg_offset));
-            arg_offset+=reg_size;
-        }
+
+    //临时变量分配
+    if(have_temp_reg){
+        offset+=temp_reg_store_num*reg_size;
     }
-    arg_offset+=reg_size;
+    //函数调用
+    if(have_func_call){
+        offset+=caller_saved_reg_num*reg_size;
+    }
     #ifdef stack_test
-        std::cout<<"arg_offset:"<<arg_offset<<std::endl;
-        for(auto i:stack_map){
-            if(i.second==nullptr)
-                std::cout<<i.first->print()<<":nullptr"<<std::endl;
-            else
-                std::cout<<i.first->print()<<":"<<i.second->get_code()<<std::endl;
-        }
-        if(stack_map.size()==0)
-            std::cout<<"stack_map empty"<<std::endl;
+        std::cout<<"offset after temp_reg&func_call:"<<offset<<std::endl;
     #endif
-    offset+=arg_offset;
+    
     //局部数组分配（遍历alloca语句）
     for(auto block:fun->get_basic_blocks()){
         for(auto inst:block->get_instructions()){
             if(inst->is_alloca()){
                 stack_map[inst] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
                 auto alloca_inst=dynamic_pointer_cast<AllocaInst>(inst);
-                offset += alloca_inst->get_alloca_type()->get_size();
-            }
+                offset += alloca_inst->get_alloca_type()->get_size();//alloca_inst->get_type()->get_size();
         }
     }
     #ifdef stack_test
@@ -98,97 +89,37 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
         if(stack_map.size()==0)
             std::cout<<"stack_map empty"<<std::endl;
     #endif
-    //临时变量分配
-    if(have_temp_reg){
-        offset+=temp_reg_store_num*reg_size;
+
+    //参数分配
+    int stack_arg_offset=(used_reg.second.size()+1)*reg_size+offset;
+    for(auto arg:fun->get_args()){
+        if(arg->get_arg_no()<4){
+            stack_map[arg]=Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp),offset));
+            offset+=reg_size;
+        }
+        else if(arg->get_arg_no()>=4){
+            stack_map[arg]=Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::sp,stack_arg_offset));
+            stack_arg_offset+=arg->get_type()->get_size();
+        }
     }
-    //函数调用
-    if(have_func_call){
-        offset+=caller_saved_reg_num*reg_size;
-    }
+    #ifdef stack_test
+        std::cout<<"arg_offset:"<<arg_offset<<std::endl;
+        for(auto i:stack_map){
+            if(i.second==nullptr)
+                std::cout<<i.first->print()<<":nullptr"<<std::endl;
+            else
+                std::cout<<i.first->print()<<":"<<i.second->get_code()<<std::endl;
+        }
+        if(stack_map.size()==0)
+            std::cout<<"stack_map empty"<<std::endl;
+    #endif
     
-    size=offset-arg_offset;
+    size=offset;
     //返回分配的总空间的大小（字节数）
     #ifdef stack_test
         std::cout<<"size:"<<size<<std::endl;
     #endif
     return size;
-        
-    // int size = 0;
-
-    // // std::map<Value *, Interval *> CodeGen::reg_map
-    // auto _reg_map = &reg_map;   // Hint: use this to get register for values
-    
-
-    // // std::map<Value *, IR2asm::Regbase *> CodeGen::stack_map
-    // stack_map.clear();          // You need to fill in this container to finish allocation
-
-    // // std::vector<IR2asm::Regbase *> CodeGen::arg_on_stack
-    // arg_on_stack.clear();       // You need to maintain this information, the order is the same as parameter
-
-    // /* TODO：put your code here */
-    // int offset = 0;
-    
-    // /* caller saved reg */
-    // if(have_func_call){
-    //   offset += caller_saved_reg_num * reg_size;
-    // }
-
-    // /* temp_reg_store_num */
-    // if(have_temp_reg){
-    //   offset += temp_reg_store_num * reg_size;
-    // }
-
-    // /* local array */
-    // for(auto block:fun->get_basic_blocks()){
-    //     for(auto inst:block->get_instructions()){
-    //         if(inst->is_alloca()){
-    //             stack_map[inst] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
-    //             offset += inst->get_type()->get_size();
-    //         }
-    //     }
-    // }
-
-    // /* statistic */
-    // int stack_time = 0;
-    // for(auto inter : *_reg_map){
-    //     if(inter.second->reg_num == -1){
-    //       stack_map[inter.first] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
-    //       offset += inter.first->get_type()->get_size();
-    //       for(auto range : inter.second->range_list){
-    //         stack_time += range->to - range->from;
-    //       }
-    //     }
-    // }
-    // std::cout << "@" << fun->get_name() << ": " << std::endl;
-    // std::cout << "total time on stack: " << stack_time << std::endl;
-
-    // /* alooc space for args */
-    // int arg_on_stack_offset = (used_reg.second.size() + 1)* reg_size;
-    // for(auto arg : fun->get_args()){
-    //   /* arg by reg */
-    //   if(arg->get_arg_no() < 4){
-    //     stack_map[arg] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
-    //     offset += reg_size;
-    //   }
-    //   /* arg by stack */
-    //   else if(arg->get_arg_no() == 4){
-    //     arg_on_stack_offset += offset;
-    //     // arg_on_stack.push_back(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), arg_on_stack_offset));
-    //     stack_map[arg] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), arg_on_stack_offset));
-    //     arg_on_stack_offset += arg->get_type()->get_size();
-        
-
-    //   }
-    //   else{
-    //     // arg_on_stack.push_back(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), arg_on_stack_offset));
-    //     stack_map[arg] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), arg_on_stack_offset));
-    //     arg_on_stack_offset += arg->get_type()->get_size();
-    //   }
-    // }
-    // size += offset;
-
-    // return size;
 }
 }
 }

@@ -58,12 +58,12 @@ if __name__ == "__main__":
     # you can only modify this to add your testcase
     # 测试目录
     TEST_DIRS = [
-                './Test_H/Easy_H/',
-                './Test_H/Medium_H/',
-                './Test_H//Hard_H/',
-                './Test/Easy/',
-                './Test/Medium/',
-                './Test/Hard/'
+                './int_only_test/Test_H/Easy_H/',
+                './int_only_test/Test_H/Medium_H/',
+                './int_only_test/Test_H/Hard_H/',
+                './int_only_test/Test/Easy/',
+                './int_only_test/Test/Medium/',
+                './int_only_test/Test/Hard/'
                 ]
     # you can only modify this to add your testcase
 
