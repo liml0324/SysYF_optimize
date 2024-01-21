@@ -6,7 +6,7 @@ import time
 IRBuild_ptn = '"{}" "-emit-ir" "-o" "{}" "{}" "{}"'
 ExeGen_ptn = '"clang" "{}" "-o" "{}" "{}" "../lib/lib.c"'
 Exe_ptn = '"{}"'
-IR_Optimiazation = "-O"
+IR_Optimiazation = "-O2"
 time_detailed = False
 time_cost_ir = 0
 time_cost_exegen = 0

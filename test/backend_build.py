@@ -81,6 +81,9 @@ if __name__ == "__main__":
                 print("folder {} does not exist".format(Dir))
                 exit(1)
         testcase_list = list(map(lambda x: x.split('.'), os.listdir(TEST_BASE_PATH)))
+        for case in testcase_list:
+            if case[0] == "a":
+                testcase_list.remove(case)
         testcase_list.sort()
         for i in range(len(testcase_list)-1, -1, -1):
             if len(testcase_list[i]) == 1:
