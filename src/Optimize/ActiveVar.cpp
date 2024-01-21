@@ -151,7 +151,7 @@ bool ValueCmp(Ptr<Value> a, Ptr<Value> b) {
     return a->get_name() < b->get_name();
 }
 
-std::vector<Ptr<Value>> sort_by_name(PtrSet<Value> &val_set) {
+PtrVec<Value> sort_by_name(PtrSet<Value> &val_set) {
     PtrVec<Value> result;
     result.assign(val_set.begin(), val_set.end());
     std::sort(result.begin(), result.end(), ValueCmp);

@@ -9,3 +9,9 @@ find_loop.out
 *_copy.*
 calc_time.py
 IRBuilder_backup.cpp
+*_copy.*
+calc_time.py
+IRBuilder_backup.cpp
+performance-cases/
+calc_time.py
+find_loop.out

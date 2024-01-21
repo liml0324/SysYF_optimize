@@ -788,5 +788,160 @@ std::string PhiInst::print()
     return instr_ir; 
 }
 
+
+CmpBrInst::CmpBrInst(OpID opid, CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false, 
+            Ptr<BasicBlock >bb)
+    : Instruction(Type::get_void_type(bb->get_module()), Instruction::cmpbr, 4, bb), cmp_op_(op)
+{
+
+}
+
+void CmpBrInst::init(OpID opid, CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false, 
+            Ptr<BasicBlock >bb)
+{
+    Instruction::init(Type::get_void_type(bb->get_module()), Instruction::cmpbr, 4, bb);
+    set_operand(0, lhs);
+    set_operand(1, rhs);
+    set_operand(2, if_true);
+    set_operand(3, if_false);
+}
+
+Ptr<CmpBrInst> CmpBrInst::create_cmpbr(CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false, Ptr<BasicBlock >bb, Ptr<Module>m)
+{
+
+    if_true->add_pre_basic_block(bb);
+    if_false->add_pre_basic_block(bb);
+    bb->add_succ_basic_block(if_false);
+    bb->add_succ_basic_block(if_true);
+
+    RET_AFTER_INIT(CmpBrInst,Instruction::cmpbr,op, lhs, rhs, if_true, if_false, bb);
+}
+
+bool CmpBrInst::is_cmp_br() const
+{
+    return get_num_operand() == 4;
+}
+
+std::string CmpBrInst::print()
+{
+    std::string instr_ir;
+    instr_ir += this->get_module()->get_instr_op_name( this->get_instr_type() );
+    instr_ir += " ";
+    instr_ir += print_cmp_type(this->cmp_op_);
+    instr_ir += " ";
+    instr_ir += this->get_operand(0)->get_type()->print();
+    instr_ir += " ";
+    instr_ir += print_as_op(this->get_operand(0), false);
+    instr_ir += ", ";
+    if (Type::is_eq_type(this->get_operand(0)->get_type(), this->get_operand(1)->get_type()))
+    {
+        instr_ir += print_as_op(this->get_operand(1), false);
+    }
+    else
+    {
+        instr_ir += print_as_op(this->get_operand(1), true);
+    }
+    if( is_cmp_br() )
+    {
+        instr_ir += ", ";
+        instr_ir += print_as_op(this->get_operand(2), true);
+        instr_ir += ", ";
+        instr_ir += print_as_op(this->get_operand(3), true);
+    }
+    return instr_ir;
+}
+
+
+
+FCmpBrInst::FCmpBrInst(OpID opid, CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false, 
+            Ptr<BasicBlock >bb)
+    : Instruction(Type::get_void_type(bb->get_module()), Instruction::fcmpbr, 4, bb), cmp_op_(op)
+{
+
+}
+
+void FCmpBrInst::init(OpID opid, CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false, 
+            Ptr<BasicBlock >bb)
+{
+    Instruction::init(Type::get_void_type(bb->get_module()), Instruction::fcmpbr, 4, bb);
+    set_operand(0, lhs);
+    set_operand(1, rhs);
+    set_operand(2, if_true);
+    set_operand(3, if_false);
+}
+
+Ptr<FCmpBrInst> FCmpBrInst::create_fcmpbr(CmpOp op, Ptr<Value>lhs, Ptr<Value>rhs, Ptr<BasicBlock >if_true, Ptr<BasicBlock >if_false, Ptr<BasicBlock >bb, Ptr<Module>m)
+{
+
+    if_true->add_pre_basic_block(bb);
+    if_false->add_pre_basic_block(bb);
+    bb->add_succ_basic_block(if_false);
+    bb->add_succ_basic_block(if_true);
+
+    RET_AFTER_INIT(FCmpBrInst,Instruction::fcmpbr,op, lhs, rhs, if_true, if_false, bb);
+}
+
+bool FCmpBrInst::is_fcmp_br() const
+{
+    return get_num_operand() == 4;
+}
+
+std::string FCmpBrInst::print()
+{
+    std::string instr_ir;
+    instr_ir += this->get_module()->get_instr_op_name( this->get_instr_type() );
+    instr_ir += " ";
+    instr_ir += print_fcmp_type(this->cmp_op_);
+    instr_ir += " ";
+    instr_ir += this->get_operand(0)->get_type()->print();
+    instr_ir += " ";
+    instr_ir += print_as_op(this->get_operand(0), false);
+    instr_ir += ", ";
+    if (Type::is_eq_type(this->get_operand(0)->get_type(), this->get_operand(1)->get_type()))
+    {
+        instr_ir += print_as_op(this->get_operand(1), false);
+    }
+    else
+    {
+        instr_ir += print_as_op(this->get_operand(1), true);
+    }
+    if( is_fcmp_br() )
+    {
+        instr_ir += ", ";
+        instr_ir += print_as_op(this->get_operand(2), true);
+        instr_ir += ", ";
+        instr_ir += print_as_op(this->get_operand(3), true);
+    }
+    return instr_ir;
+}
+
+MovConstInst::MovConstInst(OpID opid, Ptr<Type>ty, Ptr<ConstantInt>const_val, Ptr<BasicBlock >bb)
+    : Instruction(ty, Instruction::mov_const, 1, bb)
+{
+}
+
+void MovConstInst::init(OpID opid, Ptr<Type>ty, Ptr<ConstantInt>const_val, Ptr<BasicBlock >bb)
+{
+    Instruction::init(ty, Instruction::cmp, 1, bb);
+    set_operand(0, const_val);
+}
+
+Ptr<MovConstInst> MovConstInst::create_mov_const(Ptr<ConstantInt>const_val, Ptr<BasicBlock >bb)
+{
+    RET_AFTER_INIT(MovConstInst, Instruction::mov_const,Type::get_void_type(bb->get_module()), const_val, bb);
+}
+
+std::string MovConstInst::print()
+{
+    std::string instr_ir;
+    instr_ir += "%";
+    instr_ir += this->get_name();
+    instr_ir += " = ";
+    instr_ir += this->get_module()->get_instr_op_name( this->get_instr_type() );
+    instr_ir += " ";
+    instr_ir += print_as_op(this->get_operand(0), false);
+    return instr_ir;
+}
+
 }
 }

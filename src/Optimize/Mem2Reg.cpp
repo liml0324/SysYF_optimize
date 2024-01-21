@@ -31,7 +31,7 @@ void Mem2Reg::insideBlockForwarding(){
         std::map<Ptr<Value>, Ptr<Instruction>> defined_list;
         std::map<Ptr<Instruction>, Ptr<Value>> forward_list;
         std::map<Ptr<Value>, Ptr<Value>> new_value;
-        std::set<Ptr<Instruction>> delete_list;
+        PtrSet<Instruction> delete_list;
         for(auto inst: bb->get_instructions()){
             if(!isLocalVarOp(inst))continue;
             if(inst->get_instr_type() == Instruction::OpID::store){
@@ -91,7 +91,7 @@ void Mem2Reg::insideBlockForwarding(){
 }
 
 void Mem2Reg::genPhi(){
-    std::set<Ptr<Value>> globals;
+    PtrSet<Value> globals;
     std::map<Ptr<Value>, PtrSet<BasicBlock>> defined_in_block;
     for(auto bb: func_->get_basic_blocks()){
         for(auto inst: bb->get_instructions()){
@@ -114,7 +114,7 @@ void Mem2Reg::genPhi(){
         }
     }
 
-    std::map<Ptr<BasicBlock>, std::set<Ptr<Value>>> bb_phi_list;
+    std::map<Ptr<BasicBlock>, PtrSet<Value>> bb_phi_list;
 
     
     for(auto var: globals){
@@ -177,7 +177,7 @@ void Mem2Reg::valueDefineCounting(){// 记录每个基本块内有多少定值
     }
 }
 
-std::map<Ptr<Value>, std::vector<Ptr<Value>>> value_status;
+std::map<Ptr<Value>, PtrVec<Value>> value_status;
 PtrSet<BasicBlock> visited;
 
 void Mem2Reg::valueForwarding(Ptr<BasicBlock> bb){
@@ -270,7 +270,7 @@ void Mem2Reg::valueForwarding(Ptr<BasicBlock> bb){
 
 void Mem2Reg::removeAlloc(){
     for(auto bb: func_->get_basic_blocks()){
-        std::set<Ptr<Instruction>> delete_list;
+        PtrSet<Instruction> delete_list;
         for(auto inst: bb->get_instructions()){
             if(inst->get_instr_type() != Instruction::OpID::alloca)continue;
             auto alloc_inst = dynamic_pointer_cast<AllocaInst>(inst);
@@ -344,7 +344,7 @@ void Mem2Reg::phiStatistic(){
         }
     }
 
-    std::map<Ptr<Value>, std::set<Ptr<Value>>> reversed_value_map;
+    std::map<Ptr<Value>, PtrSet<Value>> reversed_value_map;
 
     for(auto map_item: value_map){
         Ptr<Value> vreg = map_item.first;

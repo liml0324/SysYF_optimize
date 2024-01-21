@@ -13,4 +13,6 @@ add_library(
         FindLoop.cpp
         LoopCodeMotion.cpp
         FindPureFunc.cpp
+        LIR.cpp
+        MovConst.cpp
 )

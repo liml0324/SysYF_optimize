@@ -16,7 +16,7 @@ class Mem2Reg : public Pass{
 private:
 	Ptr<Function>func_;
 	Ptr<IRBuilder>builder;
-	std::map<Ptr<BasicBlock>, std::vector<Ptr<Value>>> define_var;
+	std::map<Ptr<BasicBlock>, PtrVec<Value>> define_var;
     const std::string name = "Mem2Reg";
 	std::map<Ptr<Value>, Ptr<Value>> lvalue_connection;
 	PtrSet<Value> no_union_set;

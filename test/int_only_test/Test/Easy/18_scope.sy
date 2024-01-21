@@ -1,0 +1,17 @@
+const int a = 5;
+int b;
+
+int my_sum(int x, int y){
+    b = a + x - y;
+    return b;
+}
+
+int main(){
+    int a = 7;
+    {
+        const int a = 3;
+        my_sum(a, a); // b = 5+3-3 = 5
+    }
+    my_sum(a, b); // b = 5+7-5 = 7
+    return b;
+}
