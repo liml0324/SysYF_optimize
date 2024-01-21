@@ -64,7 +64,13 @@ bb0_1:
     mul r5, r1, r2
     add r6, r9, r5
     ldr r3, [r6]
-    fcmp r1, r7
+    VCVT.F32.S32 r3, r3
+    vsub r7, r4, #1.500000
+    VCVT.F32.S32 r8, r8
+    vcmp r1, r7
+    ldr r2, =0
+    ldrgt r2, =1
+    vcmp r1, r7
     bgt bb0_3
     b bb0_4
 bb0_2:

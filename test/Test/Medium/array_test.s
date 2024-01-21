@@ -80,7 +80,13 @@ bb1_1:
     mul r5, r1, r2
     add r3, r9, r5
     ldr r6, [r3]
-    fcmp r1, r7
+    VCVT.F32.S32 r6, r6
+    vsub r7, r4, #1.500000
+    VCVT.F32.S32 r8, r8
+    vcmp r1, r7
+    ldr r2, =0
+    ldrgt r2, =1
+    vcmp r1, r7
     bgt bb1_3
     Mov r9, r0
     b bb1_4

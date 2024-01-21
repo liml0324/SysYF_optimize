@@ -90,10 +90,15 @@ public:
         else exit(7);
     }
     Ptr<IR2asm::constant> get_asm_const(Ptr<Constant>val){if (dynamic_pointer_cast<ConstantZero>(val)) return Ptr<IR2asm::constant>(new IR2asm::constant(0));
-                                                    else {
+                                                    else if(dynamic_pointer_cast<ConstantInt>(val)){
                                                         auto const_val = dynamic_pointer_cast<ConstantInt>(val);
                                                         if (const_val) return Ptr<IR2asm::constant>(new IR2asm::constant(const_val->get_value()));
-                                                    }}
+                                                    }
+                                                    else{
+                                                        auto const_val = dynamic_pointer_cast<ConstantFloat>(val);
+                                                        if (const_val) return Ptr<IR2asm::constant>(new IR2asm::constant(0,true,const_val->get_value()));
+                                                    }
+                                                    }
     std::string ret_mov(Ptr<CallInst> call);
     bool instr_may_need_push_stack(Ptr<Instruction>instr) { return !(instr->is_ret() || instr->is_phi());}
 private:
