@@ -135,6 +135,7 @@ int main(int argc, char *argv[])
             if(emit_assembly){
                 passmgr.addPass<LIR>();
                 passmgr.addPass<MovConst>();
+                passmgr.addPass<ActiveVar>();
             }
             passmgr.execute();
             m->set_print_name();

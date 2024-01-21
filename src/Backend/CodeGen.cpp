@@ -334,6 +334,7 @@ namespace IR{
 
     //函数的代码生成
     std::string CodeGen::function_gen(Ptr<Function> fun,Ptr<RegAllocDriver> driver){
+        // std::cout<<"fun:"<<fun->get_name()<<std::endl;
         std::string code;
         sp_extra_ofst = 0;
         pool_number = 0;
@@ -402,6 +403,7 @@ namespace IR{
             new_code += ld_tmp_regs(inst);
             if(dynamic_pointer_cast<CallInst>(inst)){
                 auto call_inst = dynamic_pointer_cast<CallInst>(inst);
+                // std::cout<<call_inst->print()<<std::endl;
                 new_code += caller_reg_store(bb->get_parent(),call_inst);
                 new_code += arg_move(call_inst);
                 new_code += instr_gen(call_inst);

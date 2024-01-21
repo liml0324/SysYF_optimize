@@ -68,7 +68,8 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
             if(inst->is_alloca()){
                 stack_map[inst] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
                 auto alloca_inst=dynamic_pointer_cast<AllocaInst>(inst);
-                offset += alloca_inst->get_alloca_type()->get_size();
+                auto array_type=static_pointer_cast<ArrayType>(alloca_inst->get_alloca_type());
+                offset += array_type->get_num_of_elements()*array_type->get_element_type()->get_size();
             }
         }
     }
@@ -88,7 +89,11 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
     for(auto reg: *_reg_map){
         if(reg.second->reg_num==-1){
             stack_map[reg.first] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
-            offset += reg.first->get_type()->get_size();
+            size = reg.first->get_type()->get_size();
+            if(size==1){
+                size = 4;
+            }
+            offset += size;
         }
     }
     #ifdef stack_test

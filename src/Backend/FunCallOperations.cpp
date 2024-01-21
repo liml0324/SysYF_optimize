@@ -170,6 +170,7 @@ namespace IR{
                     continue;
                 }
                 auto reg = (reg_map).find(arg)->second->reg_num;
+                // std::cout<<arg->get_name()<<":"<<reg<<std::endl;
                 Ptr<IR2asm::Reg> preg;
                 if(reg >= 0){
                     if(reg<=3){
