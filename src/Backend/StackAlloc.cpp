@@ -19,9 +19,18 @@
 
 namespace SysYF{
 namespace IR{
-// #define stack_test
+#define stack_test
 int CodeGen::stack_space_allocation(Ptr<Function>fun)
 {
+    /*
+    arg
+    regs
+    lr
+    局部
+    16
+    16
+    */
+
     #ifdef stack_test
         std::cout<<"stack_space_allocation"<<std::endl;
     #endif
@@ -39,13 +48,14 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
     /* TODO：put your code here */
     int offset=0;
 
-    //临时变量分配
-    if(have_temp_reg){
-        offset+=temp_reg_store_num*reg_size;
-    }
     //函数调用
     if(have_func_call){
         offset+=caller_saved_reg_num*reg_size;
+    }
+    int stack_arg_offset=offset;
+    //临时变量分配
+    if(have_temp_reg){
+        offset+=temp_reg_store_num*reg_size;
     }
     #ifdef stack_test
         std::cout<<"offset after temp_reg&func_call:"<<offset<<std::endl;
@@ -73,6 +83,7 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
         if(stack_map.size()==0)
             std::cout<<"stack_map empty"<<std::endl;
     #endif
+
     //溢出的局部变量分配(_reg_map中)
     for(auto reg: *_reg_map){
         if(reg.second->reg_num==-1){
@@ -92,20 +103,29 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
             std::cout<<"stack_map empty"<<std::endl;
     #endif
 
+    size=offset;
+
+    offset+=reg_size;//lr
+    offset+=used_reg.second.size()*reg_size;//callee_save
+
+    #ifdef stack_test
+        std::cout<<"offset after lr and callee_save:"<<offset<<std::endl;
+    #endif
+
     //参数分配
-    int stack_arg_offset=(used_reg.second.size()+1)*reg_size+offset;
     for(auto arg:fun->get_args()){
         if(arg->get_arg_no()<4){
             stack_map[arg]=Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp),offset));
-            offset+=reg_size;
+            stack_arg_offset+=reg_size;
         }
         else if(arg->get_arg_no()>=4){
-            stack_map[arg]=Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::sp,stack_arg_offset));
-            stack_arg_offset+=arg->get_type()->get_size();
+            stack_map[arg]=Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::sp,offset));
+            // stack_arg_offset+=arg->get_type()->get_size();
+            offset+=arg->get_type()->get_size();
         }
     }
     #ifdef stack_test
-        std::cout<<"stack_arg_offset:"<<stack_arg_offset<<std::endl;
+        // std::cout<<"stack_arg_offset:"<<stack_arg_offset<<std::endl;
         for(auto i:stack_map){
             if(i.second==nullptr)
                 std::cout<<i.first->print()<<":nullptr"<<std::endl;
@@ -115,8 +135,7 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
         if(stack_map.size()==0)
             std::cout<<"stack_map empty"<<std::endl;
     #endif
-    
-    size=offset;
+
     //返回分配的总空间的大小（字节数）
     #ifdef stack_test
         std::cout<<"size:"<<size<<std::endl;
