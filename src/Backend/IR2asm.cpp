@@ -140,6 +140,7 @@ std::string ret(Ptr<Value> retval){
     asmstr += endl;
     // asmstr += space;
     // asmstr += "br lr" + endl;
+    // std::cout<<asmstr<<std::endl;
     return asmstr;
 }
 

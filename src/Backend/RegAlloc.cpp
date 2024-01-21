@@ -4,6 +4,7 @@
 
 #include "RegAlloc.h"
 #include <iostream>
+#include <fstream>
 #include <set>
 
 namespace SysYF
@@ -123,6 +124,7 @@ void RegAlloc::execute() {
     build_intervals();
     walk_intervals();
     set_unused_reg_num();
+    std::ofstream reg_out_file;
 }
 
 void RegAlloc::compute_block_order() {
@@ -249,6 +251,13 @@ void RegAlloc::walk_intervals() {
             current->reg_num = -1;
         }
     }
+    for(auto inter:interval_list){
+        std::cout<<inter->val->get_name()<<":"<<std::endl;
+        std::cout<<"\t-"<<inter->reg_num<<std::endl;
+        for(auto range: inter->range_list){
+            std::cout<<"\t"<<range->from<<":"<<range->to<<std::endl;
+        }
+    }
 }
 
 
@@ -309,11 +318,12 @@ bool RegAlloc::try_alloc_outofuse_reg(){
 bool RegAlloc::try_alloc_leastimportant_reg(){
     //取出to最大的区间
     auto inter=*(used_reg_interval.begin());
-    if(inter->range_list.back()->to>current->range_list.back()->to){
+    if(inter->range_list.back()->to>current->range_list.back()->to ){
         //当前区间更重要
         auto reg_num = inter->reg_num;
         add_reg_to_pool(inter);
         //将释放出的寄存器交给当前区间
+        inter->reg_num = -1;
         unused_reg_id.erase(unused_reg_id.begin());
         current->reg_num = reg_num;
         used_reg_interval.insert(current);
