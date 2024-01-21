@@ -8,7 +8,7 @@ main:
     sub sp, sp, #16
     ldr r0, Addr0_0
     ldr r0, [r0]
-    fadd r1, r0, #4
+    vadd r1, r0, #4.000000
     VCVT.S32.F32 r1, r1
     b bb0_0
 bb0_0:

@@ -8,7 +8,7 @@ std::string ldr_const(Ptr<Reg> rd, Ptr<IR2asm::constant>val, std::string cmpop) 
     std::string asmstr;
     asmstr += space;
     if(val->is_float_const())
-            asmstr += "VLDR" + cmpop + " ";
+            asmstr += "vldr" + cmpop + " ";
     else    asmstr += "ldr" + cmpop + " ";
     asmstr += rd->get_code();
     asmstr += ", =";
@@ -177,7 +177,7 @@ std::string cmp(Ptr<Reg> rs, Ptr<Operand2> opr2) {
 std::string fcmp(Ptr<Reg> rs, Ptr<Operand2> opr2) {
     std::string asmstr;
     asmstr += space;
-    asmstr += "fcmp ";
+    asmstr += "vcmp ";
     asmstr += rs->get_code();
     asmstr += ", ";
     asmstr += opr2->get_code();
@@ -201,7 +201,7 @@ std::string add(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
 std::string fadd(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
     std::string asmstr;
     asmstr += space;
-    asmstr += "fadd ";
+    asmstr += "vadd ";
     asmstr += rd->get_code();
     asmstr += ", ";
     asmstr += rs->get_code();
@@ -227,7 +227,7 @@ std::string sub(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
 std::string fsub(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
     std::string asmstr;
     asmstr += space;
-    asmstr += "fsub ";
+    asmstr += "vsub ";
     asmstr += rd->get_code();
     asmstr += ", ";
     asmstr += rs->get_code();
@@ -266,7 +266,7 @@ std::string mul(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> rt){
 std::string fmul(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> rt){
     std::string asmstr;
     asmstr += space;
-    asmstr += "fmul ";
+    asmstr += "vmul ";
     asmstr += rd->get_code();
     asmstr += ", ";
     asmstr += rs->get_code();
@@ -292,7 +292,7 @@ std::string sdiv(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> rt){
 std::string fdiv(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> rt){
     std::string asmstr;
     asmstr += space;
-    asmstr += "fdiv ";
+    asmstr += "vdiv ";
     asmstr += rd->get_code();
     asmstr += ", ";
     asmstr += rs->get_code();

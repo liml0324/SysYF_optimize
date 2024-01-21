@@ -135,11 +135,11 @@ namespace IR{
                     Ptr<IR2asm::Operand2> operand2;
                     if (const_op1) {
                         operand1 = op2;
-                        operand2 =Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_op1->get_value()));
+                        operand2 =Ptr<IR2asm::Operand2>( new IR2asm::Operand2(0,const_op1->get_value(),true));
                     } else {
                         operand1 = op1;
                         if (const_op2) {
-                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(const_op2->get_value()));
+                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(0,const_op2->get_value(),true));
                         } else {
                             operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(*get_asm_reg(op2)));
                         }
@@ -156,12 +156,12 @@ namespace IR{
                     Ptr<IR2asm::Operand2> operand2;
                     if (const_op1) {
                         operand1 = op2;
-                        operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_op1->get_value()));
+                        operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(0,const_op1->get_value(),true));
                         code += IR2asm::r_sub(get_asm_reg(inst), get_asm_reg(operand1), operand2);
                     } else {
                         operand1 = op1;
                         if (const_op2) {
-                            operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_op2->get_value()));
+                            operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(0,const_op2->get_value(),true));
                         } else {
                             operand2 = Ptr<IR2asm::Operand2>( new IR2asm::Operand2(*get_asm_reg(op2)));
                         }
@@ -178,11 +178,11 @@ namespace IR{
                     Ptr<IR2asm::Operand2> operand2;
                     if (const_op1) {
                         operand1 = op2;
-                        operand2 =Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_op1->get_value()));
+                        operand2 =Ptr<IR2asm::Operand2>( new IR2asm::Operand2(0,const_op1->get_value(),true));
                     } else {
                         operand1 = op1;
                         if (const_op2) {
-                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(const_op2->get_value()));
+                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(0,const_op2->get_value(),true));
                         } else {
                             operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(*get_asm_reg(op2)));
                         }
@@ -199,11 +199,11 @@ namespace IR{
                     Ptr<IR2asm::Operand2> operand2;
                     if (const_op1) {
                         operand1 = op2;
-                        operand2 =Ptr<IR2asm::Operand2>( new IR2asm::Operand2(const_op1->get_value()));
+                        operand2 =Ptr<IR2asm::Operand2>( new IR2asm::Operand2(0,const_op1->get_value(),true));
                     } else {
                         operand1 = op1;
                         if (const_op2) {
-                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(const_op2->get_value()));
+                            operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(0,const_op2->get_value(),true));
                         } else {
                             operand2 =Ptr<IR2asm::Operand2>(  new IR2asm::Operand2(*get_asm_reg(op2)));
                         }

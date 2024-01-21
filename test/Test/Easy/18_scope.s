@@ -8,7 +8,7 @@ my_sum:
     sub sp, sp, #16
     add r2, r0, #5
     VCVT.F32.S32 r2, r2
-    fsub r4, r3, r1
+    vsub r4, r3, r1
     VCVT.S32.F32 r4, r4
     push {r0}
     ldr r0, Addr0_0

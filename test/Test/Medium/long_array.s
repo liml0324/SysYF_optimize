@@ -441,9 +441,9 @@ bb0_20:
     ldr lr, =120127
     add lr, lr, sp
     str r6, [lr]
-    Mov r10, r3
-    Mov r3, r4
-    Mov r4, r10
+    Mov r10, r4
+    Mov r4, r3
+    Mov r3, r10
     b bb0_17
 bb0_21:
     Ldr r3, =5000

@@ -23,10 +23,10 @@ main:
     ldr r5, Addr0_1
     ldr r5, [r5]
     VCVT.F32.S32 r5, r5
-    fmul r7, r6, #1
+    vmul r7, r6, #1.100000
     VCVT.F32.S32 r4, r4
-    fadd r9, r8, r7
-    fadd r0, r9, #3
+    vadd r9, r8, r7
+    vadd r0, r9, #3.600000
     VCVT.S32.F32 r0, r0
     b bb0_0
 bb0_0:
