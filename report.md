@@ -21,9 +21,9 @@
 
 徐航宇：将去年框架的后端部分合并入PW6中，完成Arm汇编代码的生成和优化。
 
-## TODO: 贡献比
-
-TODO
+## 贡献比
+李牧龙：50%
+徐航宇：50%
 
 ## 具体实现
 
@@ -296,9 +296,211 @@ for(auto inst : insts) {
 
 这一部分的完整代码见[ActiveVar.h](./include/Optimize/ActiveVar.h)和[ActiveVar.cpp](./src/Optimize/ActiveVar.cpp)。
 
-### TODO: 后端代码生成与优化
+### 后端代码生成与优化
+#### 寄存器分配
 
-TODO
+寄存器分配采用的是线性扫描的寄存器分配方法：
+
+```cpp
+void RegAlloc::walk_intervals() {
+
+    /*you need to finish this function*/
+    used_reg_interval.clear();
+    for(auto current_it=interval_list.begin();current_it!=interval_list.end();current_it++){
+        current = *current_it;
+        //更新最新区间上端点位置
+        cur_loc=current->range_list.front()->from;
+        //尝试直接分配寄存器
+        if(try_alloc_free_reg()){
+            continue;
+        }
+        //尝试分配超出范围的寄存器
+        else if(try_alloc_outofuse_reg()){
+            continue;
+        }
+        //尝试争夺其他变量的寄存器
+        else if(try_alloc_leastimportant_reg()){
+            continue;
+        }
+        else{
+            //分配失败
+            current->reg_num = -1;
+        }
+    }
+}
+```
+
+具体地，我们按照变量的活跃区间的左端点进行升序排列，对于按序到来的区间，我们依次尝试直接分配寄存器、分配已经退出活跃区间的寄存器、尝试争夺其他变量的寄存器，如果以上三类操作均失败，则令当前变量的寄存器编号为-1，表示将其分配到栈上。
+
+值得一提的是，每次为变量分配寄存器时，我们都会用该变量的活跃区间的左端点更新行进的位置cur_loc。当没有可以直接分配的寄存器后，我们会用cur_loc判断是否存在已经退出活跃区间的寄存器，如果存在，则将其分配给当前变量。
+
+此外，我们维护了used_reg_interval优先队列，它按照区间结束的先后顺序排序。当不存在空闲寄存器时，我们会使用used_reg_interval的队首，即最后退出活跃区间的寄存器，来分配给当前变量。（这是因为将寄存器分配给当前变量可以为其他变量留出更大的分配到寄存器的可能）
+
+#### phi指令数据搬移
+
+按照Phi指令的语义，我们需要在`data_move`函数中并行地将`src`搬移到`dst`上。
+
+我们将`src`,`dst`中所有变量（包括寄存器、常数、栈地址），视作图中的结点，并为每对`src``dst`连边，使得`src`指向`dst`，从而构建出一张依赖图。可以注意到，图中没有出边的顶点是安全的，即可以被赋值；有出边的结点则要等待到所有出边的赋值均完成后才能被赋值。
+
+我们观察到，一次phi指令的数据搬移不存在一个变量被赋值两次。即所有节点的入度至多为一，通过数学推导可以证明，该依赖图在依次删除所有入度为0的结点后，剩下的图为若干环的并集。
+
+```cpp
+std::string CodeGen::data_move(PtrVec<IR2asm::Location> &src,
+                               PtrVec<IR2asm::Location> &dst,
+                               std::string cmpop){
+    std::string code;
+    
+    /* TODO: put your code here */
+    //寻找空闲寄存器（该方法中需要最多一个永久空闲的临时寄存器）
+    auto reg_tmp=Ptr<IR2asm::Reg>(new IR2asm::Reg(12));
+    //建立有向依赖图
+    depend_graph.clear();
+    depend_graph=create_dep_graph(src,dst);
+    //由于限制，所有顶点都至多有一条出边，所以，按逆拓扑先处理无出度顶点后，剩余图为若干圈的并集
+    //为没有出边的顶点赋值
+    std::set<Ptr<IR2asm::Location>,cmp_out_num> dec_out_vec;
+    for(auto it=depend_graph.begin();it!=depend_graph.end();it++){
+        dec_out_vec.insert(it->first);
+    }
+    auto cur_dst=*(dec_out_vec.begin());
+    while(cur_dst!=nullptr&&depend_graph[cur_dst].size()==1){
+        //找到了无出度的顶点
+        auto cur_src=depend_graph[cur_dst][0];
+        if(cur_src!=nullptr){
+            //有入度
+            code+=single_data_move(cur_src,cur_dst,reg_tmp,cmpop);
+            PtrVec<IR2asm::Location>& src_out_list=depend_graph[cur_src];
+            for(auto it=src_out_list.begin();it!=src_out_list.end();it++){
+                if(*it==cur_dst){
+                    src_out_list.erase(it);
+                    cur_src->out_deg--;
+                    break;
+                }
+            }
+        }else{
+            //无入度
+        }
+        depend_graph.erase(cur_dst);
+        dec_out_vec.erase(dec_out_vec.begin());
+        if(cur_src!=nullptr){
+            for(auto it=dec_out_vec.begin();it!=dec_out_vec.end();it++){
+                if(*it==cur_src){
+                    dec_out_vec.erase(it);
+                    break;
+                }
+            }
+            dec_out_vec.insert(cur_src);
+        }
+        if(dec_out_vec.empty())
+            cur_dst=nullptr;
+        else
+            cur_dst=*(dec_out_vec.begin());
+    }
+    //获取空闲寄存器
+    auto reg_tmp_2=Ptr<IR2asm::Location>(new IR2asm::RegLoc(10));//To Be Opmized(可以入栈)
+    //找环，直到所有顶点都被赋值
+    while(!depend_graph.empty()){
+        //找到一个环(1<-2<-3<-4<-...)
+        std::set<Ptr<IR2asm::Location>> cur_circle;
+        auto cur_dst=depend_graph.begin()->first;
+        auto cur_src=depend_graph[cur_dst][0];
+        cur_circle.insert(cur_dst);
+        auto start=cur_dst;
+        while(cur_src!=start){
+            cur_circle.insert(cur_src);
+            cur_dst=cur_src;
+            cur_src=depend_graph[cur_dst][0];
+        }
+        //处理环
+        auto it=cur_circle.begin();
+        auto last=it++;
+        code+=single_data_move(*last,reg_tmp_2,reg_tmp,cmpop);
+        for(;it!=cur_circle.end();it++){
+            code+=single_data_move(*it,*last,reg_tmp,cmpop);
+            last=it;
+        }
+        code+=single_data_move(reg_tmp_2,*last,reg_tmp,cmpop);
+        //删除环
+        for(auto it=cur_circle.begin();it!=cur_circle.end();it++){
+            depend_graph.erase(*it);
+        }
+    }
+    return code;
+}
+```
+
+我们预先分配了11,12号寄存器作为临时寄存器。我们使用拓扑排序，将节点按入度大小升序排列，得到队列 dec_out_vec ，每次取出队首，若其出度为0，则可以直接赋值；否则，说明入度为0的结点已经全部赋值完毕。
+
+找环过程中，我们首先从任意点出发，通过DFS找到一个环，然后将环中的点依次赋值，这样就完成了一次phi指令的数据搬移。
+
+#### 栈分配
+```cpp
+int CodeGen::stack_space_allocation(Ptr<Function>fun)
+{
+    int size = 0;
+
+    // std::map<Ptr<Value>, Interval *> CodeGen::reg_map
+    auto _reg_map = &reg_map;   // Hint: use this to get register for values
+
+    // std::map<Ptr<Value>, Ptr<IR2asm::Regbase>> CodeGen::stack_map
+    stack_map.clear();          // You need to fill in this container to finish allocation
+
+    // std::vector<Ptr<IR2asm::Regbase>> CodeGen::arg_on_stack（未使用，不必要维护）
+    arg_on_stack.clear();       // You need to maintain this information, the order is the same as parameter
+
+    /* TODO：put your code here */
+    int offset=0;
+
+    //临时变量分配
+    if(have_temp_reg){
+        offset+=temp_reg_store_num*reg_size;
+    }
+    //函数调用
+    if(have_func_call){
+        offset+=caller_saved_reg_num*reg_size;
+    }
+    
+    //局部数组分配（遍历alloca语句）
+    
+    for(auto block:fun->get_basic_blocks()){
+        for(auto inst:block->get_instructions()){
+            if(inst->is_alloca()){
+                stack_map[inst] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
+                auto alloca_inst=dynamic_pointer_cast<AllocaInst>(inst);
+                offset += alloca_inst->get_alloca_type()->get_size();
+            }
+        }
+    }
+    //溢出的局部变量分配(_reg_map中)
+    for(auto reg: *_reg_map){
+        if(reg.second->reg_num==-1){
+            stack_map[reg.first] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
+            offset += reg.first->get_type()->get_size();
+        }
+    }
+
+    //参数分配
+    int stack_arg_offset=(used_reg.second.size()+1)*reg_size+offset;
+    for(auto arg:fun->get_args()){
+        if(arg->get_arg_no()<4){
+            stack_map[arg]=Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp),offset));
+            offset+=reg_size;
+        }
+        else if(arg->get_arg_no()>=4){
+            stack_map[arg]=Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::sp,stack_arg_offset));
+            stack_arg_offset+=arg->get_type()->get_size();
+        }
+    }
+    
+    size=offset;
+    //返回分配的总空间的大小（字节数）
+    return size;
+}
+```
+
+在函数调用后，按照ARM标准组织栈空间。具体如下图：
+
+<img src="./report_src/image-11.png">
 
 ## 评测结果
 
@@ -553,4 +755,11 @@ else
 </html>
 
 
-### TODO: 后端代码生成与优化
+### 后端代码生成与优化
+总共140个测试样例，均能成功生成汇编代码：
+
+<img src="./report_src/image-9.png">
+
+鉴于时间原因，我们未能通过全部的测试。但仍有谬误的测试并不太多，共通过了133/140个测试。
+
+<img src="./report_src/image-10.png">

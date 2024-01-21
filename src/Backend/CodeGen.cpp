@@ -111,11 +111,14 @@ namespace IR{
                         for(int i = 0; i < init_size; i++){
                             Ptr<Constant> init_iter = initalizer_->get_element_value(i);
                             code += ".long ";
-                            if(dynamic_pointer_cast<ConstantFloat>(initializer)){
-                                code += std::to_string(dynamic_pointer_cast<ConstantFloat>(initializer)->get_value());
+                            if(dynamic_pointer_cast<ConstantFloat>(init_iter)){
+                                code += std::to_string(dynamic_pointer_cast<ConstantFloat>(init_iter)->get_value());
                             }
-                            else if(dynamic_pointer_cast<ConstantInt>(initializer)){
-                                code += std::to_string(dynamic_pointer_cast<ConstantInt>(initializer)->get_value());
+                            else if(dynamic_pointer_cast<ConstantInt>(init_iter)){
+                                code += std::to_string(dynamic_pointer_cast<ConstantInt>(init_iter)->get_value());
+                            }
+                            else{
+                                std::cout<<"error: global var initializer"<<std::endl;
                             }
                             code += IR2asm::endl;
                             code += IR2asm::space;
