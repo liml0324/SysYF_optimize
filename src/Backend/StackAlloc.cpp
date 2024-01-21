@@ -52,12 +52,14 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
     #endif
     
     //局部数组分配（遍历alloca语句）
+    
     for(auto block:fun->get_basic_blocks()){
         for(auto inst:block->get_instructions()){
             if(inst->is_alloca()){
                 stack_map[inst] = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(IR2asm::Reg(IR2asm::sp), offset));
                 auto alloca_inst=dynamic_pointer_cast<AllocaInst>(inst);
                 offset += alloca_inst->get_alloca_type()->get_size();//alloca_inst->get_type()->get_size();
+            }
         }
     }
     #ifdef stack_test
@@ -103,7 +105,7 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
         }
     }
     #ifdef stack_test
-        std::cout<<"arg_offset:"<<arg_offset<<std::endl;
+        std::cout<<"stack_arg_offset:"<<stack_arg_offset<<std::endl;
         for(auto i:stack_map){
             if(i.second==nullptr)
                 std::cout<<i.first->print()<<":nullptr"<<std::endl;
@@ -120,7 +122,6 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
         std::cout<<"size:"<<size<<std::endl;
     #endif
     return size;
-}
 }
 }
 }

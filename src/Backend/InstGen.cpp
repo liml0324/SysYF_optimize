@@ -555,7 +555,7 @@ namespace IR{
                     } else if (dynamic_pointer_cast<AllocaInst>(base_addr)) {
                         auto addr = stack_map[base_addr];
                         if(addr==nullptr){
-                            std::cout<<"stack of "<<base_addr->print()<<" :nullptr"<<std::endl;
+                            std::cout<<"ERORR: stack of "<<base_addr->print()<<" :nullptr"<<std::endl;
                             std::cout<<"stack:"<<std::endl;
                             for(auto i:stack_map){
                                 if(i.second==nullptr)

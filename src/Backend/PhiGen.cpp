@@ -102,8 +102,10 @@ namespace IR{
             bool target_stack = false;
             for(auto inst:sux->get_instructions()){
                 if(inst->is_phi()){
+                    // std::cout<<"phi:"<<inst->print()<<std::endl;
                     Ptr<Value> lst_val = nullptr;
                     int target_pos = reg_map[inst]->reg_num;
+                    // std::cout<<"target_pos:"<<target_pos<<std::endl;
                     Ptr<IR2asm::Location> target_ptr = nullptr;
                     if(target_pos>=0){
                         target_ptr =Ptr<IR2asm::RegLoc>(new IR2asm::RegLoc(target_pos, false));
@@ -153,6 +155,12 @@ namespace IR{
             if(phi_src.empty()){
                 continue;
             }
+            //print src dst
+            // std::cout<<"phi_union:"<<std::endl;
+            // for(int i=0;i<phi_src.size();i++){
+            //     std::cout<<phi_src[i]->get_code()<<"->"<<phi_target[i]->get_code()<<std::endl;
+            // }
+            // std::cout<<std::endl;
             *code += data_move(phi_src, phi_target, cmpop);
         }
         int accumulate_line_num_add = 0;

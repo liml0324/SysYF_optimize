@@ -136,6 +136,13 @@ namespace IR{
                 cur_dst=cur_src;
                 cur_src=depend_graph[cur_dst][0];
             }
+            #ifdef test_phi
+                for (auto it = cur_circle.begin(); it != cur_circle.end(); it++)
+                {
+                    std::cout << (*it)->get_code() << " ";
+                }
+                std::cout << std::endl;
+            #endif
             //处理环
             auto it=cur_circle.begin();
             auto last=it++;
