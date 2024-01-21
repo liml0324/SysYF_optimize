@@ -15,7 +15,7 @@ std::string ldr_const(Ptr<Reg> rd, Ptr<IR2asm::constant>val, std::string cmpop) 
     return asmstr;
 }
 
-std::string mov(Ptr<Reg> rd, Operand2 *opr2) {
+std::string mov(Ptr<Reg> rd, Ptr<Operand2> opr2) {
     std::string asmstr;
     asmstr += space;
     asmstr += "mov ";
@@ -82,13 +82,13 @@ std::string ble(Ptr<Location>addr) {
 
 std::string getelementptr(Ptr<Reg> rd, Ptr<Location> ptr){
     std::string asmstr;
-    auto regbase = dynamic_pointer_cast<Regbase>(ptr);
+    auto regbase = dynamic_pointer_cast<IR2asm::Regbase>(ptr);
     if(regbase){
         if (regbase->get_offset() >= (1<<8) || regbase->get_offset() < 0) {
             asmstr += ldr_const(rd, Ptr<IR2asm::constant>(new IR2asm::constant(regbase->get_offset())));
-            asmstr += add(rd, Ptr<IR2asm::Reg>(&regbase->get_reg()), new Operand2(*rd));
+            asmstr += add(rd, Ptr<IR2asm::Reg>(new IR2asm::Reg(regbase->get_reg())),Ptr<Operand2>(new Operand2(*rd)));
         } else {
-            asmstr += add(rd, Ptr<IR2asm::Reg>(&regbase->get_reg()), new Operand2(regbase->get_offset()));
+            asmstr += add(rd, Ptr<IR2asm::Reg>(new IR2asm::Reg(regbase->get_reg())),Ptr<Operand2>(new Operand2(regbase->get_offset())));
         }
     }
     else{
@@ -161,7 +161,7 @@ std::string b(Ptr<Location>addr) {
     return asmstr;
 }
 
-std::string cmp(Ptr<Reg> rs, Operand2* opr2) {
+std::string cmp(Ptr<Reg> rs, Ptr<Operand2> opr2) {
     std::string asmstr;
     asmstr += space;
     asmstr += "cmp ";
@@ -172,7 +172,18 @@ std::string cmp(Ptr<Reg> rs, Operand2* opr2) {
     return asmstr;
 }
 
-std::string add(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2){
+std::string fcmp(Ptr<Reg> rs, Ptr<Operand2> opr2) {
+    std::string asmstr;
+    asmstr += space;
+    asmstr += "fcmp ";
+    asmstr += rs->get_code();
+    asmstr += ", ";
+    asmstr += opr2->get_code();
+    asmstr += endl;
+    return asmstr;
+}
+
+std::string add(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
     std::string asmstr;
     asmstr += space;
     asmstr += "add ";
@@ -185,7 +196,7 @@ std::string add(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2){
     return asmstr;
 }
 
-std::string sub(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2){
+std::string sub(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
     std::string asmstr;
     asmstr += space;
     asmstr += "sub ";
@@ -198,7 +209,7 @@ std::string sub(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2){
     return asmstr;
 }
 
-std::string r_sub(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2){
+std::string r_sub(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
     std::string asmstr;
     asmstr += space;
     asmstr += "rsb ";
@@ -237,7 +248,7 @@ std::string sdiv(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Reg> rt){
     return asmstr;
 }
 
-std::string srem(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2){
+std::string srem(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2){
     std::string asmstr;
     asmstr += space;
     asmstr += "srem ";
@@ -264,8 +275,8 @@ std::string load(Ptr<Reg> rd, Ptr<Location> addr, std::string cmpop){
 std::string safe_load(Ptr<Reg> rd, Ptr<Location> addr, int sp_extra_ofst, bool long_func, std::string cmpop){
     std::string asmstr;
     bool is_sp_based = false;
-    if(dynamic_pointer_cast<Ptr<Regbase>>(addr)){
-        Ptr<Regbase> regbase = dynamic_pointer_cast<Regbase>(addr);
+    if(dynamic_pointer_cast<IR2asm::Regbase>(addr)){
+        Ptr<IR2asm::Regbase> regbase = dynamic_pointer_cast<IR2asm::Regbase>(addr);
         is_sp_based = (regbase->get_reg().get_id() == sp);
         int offset = regbase->get_offset() + ((is_sp_based)?sp_extra_ofst: 0);
         if(abs(offset) > 4095){
@@ -277,11 +288,11 @@ std::string safe_load(Ptr<Reg> rd, Ptr<Location> addr, int sp_extra_ofst, bool l
             asmstr += "add lr, lr, ";
             asmstr += regbase->get_reg().get_code();
             asmstr += endl;
-            asmstr += load(rd, Ptr<IR2asm::Regbase>(new Regbase(Reg(lr), 0)), cmpop);
+            asmstr += load(rd, Ptr<IR2asm::Regbase>(new IR2asm::Regbase(Reg(lr), 0)), cmpop);
         }
         else{
             if(is_sp_based){
-                Ptr<Regbase> new_regbase = Ptr<IR2asm::Regbase>(new Regbase(*regbase));
+                Ptr<IR2asm::Regbase> new_regbase = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(*regbase));
                 new_regbase->set_offset(offset);
                 asmstr += load(rd, new_regbase, cmpop);
             }
@@ -297,7 +308,7 @@ std::string safe_load(Ptr<Reg> rd, Ptr<Location> addr, int sp_extra_ofst, bool l
             asmstr += "ldr lr, =";
             asmstr += labl->get_code();
             asmstr += endl;
-            asmstr += load(rd,Ptr<Regbase>( new Regbase(Reg(lr), 0)), cmpop);
+            asmstr += load(rd,Ptr<IR2asm::Regbase>( new IR2asm::Regbase(Reg(lr), 0)), cmpop);
         }
         else{
             asmstr += load(rd, addr, cmpop);
@@ -320,8 +331,8 @@ std::string store(Ptr<Reg> rd, Ptr<Location> addr, std::string cmpop){
 std::string safe_store(Ptr<Reg> rd, Ptr<Location> addr, int sp_extra_ofst, bool long_func, std::string cmpop){
     std::string asmstr;
     bool is_sp_based = false;
-    if(dynamic_pointer_cast<Regbase>(addr)){
-        Ptr<Regbase> regbase = dynamic_pointer_cast<Regbase>(addr);
+    if(dynamic_pointer_cast<IR2asm::Regbase>(addr)){
+        Ptr<IR2asm::Regbase> regbase = dynamic_pointer_cast<IR2asm::Regbase>(addr);
         is_sp_based = (regbase->get_reg().get_id() == sp);
         int offset = regbase->get_offset() + ((is_sp_based)?sp_extra_ofst: 0);
         if(abs(offset) > 4095){
@@ -333,11 +344,11 @@ std::string safe_store(Ptr<Reg> rd, Ptr<Location> addr, int sp_extra_ofst, bool 
             asmstr += "add lr, lr, ";
             asmstr += regbase->get_reg().get_code();
             asmstr += endl;
-            asmstr += store(rd, Ptr<Regbase>(new Regbase(Reg(lr), 0)), cmpop);
+            asmstr += store(rd, Ptr<IR2asm::Regbase>(new IR2asm::Regbase(Reg(lr), 0)), cmpop);
         }
         else{
             if(is_sp_based){
-                Ptr<Regbase> new_regbase = Ptr<Regbase>(new Regbase(*regbase));
+                Ptr<IR2asm::Regbase> new_regbase = Ptr<IR2asm::Regbase>(new IR2asm::Regbase(*regbase));
                 new_regbase->set_offset(offset);
                 asmstr += store(rd, new_regbase, cmpop);
             }
@@ -353,7 +364,7 @@ std::string safe_store(Ptr<Reg> rd, Ptr<Location> addr, int sp_extra_ofst, bool 
             asmstr += "ldr lr, =";
             asmstr += labl->get_code();
             asmstr += endl;
-            asmstr += store(rd, Ptr<Regbase>(new Regbase(Reg(lr), 0)), cmpop);
+            asmstr += store(rd, Ptr<IR2asm::Regbase>(new IR2asm::Regbase(Reg(lr), 0)), cmpop);
         }
         else{
             asmstr += store(rd, addr, cmpop);

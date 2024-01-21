@@ -50,6 +50,18 @@ struct cmp_interval{
     }
 };
 
+struct cmp_interval_by_end{
+    bool operator()(const Ptr<Interval> a, const Ptr<Interval> b) const {
+        auto a_to = (*(a->range_list.rbegin()))->to;
+        auto b_to = (*(b->range_list.rbegin()))->to;
+        if(a_to!=b_to){
+            return a_to < b_to;
+        }else{
+            return a->val->get_name() < b->val->get_name();
+        }
+    }
+};
+
 const int priority[] = {
         5,//r0
         4,//r1
@@ -76,7 +88,8 @@ struct cmp_reg {
     }
 };
 
-const std::vector<int> all_reg_id = {0,1,2,3,4,5,6,7,8,9,10,12};
+// const std::vector<int> all_reg_id = {0,1,2,3,4,5,6,7,8,9,10,12};
+const std::vector<int> all_reg_id = {0,1,2,3,4,5,6,7,8,9};//10,12专用于phi(To Be Optimized)
 
 class RegAllocDriver{
 public:
@@ -108,12 +121,18 @@ private:
     void add_interval(Ptr<Interval> interval){interval_list.insert(interval);}
     void add_reg_to_pool(Ptr<Interval> inter);
     bool try_alloc_free_reg();
+    bool try_alloc_outofuse_reg();
+    bool try_alloc_leastimportant_reg();
     std::set<int> unused_reg_id = {all_reg_id.begin(),all_reg_id.end()};
     Ptr<Interval> current = nullptr;
+    int cur_loc;
     std::map<Ptr<Value>, Ptr<Interval>> val2Inter;
     Ptr<Function> func;
     PtrList<BasicBlock> block_order={};
+    //已按照区间开始的先后顺序排好序（升序）
     std::set<Ptr<Interval>,cmp_interval> interval_list;
+    //已按照区间结束的先后顺序排好序（升序）
+    std::set<Ptr<Interval>,cmp_interval_by_end> used_reg_interval={};
 };
     
     }

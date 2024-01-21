@@ -16,8 +16,12 @@ namespace IR{
         if(dynamic_pointer_cast<ConstantInt>(init)){
             return (dynamic_pointer_cast<ConstantInt>(init)->get_value() == 0);
         }
+        else if(dynamic_pointer_cast<ConstantFloat>(init)){
+            return (dynamic_pointer_cast<ConstantFloat>(init)->get_value() == 0);
+        }
         else{
             auto initalizer = dynamic_pointer_cast<ConstantArray>(init);
+            if(initalizer==nullptr) std::cout<<"nullptr"<<std::endl;
             int init_size = initalizer->get_size_of_array();
             for(int i = 0; i < init_size; i++){
                 Ptr<Constant> init_iter = initalizer->get_element_value(i);
@@ -85,7 +89,12 @@ namespace IR{
                 code += IR2asm::space;
                 if(!isarray){
                     code += ".long ";
-                    code += std::to_string(dynamic_pointer_cast<ConstantInt>(initializer)->get_value());
+                    if(dynamic_pointer_cast<ConstantFloat>(initializer)){
+                        code += std::to_string(dynamic_pointer_cast<ConstantFloat>(initializer)->get_value());
+                    }
+                    else if(dynamic_pointer_cast<ConstantInt>(initializer)){
+                        code += std::to_string(dynamic_pointer_cast<ConstantInt>(initializer)->get_value());
+                    }
                     code += IR2asm::endl;
                     code += IR2asm::space;
                 }
@@ -102,7 +111,12 @@ namespace IR{
                         for(int i = 0; i < init_size; i++){
                             Ptr<Constant> init_iter = initalizer_->get_element_value(i);
                             code += ".long ";
-                            code += std::to_string(dynamic_pointer_cast<ConstantInt>(init_iter)->get_value());
+                            if(dynamic_pointer_cast<ConstantFloat>(initializer)){
+                                code += std::to_string(dynamic_pointer_cast<ConstantFloat>(initializer)->get_value());
+                            }
+                            else if(dynamic_pointer_cast<ConstantInt>(initializer)){
+                                code += std::to_string(dynamic_pointer_cast<ConstantInt>(initializer)->get_value());
+                            }
                             code += IR2asm::endl;
                             code += IR2asm::space;
                         }
@@ -127,6 +141,7 @@ namespace IR{
     }
 
     void CodeGen::make_global_table(Ptr<Module> module){
+        //创建全局变量作用域表global_variable_use：{fun,{vars}}
         for(auto var: module->get_global_variable()){
             for(auto use: var->get_use_list()){
                 Ptr<Function> func_;
@@ -158,18 +173,20 @@ namespace IR{
 
     std::string CodeGen::module_gen(Ptr<Module> module){
         std::string code;
+        //生成全局变量定义代码
         std::string globaldef;
         globaldef += global_def_gen(module);
         auto driver = new RegAllocDriver(module);
         driver->compute_reg_alloc();
-        make_global_table(module);
-        func_no = 0;
-        code += IR2asm::space + ".arch armv7ve " + IR2asm::endl;
+        make_global_table(module);  //创建全局变量作用域表
+        func_no = 0;    //函数编号
+        code += IR2asm::space + ".arch armv8 " + IR2asm::endl;  //架构声明
         code += IR2asm::space + ".text " + IR2asm::endl;
         for(auto func_: module->get_functions()){
-            if(func_->get_basic_blocks().empty())continue;
-            reg_map = driver->get_reg_alloc_in_func(func_);
-            code += function_gen(func_) + IR2asm::endl;
+            //为func生成代码
+            if(func_->get_basic_blocks().empty())continue;  //空函数跳过
+            reg_map = driver->get_reg_alloc_in_func(func_); //获取func_的寄存器分配方案
+            code += function_gen(func_) + IR2asm::endl;     //生成func_代码
             func_no++;
         }
         return code + globaldef;
@@ -192,6 +209,10 @@ namespace IR{
         Ptr<IR2asm::label>newlabel;
         std::string label_str;
         for(auto bb: linear_fun_bb){
+        if(bb->get_terminator()==nullptr){
+            auto inst = bb->get_instructions();
+            std::cout<<"b"<<std::endl;
+        }
             if(bb != fun->get_entry_block() && !bb->get_terminator()->is_ret()){
                 label_str = "bb" + std::to_string(func_no) + "_" + std::to_string(bb_no);
                 newlabel = Ptr<IR2asm::label>(new IR2asm::label(label_str));
@@ -285,13 +306,16 @@ namespace IR{
         for(auto iter: reg_map){
             Ptr<Value> vreg = iter.first;
             Ptr<Interval> interval = iter.second;
+            //iter使用寄存器
             if(interval->reg_num >= 0){
+                //记录使用的寄存器（0~3,o.w.）
                 if(interval->reg_num > 3){
                     used_reg.second.insert(interval->reg_num);
                 }
                 else{
                     used_reg.first.insert(interval->reg_num);
                 }
+                //构造reg->val映射
                 if(reg2val.find(interval->reg_num)!=reg2val.end()){
                     reg2val.find(interval->reg_num)->second.push_back(vreg);
                 }
@@ -305,6 +329,7 @@ namespace IR{
         return;
     }
 
+    //函数的代码生成
     std::string CodeGen::function_gen(Ptr<Function> fun,Ptr<RegAllocDriver> driver){
         std::string code;
         sp_extra_ofst = 0;
@@ -318,20 +343,27 @@ namespace IR{
         func_call_check(fun);
         reg_use_statistic(fun);
         int stack_size = stack_space_allocation(fun);
+        //代码生成
+        //函数头部
         code += IR2asm::space + ".globl " + fun->get_name() + IR2asm::endl;
         code += IR2asm::space + ".p2align " + std::to_string(int_p2align) + IR2asm::endl;
         code += IR2asm::space + ".type " + fun->get_name() + ", %function" + IR2asm::endl;
         code += fun->get_name() + ":" + IR2asm::endl;
+        //函数体
+        //被调用者义务
         code += callee_reg_store(fun);
         if(stack_size)code += callee_stack_operation_in(fun, stack_size);
         code += callee_arg_move(fun);
-
+        //为各个基本块生成代码
         for(auto bb: linear_bb){
             code += bb_gen(bb);
         }
+        //被调用者义务
         if(stack_size)code += callee_stack_operation_out(fun, stack_size);
         code += callee_reg_restore(fun);
+        //跳到返回地址
         code += IR2asm::space + "bx lr" + IR2asm::endl;
+        //TO BE READ
         code += make_lit_pool(true);
         code += print_global_table();
         return code;

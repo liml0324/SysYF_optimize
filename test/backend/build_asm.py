@@ -12,9 +12,9 @@ if __name__ == '__main__':
 
     # 修改当前的python的工作目录
     os.chdir('../../build')
-    # 收集所有的`../test/student`目录下的测试样例
-    source_file_list = [os.path.join('../test/student', file) if file.endswith('.sy') for file in os.listdir('../test/student')]
+    # 收集所有的`../test/backend`目录下的测试样例
+    source_file_list = [os.path.join('../test/backend', file) if file.endswith('.sy') for file in os.listdir('../test/backend')]
     # 执行编译生成汇编
-    # 注意生成的汇编代码一定要放在`../test/student`目录下，只有该目录将被打包发送到树莓派上进行可执行程序生成和实际运行
-    subprocess.run(baseline_asm_gen_cmd.format('', '', '../test/student/demo_baseline.s'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    subprocess.run(optimized_asm_gen_cmd.format('', '', '../test/student/demo_opt.s'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # 注意生成的汇编代码一定要放在`../test/backend`目录下，只有该目录将被打包发送到树莓派上进行可执行程序生成和实际运行
+    subprocess.run(baseline_asm_gen_cmd.format('', '', '../test/backend/demo_baseline.s'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    subprocess.run(optimized_asm_gen_cmd.format('', '', '../test/backend/demo_opt.s'), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

@@ -29,7 +29,7 @@ namespace IR2asm{
     };
 
     std::string ldr_const(Ptr<Reg> rd, Ptr<IR2asm::constant>val, std::string cmpop = "");
-    std::string mov(Ptr<Reg> rd, Operand2 *opr2);
+    std::string mov(Ptr<Reg> rd, Ptr<Operand2> opr2);
     std::string getelementptr(Ptr<Reg> rd, Ptr<Location> ptr);
     std::string ret();
     std::string ret(Ptr<Value> retval);
@@ -42,13 +42,14 @@ namespace IR2asm{
     std::string ble(Ptr<Location>addr);
     std::string b(Ptr<Location> label);
     std::string br(Ptr<Location> label);
-    std::string cmp(Ptr<Reg> rs, Operand2* opr2);
-    std::string add(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2);
-    std::string sub(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2);
-    std::string r_sub(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2);
+    std::string cmp(Ptr<Reg> rs, Ptr<Operand2> opr2);
+    std::string fcmp(Ptr<Reg> rs, Ptr<Operand2> opr2);
+    std::string add(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2);
+    std::string sub(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2);
+    std::string r_sub(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2);
     std::string mul(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Reg> rt);
     std::string sdiv(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Reg> rt);
-    std::string srem(Ptr<Reg> rd, Ptr<Reg> rs, Operand2* opr2);
+    std::string srem(Ptr<Reg> rd, Ptr<Reg> rs, Ptr<Operand2> opr2);
     std::string load(Ptr<Reg> rd, Ptr<Location> addr, std::string cmpop = "");
     std::string safe_load(Ptr<Reg> rd, Ptr<Location> addr, int sp_extra_ofst, bool long_func, std::string cmpop = "");
     std::string store(Ptr<Reg> rs, Ptr<Location> addr, std::string cmpop = "");

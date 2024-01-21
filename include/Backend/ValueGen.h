@@ -32,6 +32,7 @@ namespace IR2asm {
     class Location{
         public:
         virtual std::string get_code() = 0;
+            int out_deg=0;
     };
 
 

@@ -37,7 +37,6 @@ namespace IR{
         std::string* code = &succ_code;
         bool is_succ = true;
         bool is_cmpbr = false;
-        Ptr<CmpBrInst> cmpbr = dynamic_pointer_cast<CmpBrInst>(br_inst);
         Ptr<BasicBlock> succ_bb;
         Ptr<BasicBlock> fail_bb;
 
@@ -50,8 +49,20 @@ namespace IR{
         PtrVec<IR2asm::Location> phi_target;
         PtrVec<IR2asm::Location> phi_src;
 
-        if(cmpbr){
+        if(br_inst->is_cmpbr()){
             is_cmpbr = true;
+            auto cmpbr = dynamic_pointer_cast<CmpBrInst>(br_inst);
+            succ_bb = dynamic_pointer_cast<BasicBlock>(cmpbr->get_operand(2));
+            fail_bb = dynamic_pointer_cast<BasicBlock>(cmpbr->get_operand(3));
+            cmp += cmpbr_inst[0] + IR2asm::endl;
+            succ_br += cmpbr_inst[1] + IR2asm::endl;
+            inst_cmpop += std::string(1, succ_br[5]);
+            inst_cmpop.push_back(succ_br[6]); //bad for debugging
+            fail_br += cmpbr_inst[2] + IR2asm::endl;
+        }
+        else if(br_inst->is_fcmpbr()){
+            is_cmpbr = true;
+            auto cmpbr = dynamic_pointer_cast<FCmpBrInst>(br_inst);
             succ_bb = dynamic_pointer_cast<BasicBlock>(cmpbr->get_operand(2));
             fail_bb = dynamic_pointer_cast<BasicBlock>(cmpbr->get_operand(3));
             cmp += cmpbr_inst[0] + IR2asm::endl;

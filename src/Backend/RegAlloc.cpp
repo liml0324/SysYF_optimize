@@ -224,20 +224,105 @@ void RegAlloc::build_intervals() {
     }
 }
 
+//传统线性扫描法分配寄存器
 void RegAlloc::walk_intervals() {
 
     /*you need to finish this function*/
-
+    used_reg_interval.clear();
     for(auto current_it=interval_list.begin();current_it!=interval_list.end();current_it++){
         current = *current_it;
-        
-        
+        //更新最新区间上端点位置
+        cur_loc=current->range_list.front()->from;
+        //尝试直接分配寄存器
+        if(try_alloc_free_reg()){
+            continue;
+        }
+        //尝试分配超出范围的寄存器
+        else if(try_alloc_outofuse_reg()){
+            continue;
+        }
+        else if(try_alloc_leastimportant_reg()){
+            continue;
+        }
+        else{
+            //分配失败
+            current->reg_num = -1;
+        }
     }
 }
 
 
 void RegAlloc::set_unused_reg_num() {
     func->set_unused_reg_num(unused_reg_id);
+}
+
+//--------------Tools----------------
+
+/*释放寄存器
+*/
+void RegAlloc::add_reg_to_pool(Ptr<Interval> inter){
+    //修改unused_reg_id
+    unused_reg_id.insert(inter->reg_num);
+    //从used_reg_interval中删除interval
+    used_reg_interval.erase(inter);
+}
+
+/*尝试分配寄存器
+reg_num：接收分配的寄存器编号
+返回值：是否成功分配
+修改unused_reg_id
+*/
+bool RegAlloc::try_alloc_free_reg(){
+    if(unused_reg_id.empty()){
+        return false;
+    }
+    auto reg_num = *unused_reg_id.begin();
+    unused_reg_id.erase(unused_reg_id.begin());
+    current->reg_num = reg_num;
+    used_reg_interval.insert(current);
+    return true;
+}
+
+/*尝试分配已失效的寄存器
+*/
+bool RegAlloc::try_alloc_outofuse_reg(){
+    //取出to最小的区间
+    auto inter=*(used_reg_interval.begin());
+    if(inter->range_list.back()->to<cur_loc){
+        //该寄存器已失效，可以释放
+        auto reg_num = inter->reg_num;
+        add_reg_to_pool(inter);
+        //将释放出的寄存器交给当前区间
+        unused_reg_id.erase(unused_reg_id.begin());
+        current->reg_num = reg_num;
+        used_reg_interval.insert(current);
+        return true;
+    }
+    else{
+        //不存在失效的寄存器，无法释放
+        return false;
+    }
+}
+
+/*尝试调整寄存器分配，将最不重要的寄存器分配给当前区间
+*/
+bool RegAlloc::try_alloc_leastimportant_reg(){
+    //取出to最大的区间
+    auto inter=*(used_reg_interval.begin());
+    if(inter->range_list.back()->to>current->range_list.back()->to){
+        //当前区间更重要
+        auto reg_num = inter->reg_num;
+        add_reg_to_pool(inter);
+        //将释放出的寄存器交给当前区间
+        unused_reg_id.erase(unused_reg_id.begin());
+        current->reg_num = reg_num;
+        used_reg_interval.insert(current);
+        return true;
+    }
+    else{
+        //不存在失效的寄存器，无法释放
+        return false;
+    }
 }
 
 }
