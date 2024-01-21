@@ -1,0 +1,30 @@
+label_entry
+in:
+arg0 arg1 
+out:
+arg0 arg1 
+label_ret
+in:
+arg0 op21 
+out:
+
+label12
+in:
+arg0 
+out:
+arg0 
+label16
+in:
+arg0 arg1 
+out:
+op21 
+label_entry
+in:
+
+out:
+
+label_ret
+in:
+
+out:
+

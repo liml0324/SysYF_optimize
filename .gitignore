@@ -5,3 +5,6 @@ a.out
 **/build/*
 active_var.out
 *_copy.*
+performance-cases/
+calc_time.py
+find_loop.out
