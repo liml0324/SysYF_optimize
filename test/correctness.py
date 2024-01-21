@@ -7,7 +7,7 @@ IRBuild_ptn = '"{}" "-emit-ir" "-o" "{}" "{}" "{}"'
 ExeGen_ptn = '"clang" "{}" "-o" "{}" "{}" "../lib/lib.c"'
 Exe_ptn = '"{}"'
 IR_Optimiazation = "-O2"
-time_detailed = False
+time_detailed = True
 time_cost_ir = 0
 time_cost_exegen = 0
 time_cost_exe = 0
@@ -158,7 +158,7 @@ if __name__ == "__main__":
         print("\t\033[31mTest Fail\033[0m in dirs {}".format(fail_dir_str))
     else:
         print("\t\033[32mAll Tests Passed\033[0m")
-    # print('Total IRBuild time cost: {:.4f}s'.format(time_cost_ir))
-    # print('Total ExeGen time cost: {:.4f}s'.format(time_cost_exegen))
-    # print('Total Exe time cost: {:.4f}s'.format(time_cost_exe))
+    print('Total IRBuild time cost: {:.4f}s'.format(time_cost_ir))
+    print('Total ExeGen time cost: {:.4f}s'.format(time_cost_exegen))
+    print('Total Exe time cost: {:.4f}s'.format(time_cost_exe))
         
