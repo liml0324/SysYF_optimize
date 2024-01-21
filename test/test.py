@@ -109,12 +109,6 @@ def eval(EXE_PATH, TEST_BASE_PATH, optimization):
                                 time_end_exegen - time_start_exegen,
                                 time_end_exe - time_start_exe))
                         else:
-                            if(time_detailed):
-                            print('\t\033[32mPass\033[0m\tTime: \tir:{:.4f}s\texegen:{:.4f}s\texe:{:.4f}s'.format(
-                                time_end_ir - time_start_ir,
-                                time_end_exegen - time_start_exegen,
-                                time_end_exe - time_start_exe))
-                        else:
                             print('\t\033[32mPass\033[0m')
                     else:
                         print('\t\033[31mWrong Answer\033[0m')
