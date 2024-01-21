@@ -19,7 +19,8 @@ myFunc:
     bne bb0_0
     b bb0_1
 bb0_0:
-    Ldr r2, =0
+    Mov r2, r0
+    Ldr r4, =0
     b bb0_5
 bb0_1:
     Mov r6, r0
@@ -34,15 +35,16 @@ bb0_2:
     bgt bb0_3
     b bb0_4
 bb0_3:
-    sub r4, r6, #1
-    Mov r6, r4
+    sub r5, r6, #1
+    Mov r6, r5
     b bb0_2
 bb0_4:
     add r1, r6, #2
-    Mov r2, r1
+    Mov r2, r6
+    Mov r4, r1
     b bb0_5
 bb0_5:
-    mov r0, r2
+    mov r0, r4
     add sp, sp, #16
     pop {r4, r5, r6, r7, r8, r9, lr}
     bx lr

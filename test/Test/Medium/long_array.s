@@ -115,10 +115,10 @@ bb0_7:
     mul r3, r4, r6
     str r0, [sp, #20]
     add r0, r8, r3
-    ldr lr, =240143
+    ldr lr, =240155
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240143
+    ldr lr, =240155
     add lr, lr, sp
     ldr r0, [lr]
     ldr r6, [r0]
@@ -134,10 +134,10 @@ bb0_7:
     ldr r6, =4
     mul r4, r8, r6
     add r0, r7, r4
-    ldr lr, =240147
+    ldr lr, =240159
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240147
+    ldr lr, =240159
     add lr, lr, sp
     ldr r0, [lr]
     ldr r6, [r0]
@@ -158,10 +158,10 @@ bb0_9:
     ldrlt r3, =1
     str r0, [sp, #20]
     ldr r0, =10000
-    ldr lr, =240187
+    ldr lr, =240191
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240187
+    ldr lr, =240191
     add lr, lr, sp
     ldr r0, [lr]
     cmp r2, r0
@@ -175,10 +175,10 @@ bb0_10:
     ldrlt r3, =1
     str r0, [sp, #20]
     ldr r0, =10
-    ldr lr, =240016
+    ldr lr, =240191
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240016
+    ldr lr, =240191
     add lr, lr, sp
     ldr r0, [lr]
     cmp r2, r0
@@ -195,78 +195,78 @@ bb0_12:
     str r0, [sp, #20]
     ldr r0, =200004
     add r0, sp, r0
-    ldr lr, =240020
+    ldr lr, =240032
     add lr, lr, sp
     str r0, [lr]
     ldr r0, =4
-    ldr lr, =240033
+    ldr lr, =240191
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240033
+    ldr lr, =240191
     add lr, lr, sp
     ldr r0, [lr]
     mul r0, r3, r0
-    ldr lr, =240159
+    ldr lr, =240004
     add lr, lr, sp
     str r0, [lr]
     str r1, [sp, #24]
-    ldr lr, =240020
-    add lr, lr, sp
-    ldr r0, [lr]
-    ldr lr, =240159
+    ldr lr, =240004
     add lr, lr, sp
     ldr r1, [lr]
+    ldr lr, =240032
+    add lr, lr, sp
+    ldr r0, [lr]
     add r0, r0, r1
-    ldr lr, =240179
+    ldr lr, =240061
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240179
+    ldr lr, =240061
     add lr, lr, sp
     ldr r0, [lr]
     ldr r3, [r0]
     add r0, r7, r3
-    ldr lr, =240024
+    ldr lr, =240036
     add lr, lr, sp
     str r0, [lr]
     ldr r0, =1333
-    ldr lr, =240028
+    ldr lr, =240179
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240024
+    ldr lr, =240036
     add lr, lr, sp
     ldr r0, [lr]
-    ldr lr, =240028
+    ldr lr, =240179
     add lr, lr, sp
     ldr r1, [lr]
     sdiv r7, r0, r1
     ldr r3, =1333
     mul r0, r7, r3
-    ldr lr, =240058
+    ldr lr, =240016
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240024
-    add lr, lr, sp
-    ldr r0, [lr]
-    ldr lr, =240058
+    ldr lr, =240016
     add lr, lr, sp
     ldr r1, [lr]
+    ldr lr, =240036
+    add lr, lr, sp
+    ldr r0, [lr]
     sub r0, r0, r1
-    ldr lr, =240028
+    ldr lr, =240020
     add lr, lr, sp
     str r0, [lr]
     STM SP, {r0, r2}
-    ldr lr, =240028
+    ldr lr, =240020
     add lr, lr, sp
     ldr r0, [lr]
     bl put_int
     LDM sp, {r0, r2}
     ldr r0, [sp, #20]
     ldr r1, [sp, #24]
-    ldr lr, =240131
+    ldr lr, =240143
     add lr, lr, sp
     str r6, [lr]
     Mov r3, r8
-    ldr lr, =240028
+    ldr lr, =240020
     add lr, lr, sp
     ldr r4, [lr]
     b bb0_14
@@ -277,10 +277,10 @@ bb0_13:
     ldrlt r3, =1
     str r0, [sp, #20]
     ldr r0, =20
-    ldr lr, =240008
+    ldr lr, =240061
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240008
+    ldr lr, =240061
     add lr, lr, sp
     ldr r0, [lr]
     cmp r2, r0
@@ -290,14 +290,14 @@ bb0_13:
 bb0_14:
     str r0, [sp, #20]
     add r0, r2, #1
-    ldr lr, =240119
+    ldr lr, =240127
     add lr, lr, sp
     str r0, [lr]
     ldr r0, [sp, #20]
-    ldr lr, =240119
+    ldr lr, =240127
     add lr, lr, sp
     ldr r2, [lr]
-    ldr lr, =240131
+    ldr lr, =240143
     add lr, lr, sp
     ldr r6, [lr]
     Mov r7, r4
@@ -317,10 +317,10 @@ litpool0_2:
     ldrlt r3, =1
     str r0, [sp, #20]
     ldr r0, =30
-    ldr lr, =240159
+    ldr lr, =240028
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240159
+    ldr lr, =240028
     add lr, lr, sp
     ldr r0, [lr]
     cmp r2, r0
@@ -328,10 +328,10 @@ litpool0_2:
     blt bb0_21
     b bb0_22
 bb0_17:
-    ldr lr, =240127
+    ldr lr, =240139
     add lr, lr, sp
     ldr r12, [lr]
-    ldr lr, =240131
+    ldr lr, =240143
     add lr, lr, sp
     str r12, [lr]
     b bb0_14
@@ -341,14 +341,14 @@ bb0_18:
     cmp r4, r3
     ldr r0, =0
     ldrlt r0, =1
-    ldr lr, =240032
+    ldr lr, =240044
     add lr, lr, sp
     str r0, [lr]
     ldr r0, =10000
-    ldr lr, =240123
+    ldr lr, =240008
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240123
+    ldr lr, =240008
     add lr, lr, sp
     ldr r0, [lr]
     cmp r4, r0
@@ -360,14 +360,14 @@ bb0_19:
     str r0, [sp, #20]
     ldr r0, =200004
     add r0, sp, r0
-    ldr lr, =240033
+    ldr lr, =240045
     add lr, lr, sp
     str r0, [lr]
     ldr r0, =4
-    ldr lr, =240183
+    ldr lr, =240008
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240183
+    ldr lr, =240008
     add lr, lr, sp
     ldr r0, [lr]
     mul r0, r3, r0
@@ -375,66 +375,66 @@ bb0_19:
     add lr, lr, sp
     str r0, [lr]
     str r1, [sp, #24]
-    ldr lr, =240033
+    ldr lr, =240045
     add lr, lr, sp
     ldr r0, [lr]
     ldr lr, =240183
     add lr, lr, sp
     ldr r1, [lr]
     add r0, r0, r1
-    ldr lr, =240151
+    ldr lr, =240024
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240151
+    ldr lr, =240024
     add lr, lr, sp
     ldr r0, [lr]
     ldr r3, [r0]
     add r0, r3, r3
-    ldr lr, =240037
+    ldr lr, =240049
     add lr, lr, sp
     str r0, [lr]
     add r0, r4, #0
-    ldr lr, =240041
+    ldr lr, =240053
     add lr, lr, sp
     str r0, [lr]
     ldr r3, =120004
     add r3, sp, r3
     ldr r3, =4
-    ldr lr, =240041
+    ldr lr, =240053
     add lr, lr, sp
     ldr r0, [lr]
     mul r0, r0, r3
-    ldr lr, =240155
+    ldr lr, =240131
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240155
+    ldr lr, =240131
     add lr, lr, sp
     ldr r0, [lr]
     add r0, r3, r0
-    ldr lr, =240171
+    ldr lr, =240115
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240171
+    ldr lr, =240115
     add lr, lr, sp
     ldr r0, [lr]
     ldr r3, [r0]
-    ldr lr, =240037
+    ldr lr, =240049
     add lr, lr, sp
     ldr r0, [lr]
     sub r0, r0, r3
-    ldr lr, =240045
+    ldr lr, =240057
     add lr, lr, sp
     str r0, [lr]
     add r0, r4, #1
-    ldr lr, =240053
+    ldr lr, =240065
     add lr, lr, sp
     str r0, [lr]
     ldr r0, [sp, #20]
     ldr r1, [sp, #24]
-    ldr lr, =240045
+    ldr lr, =240057
     add lr, lr, sp
     ldr r3, [lr]
-    ldr lr, =240053
+    ldr lr, =240065
     add lr, lr, sp
     ldr r4, [lr]
     b bb0_18
@@ -443,7 +443,7 @@ bb0_20:
     ldr r0, [sp, #8]
     bl put_int
     LDM sp, {r0, r2, r3}
-    ldr lr, =240127
+    ldr lr, =240139
     add lr, lr, sp
     str r6, [lr]
     Mov r10, r4
@@ -463,24 +463,24 @@ litpool0_3:
     add r3, sp, r3
     str r0, [sp, #20]
     ldr r0, =4
-    ldr lr, =240167
+    ldr lr, =240171
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240167
+    ldr lr, =240171
     add lr, lr, sp
     ldr r0, [lr]
     mul r0, r4, r0
-    ldr lr, =240135
+    ldr lr, =240069
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240135
+    ldr lr, =240069
     add lr, lr, sp
     ldr r0, [lr]
     add r0, r3, r0
-    ldr lr, =240004
+    ldr lr, =240028
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240004
+    ldr lr, =240028
     add lr, lr, sp
     ldr r0, [lr]
     ldr r4, [r0]
@@ -488,37 +488,37 @@ litpool0_3:
     mul r3, r4, r0
     str r0, [sp, #20]
     add r0, r7, r3
-    ldr lr, =240111
+    ldr lr, =240119
     add lr, lr, sp
     str r0, [lr]
     ldr r4, =99988
-    ldr lr, =240111
+    ldr lr, =240119
     add lr, lr, sp
     ldr r0, [lr]
     sdiv r3, r0, r4
     ldr r0, =99988
-    ldr lr, =240171
+    ldr lr, =240155
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240171
+    ldr lr, =240155
     add lr, lr, sp
     ldr r0, [lr]
     mul r4, r3, r0
-    ldr lr, =240111
+    ldr lr, =240119
     add lr, lr, sp
     ldr r0, [lr]
     sub r0, r0, r4
-    ldr lr, =240008
+    ldr lr, =240040
     add lr, lr, sp
     str r0, [lr]
     ldr r0, [sp, #20]
     Mov r3, r6
-    ldr lr, =240008
+    ldr lr, =240040
     add lr, lr, sp
     ldr r4, [lr]
     b bb0_23
 bb0_23:
-    ldr lr, =240127
+    ldr lr, =240139
     add lr, lr, sp
     str r3, [lr]
     Mov r3, r8
@@ -529,14 +529,14 @@ bb0_24:
     cmp r3, r4
     ldr r0, =0
     ldrlt r0, =1
-    ldr lr, =240057
+    ldr lr, =240073
     add lr, lr, sp
     str r0, [lr]
     ldr r0, =10000
-    ldr lr, =240057
+    ldr lr, =240191
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240057
+    ldr lr, =240191
     add lr, lr, sp
     ldr r0, [lr]
     cmp r3, r0
@@ -549,14 +549,14 @@ bb0_25:
     cmp r3, r4
     ldr r0, =0
     ldrgt r0, =1
-    ldr lr, =240062
+    ldr lr, =240074
     add lr, lr, sp
     str r0, [lr]
     ldr r0, =2233
-    ldr lr, =240016
+    ldr lr, =240191
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240016
+    ldr lr, =240191
     add lr, lr, sp
     ldr r0, [lr]
     cmp r3, r0
@@ -575,42 +575,42 @@ litpool0_4:
 bb0_27:
     str r0, [sp, #20]
     add r0, r2, #0
-    ldr lr, =240063
+    ldr lr, =240075
     add lr, lr, sp
     str r0, [lr]
     ldr r4, =160004
     add r4, sp, r4
     ldr r4, =4
-    ldr lr, =240063
+    ldr lr, =240075
     add lr, lr, sp
     ldr r0, [lr]
     mul r0, r0, r4
-    ldr lr, =240016
+    ldr lr, =240012
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240016
+    ldr lr, =240012
     add lr, lr, sp
     ldr r0, [lr]
     add r0, r4, r0
-    ldr lr, =240049
+    ldr lr, =240175
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240049
+    ldr lr, =240175
     add lr, lr, sp
     ldr r0, [lr]
     ldr r4, [r0]
     add r0, r4, r4
-    ldr lr, =240067
+    ldr lr, =240079
     add lr, lr, sp
     str r0, [lr]
     add r0, r3, #0
-    ldr lr, =240071
+    ldr lr, =240083
     add lr, lr, sp
     str r0, [lr]
     ldr r4, =120004
     add r4, sp, r4
     ldr r4, =4
-    ldr lr, =240071
+    ldr lr, =240083
     add lr, lr, sp
     ldr r0, [lr]
     mul r0, r0, r4
@@ -621,32 +621,32 @@ bb0_27:
     add lr, lr, sp
     ldr r0, [lr]
     add r0, r4, r0
-    ldr lr, =240167
+    ldr lr, =240187
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240167
+    ldr lr, =240187
     add lr, lr, sp
     ldr r0, [lr]
     ldr r4, [r0]
-    ldr lr, =240067
+    ldr lr, =240079
     add lr, lr, sp
     ldr r0, [lr]
     sub r0, r0, r4
-    ldr lr, =240075
+    ldr lr, =240087
     add lr, lr, sp
     str r0, [lr]
     add r0, r3, #1
-    ldr lr, =240079
+    ldr lr, =240091
     add lr, lr, sp
     str r0, [lr]
     ldr r0, [sp, #20]
-    ldr lr, =240079
+    ldr lr, =240091
     add lr, lr, sp
     ldr r12, [lr]
-    ldr lr, =240123
+    ldr lr, =240135
     add lr, lr, sp
     str r12, [lr]
-    ldr lr, =240075
+    ldr lr, =240087
     add lr, lr, sp
     ldr r4, [lr]
     b bb0_29
@@ -655,115 +655,115 @@ bb0_28:
     str r0, [sp, #20]
     ldr r0, =120004
     add r0, sp, r0
-    ldr lr, =240087
+    ldr lr, =240095
     add lr, lr, sp
     str r0, [lr]
     ldr r0, =4
-    ldr lr, =240008
+    ldr lr, =240135
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240008
+    ldr lr, =240135
     add lr, lr, sp
     ldr r0, [lr]
     mul r0, r4, r0
-    ldr lr, =240187
+    ldr lr, =240147
     add lr, lr, sp
     str r0, [lr]
     str r1, [sp, #24]
-    ldr lr, =240087
+    ldr lr, =240095
     add lr, lr, sp
     ldr r0, [lr]
-    ldr lr, =240187
+    ldr lr, =240147
     add lr, lr, sp
     ldr r1, [lr]
     add r0, r0, r1
-    ldr lr, =240012
+    ldr lr, =240167
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240012
+    ldr lr, =240167
     add lr, lr, sp
     ldr r0, [lr]
     ldr r4, [r0]
     add r0, r4, r4
-    ldr lr, =240091
+    ldr lr, =240099
     add lr, lr, sp
     str r0, [lr]
     add r0, r3, #0
-    ldr lr, =240095
+    ldr lr, =240103
     add lr, lr, sp
     str r0, [lr]
     ldr r4, =200004
     add r4, sp, r4
     ldr r4, =4
-    ldr lr, =240095
+    ldr lr, =240103
     add lr, lr, sp
     ldr r0, [lr]
     mul r0, r0, r4
-    ldr lr, =240083
+    ldr lr, =240151
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240083
+    ldr lr, =240151
     add lr, lr, sp
     ldr r0, [lr]
     add r0, r4, r0
-    ldr lr, =240107
+    ldr lr, =240171
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240107
+    ldr lr, =240171
     add lr, lr, sp
     ldr r0, [lr]
     ldr r4, [r0]
-    ldr lr, =240091
+    ldr lr, =240099
     add lr, lr, sp
     ldr r0, [lr]
     add r0, r0, r4
-    ldr lr, =240099
+    ldr lr, =240107
     add lr, lr, sp
     str r0, [lr]
     ldr r0, =13333
-    ldr lr, =240167
+    ldr lr, =240191
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240099
+    ldr lr, =240107
     add lr, lr, sp
     ldr r0, [lr]
-    ldr lr, =240167
+    ldr lr, =240191
     add lr, lr, sp
     ldr r1, [lr]
     sdiv r4, r0, r1
     ldr r0, =13333
-    ldr lr, =240147
+    ldr lr, =240191
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240147
+    ldr lr, =240191
     add lr, lr, sp
     ldr r0, [lr]
     mul r0, r4, r0
-    ldr lr, =240175
+    ldr lr, =240179
     add lr, lr, sp
     str r0, [lr]
-    ldr lr, =240099
+    ldr lr, =240107
     add lr, lr, sp
     ldr r0, [lr]
-    ldr lr, =240175
+    ldr lr, =240179
     add lr, lr, sp
     ldr r1, [lr]
     sub r0, r0, r1
-    ldr lr, =240139
+    ldr lr, =240008
     add lr, lr, sp
     str r0, [lr]
     add r4, r3, #2
     ldr r0, [sp, #20]
     ldr r1, [sp, #24]
-    ldr lr, =240123
+    ldr lr, =240135
     add lr, lr, sp
     str r4, [lr]
-    ldr lr, =240139
+    ldr lr, =240008
     add lr, lr, sp
     ldr r4, [lr]
     b bb0_29
 bb0_29:
-    ldr lr, =240123
+    ldr lr, =240135
     add lr, lr, sp
     ldr r3, [lr]
     b bb0_24

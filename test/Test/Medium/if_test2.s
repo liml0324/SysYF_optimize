@@ -17,30 +17,32 @@ if_if_Else:
     beq bb0_0
     b bb0_1
 bb0_0:
-    ldr r6, =10
-    ldr r7, =10
-    cmp r6, r7
-    ldr r8, =0
-    ldreq r8, =1
+    ldr r8, =10
     ldr r9, =10
-    ldr r0, =10
-    cmp r9, r0
+    cmp r8, r9
+    ldr r0, =0
+    ldreq r0, =1
+    ldr r1, =10
+    ldr r3, =10
+    cmp r1, r3
     beq bb0_3
-    Ldr r1, =5
+    Ldr r4, =5
     b bb0_4
 bb0_1:
-    Ldr r5, =20
+    ldr r5, =5
+    add r6, r5, #15
+    Mov r7, r6
     b bb0_2
 bb0_2:
     b bb0_5
 bb0_3:
-    Ldr r1, =25
+    Ldr r4, =25
     b bb0_4
 bb0_4:
-    Mov r5, r1
+    Mov r7, r4
     b bb0_2
 bb0_5:
-    mov r0, r5
+    mov r0, r7
     add sp, sp, #16
     pop {r4, r5, r6, r7, r8, r9, lr}
     bx lr

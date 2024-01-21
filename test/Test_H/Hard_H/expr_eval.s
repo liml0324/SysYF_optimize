@@ -330,31 +330,34 @@ bb5_7:
 stack_push:
     push {r4, r5, r6, r7, r8, r9, lr}
     sub sp, sp, #16
-    add r2, r0, #0
-    ldr r3, =0
-    ldr r4, =4
-    mul r5, r3, r4
-    add r6, r2, r5
-    add r7, r0, #0
+    ldr r2, =0
+    add r3, r2, #0
+    add r4, r0, #0
+    ldr r5, =4
+    mul r6, r3, r5
+    add r7, r4, r6
     ldr r8, =0
+    add r9, r8, #0
+    add r2, r0, #0
+    ldr r5, =4
+    mul r3, r9, r5
+    add r6, r2, r3
+    ldr r4, [r6]
+    add r8, r4, #1
+    str r8, [r7]
+    ldr r5, =0
+    add r9, r5, #0
+    add r3, r0, #0
+    ldr r2, =4
+    mul r6, r9, r2
+    add r4, r3, r6
+    ldr r8, [r4]
+    add r7, r8, #0
+    add r5, r0, #0
     ldr r9, =4
-    mul r3, r8, r9
-    add r4, r7, r3
-    ldr r5, [r4]
-    add r2, r5, #1
-    str r2, [r6]
-    add r8, r0, #0
-    ldr r9, =0
-    ldr r3, =4
-    mul r7, r9, r3
-    add r4, r8, r7
-    ldr r5, [r4]
-    add r2, r5, #0
-    add r6, r0, #0
-    ldr r9, =4
-    mul r3, r2, r9
-    add r8, r6, r3
-    str r1, [r8]
+    mul r2, r7, r9
+    add r3, r5, r2
+    str r1, [r3]
     b bb6_0
 bb6_0:
     b litpool6_0
@@ -371,34 +374,37 @@ litpool6_0:
 stack_pop:
     push {r4, r5, r6, r7, r8, r9, lr}
     sub sp, sp, #16
-    add r1, r0, #0
-    ldr r2, =0
-    ldr r3, =4
-    mul r4, r2, r3
-    add r5, r1, r4
-    ldr r6, [r5]
-    add r7, r6, #0
-    add r8, r0, #0
-    ldr r9, =4
-    mul r2, r7, r9
-    add r3, r8, r2
-    ldr r4, [r3]
-    add r1, r0, #0
-    ldr r5, =0
+    ldr r1, =0
+    add r2, r1, #0
+    add r3, r0, #0
+    ldr r4, =4
+    mul r5, r2, r4
+    add r6, r3, r5
+    ldr r7, [r6]
+    add r8, r7, #0
+    add r9, r0, #0
+    ldr r1, =4
+    mul r4, r8, r1
+    add r2, r9, r4
+    ldr r5, [r2]
+    ldr r3, =0
+    add r6, r3, #0
+    add r7, r0, #0
+    ldr r1, =4
+    mul r8, r6, r1
+    add r4, r7, r8
+    ldr r9, =0
+    add r2, r9, #0
+    add r3, r0, #0
     ldr r6, =4
-    mul r9, r5, r6
-    add r7, r1, r9
-    add r2, r0, #0
-    ldr r8, =0
-    ldr r3, =4
-    mul r5, r8, r3
-    add r6, r2, r5
-    ldr r1, [r6]
-    sub r9, r1, #1
-    str r9, [r7]
+    mul r1, r2, r6
+    add r7, r3, r1
+    ldr r8, [r7]
+    sub r9, r8, #1
+    str r9, [r4]
     b bb7_0
 bb7_0:
-    mov r0, r4
+    mov r0, r5
     add sp, sp, #16
     pop {r4, r5, r6, r7, r8, r9, lr}
     bx lr
@@ -410,21 +416,22 @@ bb7_0:
 stack_peek:
     push {r4, r5, r6, r7, r8, r9, lr}
     sub sp, sp, #16
-    add r1, r0, #0
-    ldr r2, =0
-    ldr r3, =4
-    mul r4, r2, r3
-    add r5, r1, r4
-    ldr r6, [r5]
-    add r7, r6, #0
-    add r8, r0, #0
-    ldr r9, =4
-    mul r2, r7, r9
-    add r3, r8, r2
-    ldr r4, [r3]
+    ldr r1, =0
+    add r2, r1, #0
+    add r3, r0, #0
+    ldr r4, =4
+    mul r5, r2, r4
+    add r6, r3, r5
+    ldr r7, [r6]
+    add r8, r7, #0
+    add r9, r0, #0
+    ldr r1, =4
+    mul r4, r8, r1
+    add r2, r9, r4
+    ldr r5, [r2]
     b bb8_0
 bb8_0:
-    mov r0, r4
+    mov r0, r5
     add sp, sp, #16
     pop {r4, r5, r6, r7, r8, r9, lr}
     bx lr
@@ -434,19 +441,20 @@ bb8_0:
     .p2align 2
     .type stack_size, %function
 stack_size:
-    push {r4, r5, r6, lr}
+    push {r4, r5, r6, r7, lr}
     sub sp, sp, #16
-    add r1, r0, #0
-    ldr r2, =0
-    ldr r3, =4
-    mul r4, r2, r3
-    add r5, r1, r4
-    ldr r6, [r5]
+    ldr r1, =0
+    add r2, r1, #0
+    add r3, r0, #0
+    ldr r4, =4
+    mul r5, r2, r4
+    add r6, r3, r5
+    ldr r7, [r6]
     b bb9_0
 bb9_0:
-    mov r0, r6
+    mov r0, r7
     add sp, sp, #16
-    pop {r4, r5, r6, lr}
+    pop {r4, r5, r6, r7, lr}
     bx lr
     .pool
 
@@ -4665,11 +4673,9 @@ litpool11_3:
     bne bb11_0
     b bb11_1
 bb11_0:
-    STM SP, {r1}
     bl panic
-    LDM SP, {r1}
-    mov r1, r0
-    Mov r8, r1
+    mov r5, r0
+    Mov r9, r5
     b bb11_16
 bb11_1:
     b litpool11_4
@@ -4707,20 +4713,17 @@ bb11_2:
     b bb11_4
 bb11_3:
     ldr lr, =Addr11_1
-    ldr r0, [lr]
-    ldr r0, [r0]
-    STM SP, {r0, r3}
-    ldr r0, [sp]
+    ldr r7, [lr]
+    ldr r7, [r7]
+    mov r0, r7
     bl get_op_prec
-    LDMIB SP, {r3}
-    mov r3, r0
-    ldr r0, [SP]
-    ldr r8, =0
-    cmp r3, r8
-    ldr r5, =0
-    ldreq r5, =1
-    ldr r7, =0
-    cmp r3, r7
+    mov r8, r0
+    ldr r9, =0
+    cmp r8, r9
+    ldr r4, =0
+    ldreq r4, =1
+    ldr r6, =0
+    cmp r8, r6
     beq bb11_5
     b bb11_6
 bb11_4:
@@ -4730,175 +4733,156 @@ bb11_4:
     mov r8, r0
     b bb11_13
 bb11_5:
-    Mov r2, r0
+    Mov r2, r7
     b bb11_4
 bb11_6:
     STM SP, {r0}
     bl next_token
-    mov r4, r0
-    ldr r0, [SP]
     b bb11_7
 bb11_7:
     b litpool11_5
     .pool
 litpool11_5:
-    ldr r6, =3076
-    add r6, sp, r6
-    ldr r9, =0
-    ldr r1, =4
-    mul r2, r9, r1
-    add r8, r6, r2
-    STM SP, {r0}
-    mov r0, r8
+    ldr r3, =3076
+    add r3, sp, r3
+    ldr r1, =0
+    ldr r5, =4
+    mul r2, r1, r5
+    add r9, r3, r2
+    mov r0, r9
     bl stack_size
-    mov r7, r0
-    ldr r0, [SP]
-    ldr r3, =0
-    cmp r7, r3
-    ldr r5, =0
-    ldrne r5, =1
+    mov r6, r0
+    ldr r8, =0
+    cmp r6, r8
     ldr r4, =0
-    cmp r7, r4
+    ldrne r4, =1
+    ldr r0, =0
+    cmp r6, r0
     bne bb11_10
     b bb11_9
 bb11_8:
     ldr r2, =3076
     add r2, sp, r2
-    ldr r6, =0
-    ldr r9, =4
-    mul r7, r6, r9
-    add r1, r2, r7
-    STM SP, {r0, r1}
-    ldr r0, [sp, #4]
+    ldr r3, =0
+    ldr r1, =4
+    mul r6, r3, r1
+    add r5, r2, r6
+    mov r0, r5
     bl stack_pop
-    LDMIB SP, {r1}
-    mov r8, r0
-    ldr r0, [SP]
-    ldr r4, =2052
-    add r4, sp, r4
-    ldr r5, =0
-    ldr r3, =4
-    mul r6, r5, r3
-    add r9, r4, r6
-    STM SP, {r0}
-    mov r0, r9
+    mov r9, r0
+    ldr r0, =2052
+    add r0, sp, r0
+    ldr r4, =0
+    ldr r8, =4
+    mul r3, r4, r8
+    add r1, r0, r3
+    STM SP, {r1}
+    ldr r0, [sp]
     bl stack_pop
-    mov r7, r0
-    ldr r0, [SP]
+    LDM SP, {r1}
+    mov r6, r0
     ldr r2, =2052
     add r2, sp, r2
-    ldr r1, =0
-    ldr r5, =4
-    mul r3, r1, r5
-    add r6, r2, r3
-    STM SP, {r0}
-    mov r0, r6
-    bl stack_pop
-    mov r4, r0
-    ldr r0, [SP]
-    ldr r9, =2052
-    add r9, sp, r9
-    ldr r1, =0
-    ldr r5, =4
-    mul r3, r1, r5
-    add r2, r9, r3
-    STM SP, {r0, r2}
-    mov r0, r8
-    mov r1, r4
-    mov r2, r7
-    bl eval_op
-    LDMIB SP, {r2}
-    mov r6, r0
-    ldr r0, [SP]
-    STM SP, {r0, r2}
+    ldr r5, =0
+    ldr r4, =4
+    mul r8, r5, r4
+    add r3, r2, r8
+    STM SP, {r0, r3}
     ldr r0, [sp, #4]
-    mov r1, r6
+    bl stack_pop
+    LDMIB SP, {r3}
+    ldr r1, =2052
+    add r1, sp, r1
+    ldr r5, =0
+    ldr r4, =4
+    mul r8, r5, r4
+    add r2, r1, r8
+    STM SP, {r0, r2, r3}
+    mov r0, r9
+    ldr r1, [sp]
+    mov r2, r6
+    bl eval_op
+    LDMIB SP, {r2, r3}
+    mov r3, r0
+    ldr r0, [SP]
+    STM SP, {r2, r3}
+    ldr r0, [sp]
+    ldr r1, [sp, #4]
     bl stack_push
-    LDM sp, {r0, r2}
+    LDM sp, {r2, r3}
     b bb11_7
 bb11_9:
-    ldr r9, =3076
-    add r9, sp, r9
-    ldr r1, =0
-    ldr r2, =4
-    mul r6, r1, r2
-    add r8, r9, r6
-    STM SP, {r0}
-    mov r0, r8
-    ldr r1, [sp]
-    bl stack_push
-    LDM sp, {r0}
-    ldr lr, =Addr11_2
-    ldr r3, [lr]
-    ldr r3, [r3]
-    ldr r4, =0
-    cmp r3, r4
-    ldr r7, =0
-    ldrne r7, =1
+    ldr r1, =3076
+    add r1, sp, r1
     ldr r5, =0
-    cmp r3, r5
+    ldr r2, =4
+    mul r3, r5, r2
+    add r9, r1, r3
+    mov r0, r9
+    mov r1, r7
+    bl stack_push
+    ldr lr, =Addr11_2
+    ldr r8, [lr]
+    ldr r8, [r8]
+    ldr r0, =0
+    cmp r8, r0
+    ldr r6, =0
+    ldrne r6, =1
+    ldr r4, =0
+    cmp r8, r4
     bne bb11_11
     b bb11_12
 bb11_10:
-    ldr r7, =3076
-    add r7, sp, r7
+    ldr r6, =3076
+    add r6, sp, r6
     ldr r2, =0
-    ldr r6, =4
-    mul r9, r2, r6
-    add r1, r7, r9
-    STM SP, {r0, r1}
-    ldr r0, [sp, #4]
+    ldr r3, =4
+    mul r1, r2, r3
+    add r5, r6, r1
+    mov r0, r5
     bl stack_peek
-    LDMIB SP, {r1}
-    mov r8, r0
-    ldr r0, [SP]
+    mov r9, r0
     STM SP, {r0}
-    mov r0, r8
+    mov r0, r9
+    bl get_op_prec
+    STM SP, {r0}
+    mov r0, r7
     bl get_op_prec
     mov r4, r0
     ldr r0, [SP]
-    STM SP, {r0}
-    ldr r0, [sp]
-    bl get_op_prec
-    mov r5, r0
-    ldr r0, [SP]
-    cmp r4, r5
-    ldr r3, =0
-    ldrge r3, =1
-    cmp r4, r5
+    cmp r0, r4
+    ldr r8, =0
+    ldrge r8, =1
+    cmp r0, r4
     bge bb11_8
     b bb11_9
 bb11_11:
-    STM SP, {r0, r3}
     bl panic
-    LDMIB SP, {r3}
-    mov r3, r0
-    ldr r0, [SP]
-    Mov r8, r3
+    mov r8, r0
+    Mov r9, r8
+    Mov r8, r7
     b bb11_16
 bb11_12:
     b litpool11_6
     .pool
 litpool11_6:
-    ldr r1, =2052
-    add r1, sp, r1
+    ldr r5, =2052
+    add r5, sp, r5
     ldr r2, =0
-    ldr r6, =4
-    mul r9, r2, r6
-    add r8, r1, r9
+    ldr r3, =4
+    mul r1, r2, r3
+    add r9, r5, r1
     ldr lr, =Addr11_0
-    ldr r4, [lr]
-    ldr r4, [r4]
+    ldr r0, [lr]
+    ldr r0, [r0]
     STM SP, {r0}
-    mov r0, r8
-    mov r1, r4
+    mov r0, r9
+    ldr r1, [sp]
     bl stack_push
     LDM sp, {r0}
-    STM SP, {r0}
     bl next_token
-    mov r5, r0
-    ldr r0, [SP]
-    Mov r1, r0
+    mov r4, r0
+    Mov r1, r7
     b bb11_2
 bb11_13:
     ldr r0, =3076
@@ -4921,56 +4905,56 @@ bb11_13:
     bne bb11_14
     b bb11_15
 bb11_14:
-    ldr r9, =3076
-    add r9, sp, r9
-    ldr r1, =0
-    ldr r5, =4
-    mul r4, r1, r5
-    add r0, r9, r4
-    STM SP, {r0, r2}
-    ldr r0, [sp]
-    bl stack_pop
-    LDMIB SP, {r2}
-    mov r7, r0
-    ldr r0, [SP]
-    ldr r6, =2052
-    add r6, sp, r6
-    ldr r3, =0
-    ldr r8, =4
-    mul r1, r3, r8
-    add r5, r6, r1
+    ldr r1, =3076
+    add r1, sp, r1
+    ldr r5, =0
+    ldr r4, =4
+    mul r0, r5, r4
+    add r7, r1, r0
     STM SP, {r2}
-    mov r0, r5
+    mov r0, r7
     bl stack_pop
     LDM SP, {r2}
-    mov r4, r0
-    ldr r9, =2052
-    add r9, sp, r9
-    ldr r0, =0
-    ldr r3, =4
-    mul r8, r0, r3
-    add r1, r9, r8
+    mov r6, r0
+    ldr r3, =2052
+    add r3, sp, r3
+    ldr r8, =0
+    ldr r9, =4
+    mul r5, r8, r9
+    add r4, r3, r5
+    STM SP, {r0, r2}
+    mov r0, r4
+    bl stack_pop
+    LDMIB SP, {r2}
+    ldr r1, =2052
+    add r1, sp, r1
+    ldr r7, =0
+    ldr r8, =4
+    mul r9, r7, r8
+    add r5, r1, r9
+    STM SP, {r0, r2, r3}
+    mov r0, r5
+    bl stack_pop
+    LDMIB SP, {r2, r3}
+    mov r3, r0
+    ldr r0, [SP]
+    ldr r4, =2052
+    add r4, sp, r4
+    ldr r7, =0
+    ldr r8, =4
+    mul r9, r7, r8
+    add r1, r4, r9
+    STM SP, {r0, r1, r2, r3}
+    mov r0, r6
+    ldr r1, [sp, #12]
+    ldr r2, [sp]
+    bl eval_op
+    LDMIB SP, {r1, r2, r3}
+    mov r5, r0
+    ldr r0, [SP]
     STM SP, {r1, r2}
     ldr r0, [sp]
-    bl stack_pop
-    LDM SP, {r1, r2}
-    mov r6, r0
-    ldr r5, =2052
-    add r5, sp, r5
-    ldr r0, =0
-    ldr r3, =4
-    mul r8, r0, r3
-    add r9, r5, r8
-    STM SP, {r1, r2}
-    mov r0, r7
-    mov r1, r6
-    mov r2, r4
-    bl eval_op
-    LDM SP, {r1, r2}
-    mov r1, r0
-    STM SP, {r1, r2}
-    mov r0, r9
-    ldr r1, [sp]
+    mov r1, r5
     bl stack_push
     LDM sp, {r1, r2}
     b bb11_13
@@ -4986,10 +4970,11 @@ bb11_15:
     bl stack_peek
     LDM SP, {r2, r3}
     mov r3, r0
-    Mov r8, r3
+    Mov r8, r2
+    Mov r9, r3
     b bb11_16
 bb11_16:
-    mov r0, r8
+    mov r0, r9
     mov sp, r11
     pop {r4, r5, r6, r7, r8, r9, r11, lr}
     bx lr

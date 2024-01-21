@@ -23,57 +23,58 @@ main:
     blt bb0_0
     b bb0_1
 bb0_0:
-    ldr r6, Addr0_0
-    ldr r6, [r6]
-    add r7, r6, #1
+    ldr r7, Addr0_0
+    ldr r7, [r7]
+    add r8, r7, #1
     push {r0}
     ldr r0, Addr0_0
-    str r7, [r0]
+    str r8, [r0]
     pop {r0}
-    Ldr r8, =112
+    Ldr r9, =112
     b bb0_2
 bb0_1:
-    ldr r5, Addr0_0
-    ldr r5, [r5]
+    ldr r6, Addr0_0
+    ldr r6, [r6]
     b bb0_7
 bb0_2:
-    ldr r9, =10
-    cmp r8, r9
-    ldr r0, =0
-    ldrgt r0, =1
-    ldr r2, =10
-    cmp r8, r2
+    ldr r0, =10
+    cmp r9, r0
+    ldr r2, =0
+    ldrgt r2, =1
+    ldr r1, =10
+    cmp r9, r1
     bgt bb0_3
     b bb0_4
 bb0_3:
-    sub r1, r8, #88
-    ldr r3, =1000
-    cmp r1, r3
-    ldr r4, =0
-    ldrlt r4, =1
-    ldr r5, =1000
-    cmp r1, r5
+    sub r3, r9, #88
+    ldr r4, =1000
+    cmp r3, r4
+    ldr r5, =0
+    ldrlt r5, =1
+    ldr r6, =1000
+    cmp r3, r6
     blt bb0_5
-    Mov r6, r1
+    Mov r7, r3
     b bb0_6
 bb0_4:
-    mov r0, r8
+    mov r0, r9
     bl put_int
+    Mov r5, r9
     b bb0_1
 bb0_5:
     b litpool0_0
     .pool
 litpool0_0:
-    sub r7, r1, #10
-    add r9, r7, #11
-    add r0, r9, #11
-    Mov r6, r0
+    sub r8, r3, #10
+    add r0, r8, #11
+    add r2, r0, #11
+    Mov r7, r2
     b bb0_6
 bb0_6:
-    Mov r8, r6
+    Mov r9, r7
     b bb0_2
 bb0_7:
-    mov r0, r5
+    mov r0, r6
     mov sp, r11
     pop {r4, r5, r6, r7, r8, r9, r11, lr}
     bx lr

@@ -68,7 +68,7 @@ bb0_1:
     bgt bb0_3
     b bb0_4
 bb0_2:
-    b bb0_5
+    b bb0_6
 bb0_3:
     add r9, r0, #0
     ldr r5, Addr0_0
@@ -77,14 +77,16 @@ bb0_3:
     add r4, r5, r3
     ldr r8, [r4]
     add r7, r8, #1
-    Mov r0, r7
-    b bb0_0
+    b bb0_5
 bb0_4:
     b bb0_2
 bb0_5:
     b litpool0_0
     .pool
 litpool0_0:
+    Mov r0, r7
+    b bb0_0
+bb0_6:
     add sp, sp, #16
     pop {r4, r5, r6, r7, r8, r9, lr}
     bx lr

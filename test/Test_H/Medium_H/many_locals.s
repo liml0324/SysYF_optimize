@@ -119,16 +119,34 @@ foo:
     add r1, r6, r4
     ldr r9, =3
     str r9, [r1]
+    ldr r0, =3
+    add r8, r0, #7
+    add r2, r8, #5
+    add r3, r2, #6
+    add r7, r3, #1
+    add r5, r7, #0
+    add r4, r5, #3
+    add r6, r4, #5
+    ldr r1, =4
+    add r9, r1, #2
+    add r0, r9, #7
+    add r8, r0, #9
+    add r2, r8, #8
+    add r3, r2, #1
+    add r7, r3, #4
+    add r5, r7, #6
+    add r4, r6, r5
+    ldr r1, =0
+    add r9, r1, #3
     add r0, sp, #68
-    ldr r8, =3
-    ldr r2, =4
-    mul r3, r8, r2
-    add r7, r0, r3
-    ldr r5, [r7]
-    add r4, r5, #71
+    ldr r8, =4
+    mul r2, r9, r8
+    add r3, r0, r2
+    ldr r7, [r3]
+    add r6, r4, r7
     b bb0_0
 bb0_0:
-    mov r0, r4
+    mov r0, r6
     ldr lr, =144
     add sp, sp, lr
     pop {r4, r5, r6, r7, r8, r9, lr}
@@ -139,28 +157,52 @@ bb0_0:
     .p2align 2
     .type main, %function
 main:
-    push {r4, r5, r11, lr}
+    push {r4, r5, r6, r7, r8, r9, r11, lr}
     mov r11, sp
     sub sp, sp, #36
-    STM SP, {r0}
+    ldr r0, =3
+    add r1, r0, #7
+    add r2, r1, #5
+    add r3, r2, #6
+    add r4, r3, #1
+    add r5, r4, #0
+    add r6, r5, #3
+    add r7, r6, #5
+    ldr r8, =4
+    add r9, r8, #2
+    add r0, r9, #7
+    add r1, r0, #9
+    add r2, r1, #8
+    add r3, r2, #1
+    add r4, r3, #4
+    add r5, r4, #6
     bl foo
-    add r1, r0, #30
-    STM SP, {r1, r2}
+    mov r6, r0
+    add r8, r7, r6
     bl foo
-    LDM SP, {r1, r2}
-    mov r2, r0
-    add r3, r2, #41
-    add r4, r1, r3
-    add r5, r4, #35
-    mov r0, r5
+    mov r9, r0
+    add r0, r5, r9
+    ldr r1, =4
+    add r2, r1, #7
+    add r3, r2, #2
+    add r4, r3, #5
+    add r7, r4, #8
+    add r6, r7, #0
+    add r5, r6, #6
+    add r9, r5, #3
+    add r1, r8, r0
+    add r2, r1, r9
+    STM SP, {r2}
+    ldr r0, [sp]
     bl put_int
+    LDM sp, {r2}
     ldr r0, =10
     bl put_char
     b bb1_0
 bb1_0:
     ldr r0, =0
     mov sp, r11
-    pop {r4, r5, r11, lr}
+    pop {r4, r5, r6, r7, r8, r9, r11, lr}
     bx lr
     .pool
 

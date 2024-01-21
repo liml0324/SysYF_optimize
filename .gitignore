@@ -15,3 +15,4 @@ IRBuilder_backup.cpp
 performance-cases/
 calc_time.py
 find_loop.out
+*.s

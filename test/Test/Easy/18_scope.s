@@ -27,29 +27,31 @@ Addr0_0:
     .p2align 2
     .type main, %function
 main:
-    push {r4, r11, lr}
+    push {r4, r5, r11, lr}
     mov r11, sp
     sub sp, sp, #36
-    STM SP, {r0}
-    ldr r0, =3
+    STM SP, {r0, r1}
+    ldr r0, [sp]
     ldr r1, =3.300000
     bl my_sum
-    ldr r1, Addr1_0
-    ldr r1, [r1]
-    STM SP, {r0, r2, r3}
+    LDMIB SP, {r1}
+    mov r1, r0
+    ldr r0, [SP]
+    ldr r2, Addr1_0
+    ldr r2, [r2]
+    STM SP, {r1, r3}
     ldr r0, =7
     ldr r1, [sp, #4]
     bl my_sum
-    LDMIB SP, {r2, r3}
-    mov r3, r0
-    ldr r0, [SP]
-    ldr r4, Addr1_0
-    ldr r4, [r4]
+    LDM SP, {r1, r3}
+    mov r4, r0
+    ldr r5, Addr1_0
+    ldr r5, [r5]
     b bb1_0
 bb1_0:
-    mov r0, r4
+    mov r0, r5
     mov sp, r11
-    pop {r4, r11, lr}
+    pop {r4, r5, r11, lr}
     bx lr
     .pool
 Addr1_0:

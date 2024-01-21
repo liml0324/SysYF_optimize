@@ -23,23 +23,25 @@ bb0_1:
     mul r7, r6, r4
     sub r8, r5, r7
     Mov r2, r4
+    Mov r6, r5
     Mov r9, r8
     b bb0_2
 bb0_2:
-    ldr r6, =0
-    cmp r9, r6
     ldr r7, =0
-    ldrne r7, =1
+    cmp r9, r7
     ldr r3, =0
-    cmp r9, r3
+    ldrne r3, =1
+    ldr r4, =0
+    cmp r9, r4
     bne bb0_3
     b bb0_4
 bb0_3:
-    sdiv r5, r2, r9
-    mul r8, r5, r9
-    sub r6, r2, r8
+    sdiv r8, r2, r9
+    mul r7, r8, r9
+    sub r3, r2, r7
+    Mov r6, r2
     Mov r2, r9
-    Mov r9, r6
+    Mov r9, r3
     b bb0_2
 bb0_4:
     b bb0_5

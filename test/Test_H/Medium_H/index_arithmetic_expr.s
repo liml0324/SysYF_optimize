@@ -7,38 +7,47 @@ main:
     push {r4, r5, r6, r7, r8, r9, r11, lr}
     mov r11, sp
     sub sp, sp, #60
-    add r0, sp, #16
-    ldr r1, =0
-    ldr r2, =4
-    mul r3, r1, r2
-    add r4, r0, r3
-    ldr r5, =1
-    str r5, [r4]
+    ldr r0, =0
+    add r1, r0, #0
+    add r2, sp, #16
+    ldr r3, =4
+    mul r4, r1, r3
+    add r5, r2, r4
+    ldr r6, =1
+    str r6, [r5]
+    ldr r7, =0
+    add r8, r7, #1
+    add r9, sp, #16
+    ldr r0, =4
+    mul r3, r8, r0
+    add r1, r9, r3
+    ldr r4, =2
+    str r4, [r1]
+    ldr r2, =0
+    add r5, r2, #2
     add r6, sp, #16
-    ldr r7, =1
-    ldr r8, =4
-    mul r9, r7, r8
-    add r1, r6, r9
-    ldr r2, =2
-    str r2, [r1]
-    add r3, sp, #16
-    ldr r0, =2
-    ldr r4, =4
-    mul r5, r0, r4
-    add r7, r3, r5
-    ldr r8, =3
-    str r8, [r7]
-    ldr r9, =20
+    ldr r7, =4
+    mul r0, r5, r7
+    add r8, r6, r0
+    ldr r3, =3
+    str r3, [r8]
+    ldr r9, =56
+    ldr r1, =12
+    sdiv r4, r9, r1
+    ldr r2, =12
+    mul r7, r4, r2
+    rsb r5, r7, #56
+    add r0, r5, #12
     ldr r6, =5
-    sdiv r1, r9, r6
-    sub r2, r1, #2
-    add r0, r2, #0
-    add r4, sp, #16
-    ldr r5, =4
-    mul r3, r0, r5
-    add r7, r4, r3
-    ldr r8, [r7]
-    mov r0, r8
+    sdiv r8, r0, r6
+    sub r3, r8, #2
+    add r9, r3, #0
+    add r1, sp, #16
+    ldr r4, =4
+    mul r2, r9, r4
+    add r7, r1, r2
+    ldr r5, [r7]
+    mov r0, r5
     bl put_int
     b bb0_0
 bb0_0:

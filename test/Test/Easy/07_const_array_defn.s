@@ -10,7 +10,7 @@ main:
     ldr r0, [r0]
     b bb0_0
 bb0_0:
-    mov r0, r2
+    mov r0, r3
     add sp, sp, #16
     pop {lr}
     bx lr

@@ -108,61 +108,67 @@ litpool2_0:
     ldr r3, =0
     cmp r0, r3
     bgt bb2_1
+    Ldr r5, =0
     b bb2_2
 bb2_1:
-    ldr r3, Addr2_1
-    ldr r3, [r3]
-    STM SP, {r0, r3}
-    ldr r0, [sp, #4]
+    ldr r0, Addr2_1
+    ldr r0, [r0]
+    STM SP, {r0, r2}
+    ldr r0, [sp]
     bl find
-    LDMIB SP, {r3}
-    ldr r2, =0
-    cmp r0, r2
-    ldr r6, =0
-    ldrne r6, =1
+    LDMIB SP, {r2}
+    mov r2, r0
+    ldr r0, [SP]
     ldr r7, =0
-    cmp r0, r7
+    cmp r2, r7
+    ldr r8, =0
+    ldrne r8, =1
+    ldr r9, =0
+    cmp r2, r9
     bne bb2_3
     b bb2_4
 bb2_2:
-    ldr r4, Addr2_1
-    ldr r4, [r4]
-    ldr r6, =127
-    sdiv r7, r4, r6
-    ldr r8, =127
-    mul r9, r7, r8
-    sub r1, r4, r9
+    ldr r6, Addr2_1
+    ldr r6, [r6]
+    ldr r7, =127
+    sdiv r8, r6, r7
+    ldr r9, =127
+    mul r1, r8, r9
+    sub r3, r6, r1
     b bb2_7
 bb2_3:
-    ldr r8, Addr2_1
-    ldr r8, [r8]
-    mov r0, r8
+    ldr r6, Addr2_1
+    ldr r6, [r6]
+    STM SP, {r1}
+    mov r0, r6
     bl find
-    mov r4, r0
-    add r9, r4, #0
+    LDM SP, {r1}
+    mov r1, r0
+    add r4, r1, #0
     ldr r5, Addr2_0
-    ldr r1, =4
-    mul r3, r9, r1
-    add r2, r5, r3
-    ldr r7, Addr2_1
-    ldr r7, [r7]
-    STM SP, {r0, r2}
-    mov r0, r7
+    ldr r3, =4
+    mul r0, r4, r3
+    add r7, r5, r0
+    ldr r9, Addr2_1
+    ldr r9, [r9]
+    STM SP, {r2}
+    mov r0, r9
     bl find
-    LDMIB SP, {r2}
-    str r0, [r2]
+    LDM SP, {r2}
+    mov r2, r0
+    str r2, [r7]
     ldr r0, =0
     ldr r1, =0
     bl inc
-    mov r6, r0
-    ldr r8, =-1
-    cmp r6, r8
-    ldr r4, =0
-    ldrne r4, =1
-    ldr r9, =-1
-    cmp r6, r9
+    mov r8, r0
+    ldr r6, =-1
+    cmp r8, r6
+    ldr r1, =0
+    ldrne r1, =1
+    ldr r4, =-1
+    cmp r8, r4
     bne bb2_5
-    Ldr r1, =0
+    Ldr r3, =0
     b bb2_6
 bb2_4:
     b bb2_0
@@ -171,15 +177,16 @@ bb2_5:
     ldr r1, =1
     bl inc
     mov r5, r0
-    Mov r1, r5
+    Mov r3, r5
     b bb2_6
 bb2_6:
     b litpool2_1
     .pool
 litpool2_1:
+    Mov r5, r3
     b bb2_2
 bb2_7:
-    mov r0, r1
+    mov r0, r3
     mov sp, r11
     pop {r4, r5, r6, r7, r8, r9, r11, lr}
     bx lr

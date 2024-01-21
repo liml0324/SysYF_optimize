@@ -223,7 +223,7 @@ bb6_2:
 main:
     push {r4, r5, r6, r7, r8, r9, r11, lr}
     mov r11, sp
-    ldr lr, =304
+    ldr lr, =348
     sub sp, sp, lr
     STM SP, {r0}
     bl get_int
@@ -255,16 +255,16 @@ bb7_0:
     b bb7_2
 bb7_1:
     add r5, r4, #0
-    add r9, sp, #44
-    ldr r8, =4
-    mul r6, r5, r8
-    add r7, r9, r6
+    add r6, sp, #44
+    ldr r7, =4
+    mul r8, r5, r7
+    add r9, r6, r8
     STM SP, {r0, r1, r2, r3}
     bl get_int
     LDMIB SP, {r1, r2, r3}
-    mov r8, r0
+    mov r7, r0
     ldr r0, [SP]
-    str r8, [r7]
+    str r7, [r9]
     add r5, r4, #1
     Mov r4, r5
     b bb7_0
@@ -311,175 +311,195 @@ litpool7_0:
     LDMIB SP, {r1, r2, r3}
     mov r8, r0
     ldr r0, [SP]
-    add r9, sp, #44
-    ldr r5, =0
-    ldr r7, =4
-    mul r6, r5, r7
+    ldr r9, =0
+    add r5, r9, #0
+    add r7, sp, #44
+    ldr r6, =4
+    mul r9, r5, r6
     str r0, [sp, #20]
-    add r0, r9, r6
+    add r0, r7, r9
     str r0, [sp, #92]
     ldr r0, [sp, #92]
-    ldr r5, [r0]
+    ldr r6, [r0]
+    ldr r5, =0
+    add r9, r5, #1
     add r7, sp, #44
-    ldr r6, =1
-    ldr r9, =4
-    mul r0, r6, r9
+    ldr r5, =4
+    mul r0, r9, r5
     str r0, [sp, #96]
     ldr r0, [sp, #96]
     add r0, r7, r0
     str r0, [sp, #100]
     ldr r0, [sp, #100]
-    ldr r6, [r0]
+    ldr r5, [r0]
     STM SP, {r0, r1, r2, r3}
-    mov r0, r6
+    mov r0, r5
     bl func5
     LDMIB SP, {r1, r2, r3}
     mov r9, r0
     ldr r0, [SP]
-    add r7, sp, #44
-    ldr r6, =2
-    ldr r0, =4
-    str r0, [sp, #272]
-    ldr r0, [sp, #272]
-    mul r0, r6, r0
+    ldr r7, =0
+    add r5, r7, #2
+    add r0, sp, #44
+    str r0, [sp, #164]
+    ldr r7, =4
+    mul r0, r5, r7
     str r0, [sp, #84]
-    ldr r0, [sp, #84]
-    add r0, r7, r0
+    str r1, [sp, #24]
+    ldr r1, [sp, #84]
+    ldr r0, [sp, #164]
+    add r0, r0, r1
     str r0, [sp, #224]
     ldr r0, [sp, #224]
-    ldr r6, [r0]
-    add r7, sp, #44
-    ldr r7, =3
-    ldr r0, =4
-    str r0, [sp, #272]
-    ldr r0, [sp, #272]
-    mul r0, r7, r0
-    str r0, [sp, #164]
-    ldr r0, [sp, #164]
-    add r0, r7, r0
-    str r0, [sp, #160]
-    ldr r0, [sp, #160]
     ldr r7, [r0]
-    STM SP, {r0, r1, r2, r3}
-    mov r0, r7
-    bl func7
-    LDMIB SP, {r1, r2, r3}
+    ldr r5, =0
+    add r0, r5, #3
+    str r0, [sp, #168]
+    add r0, sp, #44
     str r0, [sp, #172]
-    ldr r0, [SP]
+    ldr r5, =4
+    ldr r0, [sp, #168]
+    mul r0, r0, r5
+    str r0, [sp, #136]
+    ldr r1, [sp, #136]
+    ldr r0, [sp, #172]
+    add r0, r0, r1
+    str r0, [sp, #132]
+    ldr r0, [sp, #132]
+    ldr r5, [r0]
     STM SP, {r0, r1, r2, r3}
-    mov r0, r6
-    ldr r1, [sp, #172]
-    bl func6
+    mov r0, r5
+    bl func7
     LDMIB SP, {r1, r2, r3}
     str r0, [sp, #176]
     ldr r0, [SP]
-    add r7, sp, #44
-    ldr r6, =4
-    ldr r0, =4
-    str r0, [sp, #272]
-    ldr r0, [sp, #272]
-    mul r0, r6, r0
-    str r0, [sp, #152]
-    ldr r0, [sp, #152]
-    add r0, r7, r0
-    str r0, [sp, #156]
-    ldr r0, [sp, #156]
-    ldr r6, [r0]
-    add r7, sp, #44
-    ldr r7, =5
-    ldr r0, =4
-    str r0, [sp, #272]
-    ldr r0, [sp, #272]
-    mul r0, r7, r0
-    str r0, [sp, #148]
-    ldr r0, [sp, #148]
-    add r0, r7, r0
-    str r0, [sp, #144]
-    ldr r0, [sp, #144]
+    STM SP, {r0, r1, r2, r3}
+    mov r0, r7
+    ldr r1, [sp, #176]
+    bl func6
+    LDMIB SP, {r1, r2, r3}
+    str r0, [sp, #180]
+    ldr r0, [SP]
+    ldr r5, =0
+    add r7, r5, #4
+    add r0, sp, #44
+    str r0, [sp, #184]
+    ldr r5, =4
+    mul r0, r7, r5
+    str r0, [sp, #124]
+    ldr r1, [sp, #124]
+    ldr r0, [sp, #184]
+    add r0, r0, r1
+    str r0, [sp, #112]
+    ldr r0, [sp, #112]
+    ldr r5, [r0]
+    ldr r7, =0
+    add r0, r7, #5
+    str r0, [sp, #188]
+    add r0, sp, #44
+    str r0, [sp, #192]
+    ldr r7, =4
+    ldr r0, [sp, #188]
+    mul r0, r0, r7
+    str r0, [sp, #88]
+    ldr r1, [sp, #88]
+    ldr r0, [sp, #192]
+    add r0, r0, r1
+    str r0, [sp, #116]
+    ldr r0, [sp, #116]
     ldr r7, [r0]
     STM SP, {r0, r1, r2, r3}
     mov r0, r7
     bl func7
     LDMIB SP, {r1, r2, r3}
-    str r0, [sp, #184]
+    str r0, [sp, #196]
     ldr r0, [SP]
     STM SP, {r0, r1, r2, r3}
-    mov r0, r6
-    ldr r1, [sp, #184]
+    mov r0, r5
+    ldr r1, [sp, #196]
     bl func2
     LDMIB SP, {r1, r2, r3}
-    str r0, [sp, #188]
+    str r0, [sp, #200]
     ldr r0, [SP]
     STM SP, {r0, r1, r2, r3}
     mov r0, r9
-    ldr r1, [sp, #176]
-    ldr r2, [sp, #188]
+    ldr r1, [sp, #180]
+    ldr r2, [sp, #200]
     bl func4
     LDMIB SP, {r1, r2, r3}
     mov r7, r0
     ldr r0, [SP]
-    add r6, sp, #44
-    ldr r9, =6
-    ldr r0, =4
-    str r0, [sp, #272]
-    ldr r0, [sp, #272]
-    mul r0, r9, r0
-    str r0, [sp, #268]
-    ldr r0, [sp, #268]
-    add r0, r6, r0
-    str r0, [sp, #168]
-    ldr r0, [sp, #168]
-    ldr r9, [r0]
+    ldr r5, =0
+    add r9, r5, #6
+    add r0, sp, #44
+    str r0, [sp, #204]
+    ldr r5, =4
+    mul r0, r9, r5
+    str r0, [sp, #128]
+    ldr r1, [sp, #128]
+    ldr r0, [sp, #204]
+    add r0, r0, r1
+    str r0, [sp, #120]
+    ldr r0, [sp, #120]
+    ldr r5, [r0]
     STM SP, {r0, r1, r2, r3}
     mov r0, r7
-    mov r1, r9
+    mov r1, r5
     bl func3
-    LDMIB SP, {r1, r2, r3}
-    mov r6, r0
-    ldr r0, [SP]
-    add r0, sp, #44
-    str r0, [sp, #200]
-    ldr r7, =7
-    ldr r9, =4
-    mul r0, r7, r9
-    str r0, [sp, #228]
-    str r1, [sp, #24]
-    ldr r0, [sp, #200]
-    ldr r1, [sp, #228]
-    add r0, r0, r1
-    str r0, [sp, #212]
-    ldr r0, [sp, #212]
-    ldr r7, [r0]
-    STM SP, {r0, r1, r2, r3}
-    mov r0, r6
-    mov r1, r7
-    bl func2
     LDMIB SP, {r1, r2, r3}
     mov r9, r0
     ldr r0, [SP]
-    add r0, sp, #44
-    str r0, [sp, #208]
-    ldr r6, =8
-    ldr r7, =4
-    mul r0, r6, r7
-    str r0, [sp, #204]
-    ldr r1, [sp, #204]
-    ldr r0, [sp, #208]
-    add r0, r0, r1
-    str r0, [sp, #196]
-    ldr r0, [sp, #196]
-    ldr r6, [r0]
-    add r7, sp, #44
-    ldr r7, =9
+    ldr r0, =0
+    str r0, [sp, #316]
+    ldr r0, [sp, #316]
+    add r7, r0, #7
+    add r5, sp, #44
     ldr r0, =4
-    str r0, [sp, #272]
-    ldr r0, [sp, #272]
+    str r0, [sp, #316]
+    ldr r0, [sp, #316]
     mul r0, r7, r0
-    str r0, [sp, #192]
-    ldr r0, [sp, #192]
+    str r0, [sp, #228]
+    ldr r0, [sp, #228]
+    add r0, r5, r0
+    str r0, [sp, #160]
+    ldr r0, [sp, #160]
+    ldr r7, [r0]
+    STM SP, {r0, r1, r2, r3}
+    mov r0, r9
+    mov r1, r7
+    bl func2
+    LDMIB SP, {r1, r2, r3}
+    mov r5, r0
+    ldr r0, [SP]
+    ldr r0, =0
+    str r0, [sp, #316]
+    ldr r0, [sp, #316]
+    add r9, r0, #8
+    add r7, sp, #44
+    ldr r0, =4
+    str r0, [sp, #316]
+    ldr r0, [sp, #316]
+    mul r0, r9, r0
+    str r0, [sp, #108]
+    ldr r0, [sp, #108]
     add r0, r7, r0
-    str r0, [sp, #180]
-    ldr r0, [sp, #180]
+    str r0, [sp, #260]
+    ldr r0, [sp, #260]
+    ldr r9, [r0]
+    ldr r7, =0
+    add r0, r7, #9
+    str r0, [sp, #208]
+    add r0, sp, #44
+    str r0, [sp, #212]
+    ldr r7, =4
+    ldr r0, [sp, #208]
+    mul r0, r0, r7
+    str r0, [sp, #152]
+    ldr r1, [sp, #152]
+    ldr r0, [sp, #212]
+    add r0, r0, r1
+    str r0, [sp, #156]
+    ldr r0, [sp, #156]
     ldr r7, [r0]
     STM SP, {r0, r1, r2, r3}
     mov r0, r7
@@ -488,7 +508,7 @@ litpool7_0:
     str r0, [sp, #216]
     ldr r0, [SP]
     STM SP, {r0, r1, r2, r3}
-    mov r0, r6
+    mov r0, r9
     ldr r1, [sp, #216]
     bl func3
     LDMIB SP, {r1, r2, r3}
@@ -496,7 +516,7 @@ litpool7_0:
     ldr r0, [SP]
     ldr r0, [sp, #20]
     STM SP, {r0, r1, r2, r3}
-    mov r0, r9
+    mov r0, r5
     ldr r1, [sp, #220]
     ldr r2, [sp]
     bl func1
@@ -505,20 +525,20 @@ litpool7_0:
     ldr r0, [SP]
     STM SP, {r0, r1, r2, r3}
     mov r0, r8
-    mov r1, r5
+    mov r1, r6
     mov r2, r7
     bl func4
     LDMIB SP, {r1, r2, r3}
-    mov r6, r0
+    mov r9, r0
     ldr r0, [SP]
     STM SP, {r0, r1, r2, r3}
     ldr r0, [sp, #8]
     bl func7
     LDMIB SP, {r1, r2, r3}
-    mov r9, r0
+    mov r5, r0
     ldr r0, [SP]
     STM SP, {r0, r1, r3}
-    mov r0, r9
+    mov r0, r5
     ldr r1, [sp, #8]
     bl func3
     LDMIB SP, {r1, r3}
@@ -530,83 +550,112 @@ litpool7_0:
     mov r1, r8
     bl func2
     LDMIB SP, {r1}
-    mov r5, r0
+    mov r6, r0
     ldr r0, [SP]
     STM SP, {r0}
-    mov r0, r6
-    mov r1, r5
+    mov r0, r9
+    mov r1, r6
     bl func3
     mov r7, r0
     ldr r0, [SP]
+    ldr r5, =0
+    add r8, r5, #0
     add r9, sp, #44
-    ldr r8, =0
     ldr r6, =4
     mul r5, r8, r6
     str r0, [sp, #20]
     add r0, r9, r5
-    str r0, [sp, #232]
-    ldr r0, [sp, #232]
+    str r0, [sp, #104]
+    ldr r0, [sp, #104]
+    ldr r6, [r0]
+    ldr r8, =0
+    add r5, r8, #1
+    add r9, sp, #44
+    ldr r8, =4
+    mul r0, r5, r8
+    str r0, [sp, #144]
+    ldr r0, [sp, #144]
+    add r0, r9, r0
+    str r0, [sp, #148]
+    ldr r0, [sp, #148]
     ldr r8, [r0]
-    add r6, sp, #44
-    ldr r5, =1
-    ldr r9, =4
-    mul r0, r5, r9
-    str r0, [sp, #264]
-    ldr r0, [sp, #264]
-    add r0, r6, r0
-    str r0, [sp, #252]
-    ldr r0, [sp, #252]
-    ldr r5, [r0]
     STM SP, {r0}
     mov r0, r7
-    mov r1, r8
-    mov r2, r5
+    mov r1, r6
+    mov r2, r8
     bl func1
+    mov r5, r0
+    ldr r0, [SP]
+    ldr r9, =0
+    add r7, r9, #2
+    add r6, sp, #44
+    ldr r8, =4
+    mul r9, r7, r8
+    add r0, r6, r9
+    str r0, [sp, #140]
+    ldr r0, [sp, #140]
+    ldr r8, [r0]
+    STM SP, {r0}
+    mov r0, r5
+    mov r1, r8
+    bl func2
+    mov r7, r0
+    ldr r0, [SP]
+    ldr r9, =0
+    add r6, r9, #3
+    add r5, sp, #44
+    ldr r8, =4
+    mul r9, r6, r8
+    add r0, r5, r9
+    str r0, [sp, #280]
+    ldr r0, [sp, #280]
+    ldr r8, [r0]
+    ldr r6, =0
+    add r9, r6, #4
+    add r5, sp, #44
+    ldr r6, =4
+    mul r0, r9, r6
+    str r0, [sp, #264]
+    ldr r0, [sp, #264]
+    add r0, r5, r0
+    str r0, [sp, #268]
+    ldr r0, [sp, #268]
+    ldr r6, [r0]
+    ldr r9, =0
+    add r5, r9, #5
+    add r0, sp, #44
+    str r0, [sp, #232]
+    ldr r9, =4
+    mul r0, r5, r9
+    str r0, [sp, #272]
+    str r1, [sp, #24]
+    ldr r0, [sp, #232]
+    ldr r1, [sp, #272]
+    add r0, r0, r1
+    str r0, [sp, #276]
+    ldr r0, [sp, #276]
+    ldr r5, [r0]
+    STM SP, {r0}
+    mov r0, r5
+    bl func5
     mov r9, r0
     ldr r0, [SP]
-    add r6, sp, #44
-    ldr r7, =2
-    ldr r8, =4
-    mul r5, r7, r8
-    add r0, r6, r5
-    str r0, [sp, #244]
-    ldr r0, [sp, #244]
-    ldr r7, [r0]
     STM SP, {r0}
-    mov r0, r9
-    mov r1, r7
-    bl func2
-    mov r8, r0
-    ldr r0, [SP]
-    add r5, sp, #44
-    ldr r6, =3
-    ldr r9, =4
-    mul r7, r6, r9
-    add r0, r5, r7
-    str r0, [sp, #240]
-    ldr r0, [sp, #240]
-    ldr r6, [r0]
-    add r9, sp, #44
-    ldr r7, =4
-    ldr r5, =4
-    mul r0, r7, r5
+    mov r0, r6
+    mov r1, r9
+    bl func3
     str r0, [sp, #236]
-    ldr r0, [sp, #236]
-    add r0, r9, r0
-    str r0, [sp, #88]
-    ldr r0, [sp, #88]
-    ldr r7, [r0]
-    add r5, sp, #44
-    ldr r9, =5
-    ldr r0, =4
-    str r0, [sp, #272]
-    ldr r0, [sp, #272]
-    mul r0, r9, r0
-    str r0, [sp, #136]
-    ldr r0, [sp, #136]
-    add r0, r5, r0
-    str r0, [sp, #132]
-    ldr r0, [sp, #132]
+    ldr r0, [SP]
+    ldr r5, =0
+    add r9, r5, #6
+    add r6, sp, #44
+    ldr r5, =4
+    mul r0, r9, r5
+    str r0, [sp, #284]
+    ldr r0, [sp, #284]
+    add r0, r6, r0
+    str r0, [sp, #288]
+    ldr r0, [sp, #288]
     ldr r9, [r0]
     STM SP, {r0}
     mov r0, r9
@@ -614,86 +663,70 @@ litpool7_0:
     mov r5, r0
     ldr r0, [SP]
     STM SP, {r0}
-    mov r0, r7
+    ldr r0, [sp, #236]
     mov r1, r5
-    bl func3
-    str r0, [sp, #248]
-    ldr r0, [SP]
-    add r9, sp, #44
-    ldr r5, =6
-    ldr r7, =4
-    mul r0, r5, r7
-    str r0, [sp, #120]
-    ldr r0, [sp, #120]
-    add r0, r9, r0
-    str r0, [sp, #140]
-    ldr r0, [sp, #140]
-    ldr r5, [r0]
-    STM SP, {r0}
-    mov r0, r5
-    bl func5
-    mov r7, r0
-    ldr r0, [SP]
-    STM SP, {r0}
-    ldr r0, [sp, #248]
-    mov r1, r7
     bl func2
-    mov r9, r0
+    mov r6, r0
     ldr r0, [SP]
-    add r5, sp, #44
-    ldr r7, =7
-    ldr r0, =4
-    str r0, [sp, #272]
-    ldr r0, [sp, #272]
-    mul r0, r7, r0
-    str r0, [sp, #116]
-    ldr r0, [sp, #116]
-    add r0, r5, r0
-    str r0, [sp, #112]
-    ldr r0, [sp, #112]
-    ldr r7, [r0]
-    add r5, sp, #44
-    ldr r5, =8
-    ldr r0, =4
-    str r0, [sp, #272]
-    ldr r0, [sp, #272]
-    mul r0, r5, r0
-    str r0, [sp, #108]
-    ldr r0, [sp, #108]
-    add r0, r5, r0
-    str r0, [sp, #124]
-    ldr r0, [sp, #124]
+    ldr r9, =0
+    add r5, r9, #7
+    add r0, sp, #44
+    str r0, [sp, #240]
+    ldr r9, =4
+    mul r0, r5, r9
+    str r0, [sp, #292]
+    ldr r0, [sp, #240]
+    ldr r1, [sp, #292]
+    add r0, r0, r1
+    str r0, [sp, #296]
+    ldr r0, [sp, #296]
     ldr r5, [r0]
-    STM SP, {r0}
-    mov r0, r5
-    bl func7
-    str r0, [sp, #256]
-    ldr r0, [SP]
-    STM SP, {r0}
-    mov r0, r9
-    mov r1, r7
-    ldr r2, [sp, #256]
-    bl func1
-    str r0, [sp, #260]
-    ldr r0, [SP]
-    add r5, sp, #44
-    ldr r9, =9
-    ldr r7, =4
-    mul r0, r9, r7
-    str r0, [sp, #128]
-    ldr r0, [sp, #128]
-    add r0, r5, r0
-    str r0, [sp, #104]
-    ldr r0, [sp, #104]
+    ldr r9, =0
+    add r0, r9, #8
+    str r0, [sp, #244]
+    add r0, sp, #44
+    str r0, [sp, #248]
+    ldr r9, =4
+    ldr r0, [sp, #244]
+    mul r0, r0, r9
+    str r0, [sp, #300]
+    ldr r0, [sp, #248]
+    ldr r1, [sp, #300]
+    add r0, r0, r1
+    str r0, [sp, #304]
+    ldr r0, [sp, #304]
     ldr r9, [r0]
     STM SP, {r0}
     mov r0, r9
-    bl func5
-    mov r7, r0
+    bl func7
+    str r0, [sp, #252]
     ldr r0, [SP]
     STM SP, {r0}
-    ldr r0, [sp, #260]
-    mov r1, r7
+    mov r0, r6
+    mov r1, r5
+    ldr r2, [sp, #252]
+    bl func1
+    str r0, [sp, #256]
+    ldr r0, [SP]
+    ldr r9, =0
+    add r6, r9, #9
+    add r5, sp, #44
+    ldr r9, =4
+    mul r0, r6, r9
+    str r0, [sp, #308]
+    ldr r0, [sp, #308]
+    add r0, r5, r0
+    str r0, [sp, #312]
+    ldr r0, [sp, #312]
+    ldr r6, [r0]
+    STM SP, {r0}
+    mov r0, r6
+    bl func5
+    mov r9, r0
+    ldr r0, [SP]
+    STM SP, {r0}
+    ldr r0, [sp, #256]
+    mov r1, r9
     bl func2
     mov r5, r0
     ldr r0, [SP]
@@ -702,16 +735,17 @@ litpool7_0:
     mov r0, r5
     ldr r1, [sp]
     bl func3
-    mov r9, r0
+    mov r6, r0
     ldr r0, [SP]
-    mov r0, r8
-    mov r1, r6
-    mov r2, r9
+    mov r0, r7
+    mov r1, r8
+    mov r2, r6
     bl func1
-    mov r7, r0
+    mov r9, r0
+    ldr r1, [sp, #24]
     b bb7_3
 bb7_3:
-    mov r0, r7
+    mov r0, r9
     mov sp, r11
     pop {r4, r5, r6, r7, r8, r9, r11, lr}
     bx lr

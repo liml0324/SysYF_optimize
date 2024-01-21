@@ -6,88 +6,89 @@
 get_next:
     push {r4, r5, r6, r7, r8, r9, lr}
     sub sp, sp, #16
-    add r2, r1, #0
-    ldr r3, =0
-    ldr r4, =4
-    mul r5, r3, r4
-    add r6, r2, r5
-    ldr r7, =-1
-    str r7, [r6]
-    Ldr r8, =-1
-    Ldr r9, =0
+    ldr r2, =0
+    add r3, r2, #0
+    add r4, r1, #0
+    ldr r5, =4
+    mul r6, r3, r5
+    add r7, r4, r6
+    ldr r8, =-1
+    str r8, [r7]
+    Ldr r2, =0
+    Ldr r9, =-1
     b bb0_0
 bb0_0:
-    add r3, r9, #0
-    add r4, r0, #0
-    ldr r5, =4
-    mul r2, r3, r5
-    add r6, r4, r2
-    ldr r7, [r6]
+    add r3, r2, #0
+    add r5, r0, #0
+    ldr r6, =4
+    mul r4, r3, r6
+    add r7, r5, r4
+    ldr r8, [r7]
     ldr r3, =0
-    cmp r7, r3
+    cmp r8, r3
+    ldr r6, =0
+    ldrne r6, =1
     ldr r5, =0
-    ldrne r5, =1
-    ldr r4, =0
-    cmp r7, r4
+    cmp r8, r5
     bne bb0_1
     b bb0_2
 bb0_1:
-    ldr r2, =-1
-    cmp r8, r2
-    ldr r6, =0
-    ldreq r6, =1
+    ldr r4, =-1
+    cmp r9, r4
+    ldr r7, =0
+    ldreq r7, =1
     ldr r3, =-1
-    cmp r8, r3
+    cmp r9, r3
     beq bb0_3
     b bb0_6
 bb0_2:
     b bb0_7
 bb0_3:
-    add r2, r8, #1
-    add r3, r9, #1
-    add r7, r3, #0
-    add r5, r1, #0
-    ldr r4, =4
-    mul r6, r7, r4
-    add r8, r5, r6
-    str r2, [r8]
-    Mov r4, r2
-    Mov r6, r3
+    add r4, r9, #1
+    add r3, r2, #1
+    add r8, r3, #0
+    add r6, r1, #0
+    ldr r5, =4
+    mul r7, r8, r5
+    add r9, r6, r7
+    str r4, [r9]
+    Mov r5, r4
+    Mov r7, r3
     b bb0_5
 bb0_4:
-    add r4, r8, #0
-    add r2, r1, #0
-    ldr r6, =4
-    mul r3, r4, r6
-    add r7, r2, r3
-    ldr r5, [r7]
-    Mov r4, r5
-    Mov r6, r9
+    add r5, r9, #0
+    add r4, r1, #0
+    ldr r7, =4
+    mul r3, r5, r7
+    add r8, r4, r3
+    ldr r6, [r8]
+    Mov r5, r6
+    Mov r7, r2
     b bb0_5
 bb0_5:
     b litpool0_0
     .pool
 litpool0_0:
-    Mov r8, r4
-    Mov r9, r6
+    Mov r2, r7
+    Mov r9, r5
     b bb0_0
 bb0_6:
-    add r7, r9, #0
-    add r5, r0, #0
-    ldr r4, =4
-    mul r2, r7, r4
-    add r6, r5, r2
-    ldr r3, [r6]
-    add r7, r8, #0
-    add r4, r0, #0
+    add r8, r2, #0
+    add r6, r0, #0
     ldr r5, =4
-    mul r2, r7, r5
-    add r6, r4, r2
-    ldr r7, [r6]
-    cmp r3, r7
-    ldr r5, =0
-    ldreq r5, =1
-    cmp r3, r7
+    mul r4, r8, r5
+    add r7, r6, r4
+    ldr r3, [r7]
+    add r8, r9, #0
+    add r5, r0, #0
+    ldr r6, =4
+    mul r4, r8, r6
+    add r7, r5, r4
+    ldr r8, [r7]
+    cmp r3, r8
+    ldr r6, =0
+    ldreq r6, =1
+    cmp r3, r8
     beq bb0_3
     b bb0_4
 bb0_7:
@@ -139,89 +140,93 @@ bb1_0:
     bne bb1_1
     b bb1_2
 bb1_1:
-    add r6, r5, #0
-    add r8, r0, #0
-    ldr r4, =4
-    mul r3, r6, r4
-    add r9, r8, r3
-    ldr r7, [r9]
-    add r6, r2, #0
-    add r4, r1, #0
-    ldr r8, =4
-    mul r3, r6, r8
-    add r9, r4, r3
-    ldr r6, [r9]
-    cmp r7, r6
-    ldr r8, =0
-    ldreq r8, =1
-    cmp r7, r6
+    add r4, r5, #0
+    add r3, r0, #0
+    ldr r9, =4
+    mul r7, r4, r9
+    add r6, r3, r7
+    ldr r8, [r6]
+    add r4, r2, #0
+    add r9, r1, #0
+    ldr r3, =4
+    mul r7, r4, r3
+    add r6, r9, r7
+    ldr r4, [r6]
+    cmp r8, r4
+    ldr r3, =0
+    ldreq r3, =1
+    cmp r8, r4
     beq bb1_3
     b bb1_4
 bb1_2:
-    Ldr r7, =-1
+    Mov r6, r5
+    Mov r7, r2
+    Ldr r8, =-1
     b bb1_10
 bb1_3:
     b litpool1_0
     .pool
 litpool1_0:
-    add r6, r5, #1
-    add r4, r2, #1
-    add r9, r6, #0
-    add r8, r0, #0
-    ldr r3, =4
-    mul r7, r9, r3
-    add r5, r8, r7
+    add r4, r5, #1
+    add r9, r2, #1
+    add r6, r4, #0
+    add r3, r0, #0
+    ldr r7, =4
+    mul r8, r6, r7
+    add r5, r3, r8
     ldr r2, [r5]
-    ldr r9, =0
-    cmp r2, r9
+    ldr r6, =0
+    cmp r2, r6
+    ldr r7, =0
+    ldreq r7, =1
     ldr r3, =0
-    ldreq r3, =1
-    ldr r8, =0
-    cmp r2, r8
+    cmp r2, r3
     beq bb1_6
     b bb1_7
 bb1_4:
-    add r4, r5, #0
-    ldr r3, =16388
-    add r3, sp, r3
-    ldr r9, =4
-    mul r7, r4, r9
-    add r6, r3, r7
-    ldr r8, [r6]
-    ldr r4, =-1
-    cmp r8, r4
-    ldr r9, =0
-    ldreq r9, =1
-    ldr r3, =-1
-    cmp r8, r3
+    add r9, r5, #0
+    ldr r7, =16388
+    add r7, sp, r7
+    ldr r6, =4
+    mul r8, r9, r6
+    add r4, r7, r8
+    ldr r3, [r4]
+    ldr r9, =-1
+    cmp r3, r9
+    ldr r6, =0
+    ldreq r6, =1
+    ldr r7, =-1
+    cmp r3, r7
     beq bb1_8
-    Mov r6, r8
-    Mov r7, r2
+    Mov r4, r3
+    Mov r8, r2
     b bb1_9
 bb1_5:
-    Mov r2, r4
-    Mov r5, r9
+    Mov r2, r9
+    Mov r5, r6
     b bb1_0
 bb1_6:
-    Mov r7, r4
+    Mov r6, r4
+    Mov r7, r9
+    Mov r8, r9
     b bb1_10
 bb1_7:
-    Mov r9, r6
+    Mov r6, r4
     b bb1_5
 bb1_8:
-    add r3, r8, #1
-    add r7, r2, #1
-    Mov r6, r3
+    add r7, r3, #1
+    add r8, r2, #1
+    Mov r4, r7
     b bb1_9
 bb1_9:
     b litpool1_1
     .pool
 litpool1_1:
-    Mov r4, r7
-    Mov r9, r6
+    Mov r6, r4
+    Mov r9, r8
     b bb1_5
 bb1_10:
-    mov r0, r7
+    mov r0, r8
     mov sp, r11
     pop {r4, r5, r6, r7, r8, r9, r11, lr}
     bx lr

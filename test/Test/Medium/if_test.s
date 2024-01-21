@@ -31,13 +31,15 @@ bb0_0:
 bb0_1:
     b bb0_5
 bb0_2:
-    Ldr r1, =25
+    Ldr r4, =25
     b bb0_4
 bb0_3:
-    Ldr r1, =20
+    ldr r1, =5
+    add r3, r1, #15
+    Mov r4, r3
     b bb0_4
 bb0_4:
-    Mov r5, r1
+    Mov r5, r4
     b bb0_1
 bb0_5:
     mov r0, r5

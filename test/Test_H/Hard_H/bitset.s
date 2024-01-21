@@ -224,397 +224,420 @@ set:
     add r3, r9, r8
     ldr r7, =0
     str r7, [r3]
-    add r6, sp, #128
-    ldr r4, =0
-    ldr r5, =4
-    mul r8, r4, r5
-    add r9, r6, r8
-    ldr r3, =1
-    str r3, [r9]
-    add r7, sp, #128
-    ldr r4, =1
-    ldr r5, =4
-    mul r8, r4, r5
-    add r6, r7, r8
-    add r9, sp, #128
-    ldr r3, =0
-    ldr r4, =4
-    mul r5, r3, r4
-    add r8, r9, r5
-    ldr r7, [r8]
-    ldr r3, =2
-    mul r4, r7, r3
-    str r4, [r6]
+    ldr r6, =0
+    add r4, r6, #0
     add r5, sp, #128
-    ldr r9, =2
     ldr r8, =4
-    mul r3, r9, r8
-    add r7, r5, r3
-    add r6, sp, #128
-    ldr r4, =1
-    ldr r9, =4
-    mul r8, r4, r9
-    add r3, r6, r8
-    ldr r5, [r3]
-    ldr r4, =2
-    mul r9, r5, r4
-    str r9, [r7]
-    add r8, sp, #128
-    ldr r6, =3
-    ldr r3, =4
-    mul r4, r6, r3
-    add r5, r8, r4
-    add r7, sp, #128
-    ldr r9, =2
-    ldr r6, =4
-    mul r3, r9, r6
-    add r4, r7, r3
-    ldr r8, [r4]
-    ldr r9, =2
-    mul r6, r8, r9
-    str r6, [r5]
-    add r3, sp, #128
-    ldr r7, =4
-    ldr r4, =4
-    mul r9, r7, r4
-    add r8, r3, r9
-    add r5, sp, #128
-    ldr r6, =3
-    ldr r7, =4
-    mul r4, r6, r7
-    add r9, r5, r4
-    ldr r3, [r9]
-    ldr r6, =2
-    mul r7, r3, r6
-    str r7, [r8]
+    mul r9, r4, r8
+    add r3, r5, r9
+    ldr r7, =1
+    str r7, [r3]
+    ldr r6, =0
+    add r8, r6, #1
     add r4, sp, #128
-    ldr r5, =5
     ldr r9, =4
-    mul r6, r5, r9
-    add r3, r4, r6
-    add r8, sp, #128
-    ldr r7, =4
-    ldr r5, =4
-    mul r9, r7, r5
-    add r6, r8, r9
-    ldr r4, [r6]
-    ldr r7, =2
-    mul r5, r4, r7
-    str r5, [r3]
+    mul r5, r8, r9
+    add r3, r4, r5
+    ldr r7, =0
+    add r6, r7, #0
     add r9, sp, #128
-    ldr r8, =6
-    ldr r6, =4
-    mul r7, r8, r6
-    add r4, r9, r7
-    add r3, sp, #128
-    ldr r5, =5
     ldr r8, =4
-    mul r6, r5, r8
-    add r7, r3, r6
-    ldr r9, [r7]
-    ldr r5, =2
-    mul r8, r9, r5
-    str r8, [r4]
-    add r6, sp, #128
-    ldr r3, =7
-    ldr r7, =4
-    mul r5, r3, r7
-    add r9, r6, r5
-    add r4, sp, #128
-    ldr r8, =6
-    ldr r3, =4
-    mul r7, r8, r3
-    add r5, r4, r7
-    ldr r6, [r5]
+    mul r5, r6, r8
+    add r4, r9, r5
+    ldr r7, [r4]
     ldr r8, =2
-    mul r3, r6, r8
-    str r3, [r9]
-    add r7, sp, #128
-    ldr r4, =8
-    ldr r5, =4
-    mul r8, r4, r5
-    add r6, r7, r8
-    add r9, sp, #128
-    ldr r3, =7
-    ldr r4, =4
-    mul r5, r3, r4
-    add r8, r9, r5
-    ldr r7, [r8]
-    ldr r3, =2
-    mul r4, r7, r3
-    str r4, [r6]
-    add r5, sp, #128
-    ldr r9, =9
+    mul r6, r7, r8
+    str r6, [r3]
+    ldr r5, =0
+    add r9, r5, #2
+    add r4, sp, #128
     ldr r8, =4
-    mul r3, r9, r8
-    add r7, r5, r3
-    add r6, sp, #128
-    ldr r4, =8
-    ldr r9, =4
-    mul r8, r4, r9
-    add r3, r6, r8
-    ldr r5, [r3]
-    ldr r4, =2
-    mul r9, r5, r4
-    str r9, [r7]
+    mul r7, r9, r8
+    add r3, r4, r7
+    ldr r6, =0
+    add r5, r6, #1
     add r8, sp, #128
-    ldr r6, =10
-    ldr r3, =4
-    mul r4, r6, r3
-    add r5, r8, r4
-    add r7, sp, #128
-    ldr r9, =9
-    ldr r6, =4
-    mul r3, r9, r6
-    add r4, r7, r3
-    ldr r8, [r4]
+    ldr r9, =4
+    mul r7, r5, r9
+    add r4, r8, r7
+    ldr r6, [r4]
     ldr r9, =2
+    mul r5, r6, r9
+    str r5, [r3]
+    ldr r7, =0
+    add r8, r7, #3
+    add r4, sp, #128
+    ldr r9, =4
     mul r6, r8, r9
-    str r6, [r5]
-    Ldr r3, =10
+    add r3, r4, r6
+    ldr r5, =0
+    add r7, r5, #2
+    add r9, sp, #128
+    ldr r8, =4
+    mul r6, r7, r8
+    add r4, r9, r6
+    ldr r5, [r4]
+    ldr r8, =2
+    mul r7, r5, r8
+    str r7, [r3]
+    ldr r6, =0
+    add r9, r6, #4
+    add r4, sp, #128
+    ldr r8, =4
+    mul r5, r9, r8
+    add r3, r4, r5
+    ldr r7, =0
+    add r6, r7, #3
+    add r8, sp, #128
+    ldr r9, =4
+    mul r5, r6, r9
+    add r4, r8, r5
+    ldr r7, [r4]
+    ldr r9, =2
+    mul r6, r7, r9
+    str r6, [r3]
+    ldr r5, =0
+    add r8, r5, #5
+    add r4, sp, #128
+    ldr r9, =4
+    mul r7, r8, r9
+    add r3, r4, r7
+    ldr r6, =0
+    add r5, r6, #4
+    add r9, sp, #128
+    ldr r8, =4
+    mul r7, r5, r8
+    add r4, r9, r7
+    ldr r6, [r4]
+    ldr r8, =2
+    mul r5, r6, r8
+    str r5, [r3]
+    ldr r7, =0
+    add r9, r7, #6
+    add r4, sp, #128
+    ldr r8, =4
+    mul r6, r9, r8
+    add r3, r4, r6
+    ldr r5, =0
+    add r7, r5, #5
+    add r8, sp, #128
+    ldr r9, =4
+    mul r6, r7, r9
+    add r4, r8, r6
+    ldr r5, [r4]
+    ldr r9, =2
+    mul r7, r5, r9
+    str r7, [r3]
+    ldr r6, =0
+    add r8, r6, #7
+    add r4, sp, #128
+    ldr r9, =4
+    mul r5, r8, r9
+    add r3, r4, r5
+    ldr r7, =0
+    add r6, r7, #6
+    add r9, sp, #128
+    ldr r8, =4
+    mul r5, r6, r8
+    add r4, r9, r5
+    ldr r7, [r4]
+    ldr r8, =2
+    mul r6, r7, r8
+    str r6, [r3]
+    ldr r5, =0
+    add r9, r5, #8
+    add r4, sp, #128
+    ldr r8, =4
+    mul r7, r9, r8
+    add r3, r4, r7
+    ldr r6, =0
+    add r5, r6, #7
+    add r8, sp, #128
+    ldr r9, =4
+    mul r7, r5, r9
+    add r4, r8, r7
+    ldr r6, [r4]
+    ldr r9, =2
+    mul r5, r6, r9
+    str r5, [r3]
+    ldr r7, =0
+    add r8, r7, #9
+    add r4, sp, #128
+    ldr r9, =4
+    mul r6, r8, r9
+    add r3, r4, r6
+    ldr r5, =0
+    add r7, r5, #8
+    add r9, sp, #128
+    ldr r8, =4
+    mul r6, r7, r8
+    add r4, r9, r6
+    ldr r5, [r4]
+    ldr r8, =2
+    mul r7, r5, r8
+    str r7, [r3]
+    ldr r6, =0
+    add r9, r6, #10
+    add r4, sp, #128
+    ldr r8, =4
+    mul r5, r9, r8
+    add r3, r4, r5
+    ldr r7, =0
+    add r6, r7, #9
+    add r8, sp, #128
+    ldr r9, =4
+    mul r5, r6, r9
+    add r4, r8, r5
+    ldr r7, [r4]
+    ldr r9, =2
+    mul r6, r7, r9
+    str r6, [r3]
+    Ldr r5, =10
     b bb0_0
 bb0_0:
-    ldr r7, =30
-    cmp r3, r7
+    ldr r8, =30
+    cmp r5, r8
     ldr r4, =0
     ldrlt r4, =1
     ldr r9, =30
-    cmp r3, r9
+    cmp r5, r9
     blt bb0_1
     b bb0_2
 bb0_1:
     b litpool0_0
     .pool
 litpool0_0:
-    add r8, r3, #1
-    add r9, r8, #0
-    add r6, sp, #128
-    ldr r5, =4
-    mul r7, r9, r5
-    add r4, r6, r7
-    sub r3, r8, #1
-    add r9, r3, #0
-    add r5, sp, #128
-    ldr r6, =4
-    mul r7, r9, r6
-    add r3, r5, r7
-    ldr r9, [r3]
-    ldr r6, =2
-    mul r5, r9, r6
-    str r5, [r4]
-    Mov r3, r8
+    add r6, r5, #1
+    add r3, r6, #0
+    add r4, sp, #128
+    ldr r8, =4
+    mul r7, r3, r8
+    add r9, r4, r7
+    sub r5, r6, #1
+    add r3, r5, #0
+    add r8, sp, #128
+    ldr r4, =4
+    mul r7, r3, r4
+    add r5, r8, r7
+    ldr r3, [r5]
+    ldr r4, =2
+    mul r8, r3, r4
+    str r8, [r9]
+    Mov r5, r6
     b bb0_0
 bb0_2:
-    ldr r8, =30
-    sdiv r6, r1, r8
-    ldr r5, =10000
-    cmp r6, r5
-    ldr r7, =0
-    ldrge r7, =1
+    ldr r7, =30
+    sdiv r6, r1, r7
+    ldr r3, =10000
+    cmp r6, r3
+    ldr r8, =0
+    ldrge r8, =1
     ldr r4, =10000
     cmp r6, r4
     bge bb0_3
     b bb0_4
 bb0_3:
+    Ldr r3, =0
     Ldr r9, =0
     b bb0_15
 bb0_4:
     ldr r9, =30
-    sdiv r8, r1, r9
-    add r5, r8, #0
+    sdiv r7, r1, r9
+    add r3, r7, #0
     add r6, r0, #0
-    ldr r7, =4
-    mul r4, r5, r7
+    ldr r8, =4
+    mul r4, r3, r8
     add r9, r6, r4
-    ldr r8, [r9]
-    ldr r5, =30
-    sdiv r7, r1, r5
+    ldr r7, [r9]
+    ldr r3, =30
+    sdiv r8, r1, r3
     ldr r6, =30
-    mul r4, r7, r6
+    mul r4, r8, r6
     sub r9, r1, r4
-    add r5, r9, #0
-    add r7, sp, #128
+    add r3, r9, #0
+    add r8, sp, #128
     ldr r6, =4
-    mul r4, r5, r6
-    add r9, r7, r4
-    ldr r5, [r9]
-    sdiv r6, r8, r5
-    ldr r7, =2
-    sdiv r4, r6, r7
+    mul r4, r3, r6
+    add r9, r8, r4
+    ldr r3, [r9]
+    sdiv r6, r7, r3
+    ldr r8, =2
+    sdiv r4, r6, r8
     ldr r9, =2
-    mul r8, r4, r9
-    sub r5, r6, r8
-    cmp r5, r2
-    ldr r7, =0
-    ldrne r7, =1
-    cmp r5, r2
+    mul r7, r4, r9
+    sub r3, r6, r7
+    cmp r3, r2
+    ldr r8, =0
+    ldrne r8, =1
+    cmp r3, r2
     bne bb0_5
     Ldr r4, =0
     b bb0_6
 bb0_5:
-    ldr r5, =30
-    sdiv r7, r1, r5
-    add r8, r7, #0
-    add r6, r0, #0
-    ldr r4, =4
-    mul r9, r8, r4
-    add r5, r6, r9
-    ldr r7, [r5]
     ldr r8, =30
-    sdiv r4, r1, r8
+    sdiv r7, r1, r8
+    add r6, r7, #0
+    add r4, r0, #0
+    ldr r9, =4
+    mul r3, r6, r9
+    add r8, r4, r3
+    ldr r7, [r8]
     ldr r6, =30
-    mul r9, r4, r6
-    sub r5, r1, r9
-    add r8, r5, #0
-    add r4, sp, #128
-    ldr r6, =4
-    mul r9, r8, r6
-    add r5, r4, r9
-    ldr r8, [r5]
-    sdiv r6, r7, r8
-    ldr r4, =2
-    sdiv r9, r6, r4
-    ldr r5, =2
-    mul r7, r9, r5
-    sub r8, r6, r7
-    ldr r4, =0
-    cmp r8, r4
+    sdiv r9, r1, r6
+    ldr r4, =30
+    mul r3, r9, r4
+    sub r8, r1, r3
+    add r6, r8, #0
+    add r9, sp, #128
+    ldr r4, =4
+    mul r3, r6, r4
+    add r8, r9, r3
+    ldr r6, [r8]
+    sdiv r4, r7, r6
+    ldr r9, =2
+    sdiv r3, r4, r9
+    ldr r8, =2
+    mul r7, r3, r8
+    sub r6, r4, r7
     ldr r9, =0
-    ldreq r9, =1
-    ldr r5, =0
-    cmp r8, r5
+    cmp r6, r9
+    ldr r3, =0
+    ldreq r3, =1
+    ldr r8, =0
+    cmp r6, r8
     beq bb0_7
-    Ldr r6, =0
+    Ldr r4, =0
     b bb0_8
 bb0_6:
     ldr r9, =30
     sdiv r6, r1, r9
-    add r8, r6, #0
-    add r7, r0, #0
-    ldr r5, =4
-    mul r9, r8, r5
-    add r6, r7, r9
-    ldr r8, =30
-    sdiv r5, r1, r8
-    add r7, r5, #0
+    add r7, r6, #0
+    add r8, r0, #0
+    ldr r3, =4
+    mul r9, r7, r3
+    add r6, r8, r9
+    ldr r7, =30
+    sdiv r3, r1, r7
+    add r8, r3, #0
     add r9, r0, #0
-    ldr r8, =4
-    mul r5, r7, r8
+    ldr r7, =4
+    mul r3, r8, r7
     str r0, [sp]
-    add r0, r9, r5
+    add r0, r9, r3
     str r0, [sp, #252]
     ldr r0, [sp, #252]
-    ldr r7, [r0]
-    add r8, r7, r4
-    str r8, [r6]
+    ldr r8, [r0]
+    add r7, r8, r4
+    str r7, [r6]
     ldr r0, [sp]
-    Ldr r9, =0
+    Ldr r3, =0
+    Mov r9, r4
     b bb0_15
 bb0_7:
     b litpool0_1
     .pool
 litpool0_1:
-    ldr r5, =1
-    cmp r2, r5
+    ldr r8, =1
+    cmp r2, r8
     ldr r7, =0
     ldreq r7, =1
-    ldr r4, =1
-    cmp r2, r4
+    ldr r9, =1
+    cmp r2, r9
     beq bb0_9
-    Ldr r8, =0
+    Ldr r6, =0
     b bb0_10
 bb0_8:
     ldr r7, =30
-    sdiv r4, r1, r7
-    add r9, r4, #0
-    add r8, r0, #0
-    ldr r5, =4
-    mul r7, r9, r5
-    add r4, r8, r7
-    ldr r9, [r4]
-    ldr r5, =30
-    sdiv r8, r1, r5
+    sdiv r9, r1, r7
+    add r3, r9, #0
+    add r6, r0, #0
+    ldr r8, =4
+    mul r7, r3, r8
+    add r9, r6, r7
+    ldr r3, [r9]
+    ldr r8, =30
+    sdiv r6, r1, r8
     ldr r7, =30
-    mul r4, r8, r7
-    sub r5, r1, r4
-    add r8, r5, #0
+    mul r9, r6, r7
+    sub r8, r1, r9
+    add r6, r8, #0
     add r7, sp, #128
-    ldr r4, =4
-    mul r5, r8, r4
+    ldr r9, =4
+    mul r8, r6, r9
     str r0, [sp]
-    add r0, r7, r5
+    add r0, r7, r8
     str r0, [sp, #256]
     ldr r0, [sp, #256]
-    ldr r8, [r0]
-    sdiv r4, r9, r8
+    ldr r6, [r0]
+    sdiv r9, r3, r6
     ldr r7, =2
-    sdiv r5, r4, r7
-    ldr r9, =2
-    mul r8, r5, r9
-    sub r7, r4, r8
-    ldr r5, =1
-    cmp r7, r5
-    ldr r9, =0
-    ldreq r9, =1
-    ldr r4, =1
-    cmp r7, r4
+    sdiv r8, r9, r7
+    ldr r3, =2
+    mul r6, r8, r3
+    sub r7, r9, r6
+    ldr r8, =1
+    cmp r7, r8
+    ldr r3, =0
+    ldreq r3, =1
+    ldr r9, =1
+    cmp r7, r9
     ldr r0, [sp]
     beq bb0_11
-    Mov r8, r6
+    Mov r6, r4
     b bb0_12
 bb0_9:
-    ldr r6, =30
-    sdiv r9, r1, r6
-    ldr r5, =30
-    mul r7, r9, r5
-    sub r4, r1, r7
-    add r8, r4, #0
-    add r6, sp, #128
-    ldr r9, =4
-    mul r5, r8, r9
-    add r7, r6, r5
-    ldr r4, [r7]
-    Mov r8, r4
+    ldr r4, =30
+    sdiv r3, r1, r4
+    ldr r8, =30
+    mul r7, r3, r8
+    sub r9, r1, r7
+    add r6, r9, #0
+    add r4, sp, #128
+    ldr r3, =4
+    mul r8, r6, r3
+    add r7, r4, r8
+    ldr r9, [r7]
+    Mov r6, r9
     b bb0_10
 bb0_10:
-    Mov r6, r8
+    Mov r4, r6
     b bb0_8
 bb0_11:
-    ldr r5, =0
-    cmp r2, r5
-    ldr r9, =0
-    ldreq r9, =1
+    ldr r8, =0
+    cmp r2, r8
+    ldr r3, =0
+    ldreq r3, =1
     ldr r7, =0
     cmp r2, r7
     beq bb0_13
-    Mov r4, r6
+    Mov r9, r4
     b bb0_14
 bb0_12:
-    Mov r4, r8
+    Mov r4, r6
     b bb0_6
 bb0_13:
     b litpool0_2
     .pool
 litpool0_2:
-    ldr r8, =30
-    sdiv r5, r1, r8
-    ldr r9, =30
-    mul r7, r5, r9
-    sub r4, r1, r7
-    add r8, r4, #0
-    add r5, sp, #128
-    ldr r9, =4
-    mul r7, r8, r9
-    add r4, r5, r7
-    ldr r8, [r4]
-    sub r9, r6, r8
-    Mov r4, r9
+    ldr r6, =30
+    sdiv r8, r1, r6
+    ldr r3, =30
+    mul r7, r8, r3
+    sub r9, r1, r7
+    add r6, r9, #0
+    add r8, sp, #128
+    ldr r3, =4
+    mul r7, r6, r3
+    add r9, r8, r7
+    ldr r6, [r9]
+    sub r3, r4, r6
+    Mov r9, r3
     b bb0_14
 bb0_14:
-    Mov r8, r4
+    Mov r6, r9
     b bb0_12
 bb0_15:
-    mov r0, r9
+    mov r0, r3
     ldr lr, =272
     add sp, sp, lr
     pop {r4, r5, r6, r7, r8, r9, lr}
@@ -629,70 +652,74 @@ rand:
     sub sp, sp, #16
     ldr r0, Addr1_1
     ldr r0, [r0]
+    ldr r1, =0
+    add r2, r1, #0
+    ldr r3, Addr1_0
+    ldr r4, =4
+    mul r5, r2, r4
+    add r6, r3, r5
+    ldr r7, [r6]
+    mul r8, r0, r7
+    ldr r9, =0
+    add r1, r9, #1
+    ldr r2, Addr1_0
+    ldr r4, =4
+    mul r5, r1, r4
+    add r3, r2, r5
+    ldr r6, [r3]
+    add r0, r8, r6
+    push {r1}
+    ldr r1, Addr1_1
+    str r0, [r1]
+    pop {r1}
+    ldr r7, Addr1_1
+    ldr r7, [r7]
+    ldr r9, =0
+    add r4, r9, #2
     ldr r1, Addr1_0
-    ldr r2, =0
-    ldr r3, =4
-    mul r4, r2, r3
-    add r5, r1, r4
-    ldr r6, [r5]
-    mul r7, r0, r6
-    ldr r8, Addr1_0
-    ldr r9, =1
-    ldr r2, =4
-    mul r3, r9, r2
-    add r4, r8, r3
-    ldr r1, [r4]
-    add r5, r7, r1
+    ldr r5, =4
+    mul r2, r4, r5
+    add r3, r1, r2
+    ldr r8, [r3]
+    sdiv r6, r7, r8
+    mul r0, r6, r8
+    sub r9, r7, r0
     push {r0}
     ldr r0, Addr1_1
-    str r5, [r0]
+    str r9, [r0]
     pop {r0}
-    ldr r0, Addr1_1
-    ldr r0, [r0]
-    ldr r6, Addr1_0
-    ldr r9, =2
-    ldr r2, =4
-    mul r3, r9, r2
-    add r8, r6, r3
-    ldr r4, [r8]
-    sdiv r7, r0, r4
-    mul r1, r7, r4
-    sub r5, r0, r1
-    push {r0}
-    ldr r0, Addr1_1
-    str r5, [r0]
-    pop {r0}
-    ldr r9, Addr1_1
-    ldr r9, [r9]
+    ldr r4, Addr1_1
+    ldr r4, [r4]
+    ldr r5, =0
+    cmp r4, r5
+    ldr r1, =0
+    ldrlt r1, =1
     ldr r2, =0
-    cmp r9, r2
-    ldr r6, =0
-    ldrlt r6, =1
-    ldr r3, =0
-    cmp r9, r3
+    cmp r4, r2
     blt bb1_0
     b bb1_1
 bb1_0:
-    ldr r4, Addr1_0
-    ldr r7, =2
+    ldr r8, =0
+    add r6, r8, #2
+    ldr r7, Addr1_0
     ldr r0, =4
-    mul r1, r7, r0
-    add r5, r4, r1
-    ldr r2, [r5]
-    ldr r9, Addr1_1
-    ldr r9, [r9]
-    add r6, r2, r9
+    mul r9, r6, r0
+    add r5, r7, r9
+    ldr r4, [r5]
+    ldr r1, Addr1_1
+    ldr r1, [r1]
+    add r2, r4, r1
     push {r0}
     ldr r0, Addr1_1
-    str r6, [r0]
+    str r2, [r0]
     pop {r0}
     b bb1_1
 bb1_1:
-    ldr r8, Addr1_1
-    ldr r8, [r8]
+    ldr r3, Addr1_1
+    ldr r3, [r3]
     b bb1_2
 bb1_2:
-    mov r0, r8
+    mov r0, r3
     add sp, sp, #16
     pop {r4, r5, r6, r7, r8, r9, lr}
     bx lr
