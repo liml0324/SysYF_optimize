@@ -355,4 +355,202 @@ TODO
 
 总而言之，每一个优化Pass都是较为有效的，在合适的场景下能发挥出较为明显的效果。
 
+开启各种优化的运行时间总结如下：
+
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=gb2312">
+<meta name=ProgId content=Excel.Sheet>
+<meta name=Generator content="Microsoft Excel 15">
+<link rel=File-List href=filelist.xml>
+<link rel=Stylesheet href=stylesheet.css>
+<style>
+<!--table
+	{mso-displayed-decimal-separator:"\.";
+	mso-displayed-thousand-separator:"\,";}
+@page
+	{margin:.75in .7in .75in .7in;
+	mso-header-margin:.3in;
+	mso-footer-margin:.3in;}
+ruby
+	{ruby-align:left;}
+rt
+	{color:windowtext;
+	font-size:9.0pt;
+	font-weight:400;
+	font-style:normal;
+	text-decoration:none;
+	font-family:等线;
+	mso-generic-font-family:auto;
+	mso-font-charset:134;
+	mso-char-type:none;
+	display:none;}
+-->
+</style>
+<![if !supportTabStrip]><script language="JavaScript">
+<!--
+function fnUpdateTabs()
+ {
+  if (parent.window.g_iIEVer>=4) {
+   if (parent.document.readyState=="complete"
+    && parent.frames['frTabs'].document.readyState=="complete")
+   parent.fnSetActiveSheet(0);
+  else
+   window.setTimeout("fnUpdateTabs();",150);
+ }
+}
+
+if (window.name!="frSheet")
+ window.location.replace("../工作簿1.htm");
+else
+ fnUpdateTabs();
+//-->
+</script>
+<![endif]>
+</head>
+
+<body link="#0563C1" vlink="#954F72">
+
+<table border=0 cellpadding=0 cellspacing=0 width=1201 style='border-collapse:
+ collapse;table-layout:fixed;width:898pt'>
+ <col width=183 style='mso-width-source:userset;mso-width-alt:6229;width:137pt'>
+ <col width=95 span=10 style='mso-width-source:userset;mso-width-alt:3225;
+ width:71pt'>
+ <col width=68 style='width:51pt'>
+ <tr height=19 style='height:13.9pt'>
+  <td height=19 class=xl65 width=183 style='height:13.9pt;width:137pt'>　</td>
+  <td colspan=10 class=xl66 width=950 style='border-left:none;width:710pt'>样例运行时间(s)</td>
+  <td rowspan=2 class=xl66 width=68 style='width:51pt'>总时间(s)</td>
+ </tr>
+ <tr height=62 style='mso-height-source:userset;height:46.5pt'>
+  <td height=62 class=xl67 style='height:46.5pt;border-top:none'>开启的优化Pass<span
+  style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <td class=xl65 style='border-top:none;border-left:none'>bitset</td>
+  <td class=xl65 style='border-top:none;border-left:none'>conv</td>
+  <td class=xl65 style='border-top:none;border-left:none'>expr_eval</td>
+  <td class=xl65 style='border-top:none;border-left:none'>fft</td>
+  <td class=xl65 style='border-top:none;border-left:none'>kmp</td>
+  <td class=xl65 style='border-top:none;border-left:none'>long_code</td>
+  <td class=xl65 style='border-top:none;border-left:none'>nested_calls</td>
+  <td class=xl65 style='border-top:none;border-left:none'>percolation</td>
+  <td class=xl65 style='border-top:none;border-left:none'>scope2</td>
+  <td class=xl65 style='border-top:none;border-left:none'>side_efect</td>
+ </tr>
+ <tr height=19 style='height:13.9pt'>
+  <td height=19 class=xl65 style='height:13.9pt;border-top:none'>无优化</td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.9884 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>8.2297 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0014 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>5.1890 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0008 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0010 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0008 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0006 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0010 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0009 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>14.4136 </td>
+ </tr>
+ <tr height=19 style='height:13.9pt'>
+  <td height=19 class=xl65 style='height:13.9pt;border-top:none'>仅开启Mem2Reg</td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.8559 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>7.5827 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0012 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>6.0951 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0007 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0008 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0009 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0007 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0007 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0007 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>14.5394 </td>
+ </tr>
+ <tr height=58 style='mso-height-source:userset;height:43.15pt'>
+  <td height=58 class=xl68 width=183 style='height:43.15pt;border-top:none;
+  width:137pt'>Mem2Reg+函数性质<br>
+    分析+死代码删除</td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.8521 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>7.5741 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0012 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>6.0905 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0006 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0007 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0008 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0008 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0007 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0007 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>14.5222 </td>
+ </tr>
+ <tr height=19 style='height:13.9pt'>
+  <td height=19 class=xl65 style='height:13.9pt;border-top:none'>上面几项+常量折叠与传播</td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.6838 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>7.5628 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0010 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>6.0888 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0006 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0006 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0007 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0008 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0007 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0007 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>14.3405 </td>
+ </tr>
+ <tr height=37 style='height:27.75pt'>
+  <td height=37 class=xl68 width=183 style='height:27.75pt;border-top:none;
+  width:137pt'>上面几项+局部公共子表达<br>
+    式消除</td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.6847 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>7.6111 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0014 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>4.6788 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0009 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0008 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0008 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0007 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0008 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0008 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>12.9808 </td>
+ </tr>
+ <tr height=37 style='height:27.75pt'>
+  <td height=37 class=xl68 width=183 style='height:27.75pt;border-top:none;
+  width:137pt'>开启全部优化（再加循环<br>
+    表达式外提）</td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.6947 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>7.4084 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0010 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>4.6495 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0007 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0006 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0006 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0007 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0007 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>0.0008 </td>
+  <td class=xl69 align=right style='border-top:none;border-left:none'>12.7577 </td>
+ </tr>
+ <![if supportMisalignedColumns]>
+ <tr height=0 style='display:none'>
+  <td width=183 style='width:137pt'></td>
+  <td width=95 style='width:71pt'></td>
+  <td width=95 style='width:71pt'></td>
+  <td width=95 style='width:71pt'></td>
+  <td width=95 style='width:71pt'></td>
+  <td width=95 style='width:71pt'></td>
+  <td width=95 style='width:71pt'></td>
+  <td width=95 style='width:71pt'></td>
+  <td width=95 style='width:71pt'></td>
+  <td width=95 style='width:71pt'></td>
+  <td width=95 style='width:71pt'></td>
+  <td width=68 style='width:51pt'></td>
+ </tr>
+ <![endif]>
+</table>
+
+</body>
+
+</html>
+
+
 ### TODO: 后端代码生成与优化
