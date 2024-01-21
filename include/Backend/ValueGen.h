@@ -117,15 +117,18 @@ enum ShiftOp{
     class constant: public Value{
         private:
             int value_;
+            bool is_float=false;
+            float float_value_;
 
         public:
-            explicit constant(int val):value_(val){}
+            explicit constant(int val,bool is_float=false,float float_val=0):value_(val),is_float(is_float),float_value_(float_val){}
             ~constant(){}
             bool is_const() final {return true;}
             bool is_reg() final {return false;}
-            int get_val(){return value_;}
-            std::string get_code(){return "#" + std::to_string(value_);}
-            std::string get_num(){return std::to_string(value_);}
+            bool is_float_const() {return is_float;}
+            int get_val(){if(is_float) return float_value_; else return value_;}
+            std::string get_code(){if(is_float) return "#" + std::to_string(float_value_); else return "#" + std::to_string(value_);}
+            std::string get_num(){if(is_float) return std::to_string(float_value_); else return std::to_string(value_);}
     };
 
     class RegLoc: public Location{
@@ -179,12 +182,14 @@ enum Operand2Type{
             ShiftOp shift_op_ = NOSHIFT;
             Operand2Type ty;
             int value_ = 0;
+            float value_float_ = 0;
+            bool is_float = false;
 
         public:
             explicit Operand2(Reg reg_1, ShiftOp shift_op, Reg reg_2):ty(RegShiftRegTy), reg_1_(reg_1), shift_op_(shift_op), reg_2_(reg_2){}
-            explicit Operand2(Reg reg, ShiftOp shift_op, int val):ty(RegShiftConstTy), reg_1_(reg), shift_op_(shift_op), value_(val), reg_2_(IR2asm::Reg(-1)){}
+            explicit Operand2(Reg reg, ShiftOp shift_op, int val ,float float_val,bool is_float):ty(RegShiftConstTy), reg_1_(reg), shift_op_(shift_op), value_(val),value_float_(float_val),is_float(is_float), reg_2_(IR2asm::Reg(-1)){}
             explicit Operand2(Reg reg):ty(RegTy), reg_1_(reg), reg_2_(IR2asm::Reg(-1)){}
-            explicit Operand2(int val):ty(ConstTy), value_(val), reg_1_(IR2asm::Reg(-1)), reg_2_(IR2asm::Reg(-1)){}
+            explicit Operand2(int val, float float_val=0,bool is_float=false):ty(ConstTy), value_(val),value_float_(float_val),is_float(is_float), reg_1_(IR2asm::Reg(-1)), reg_2_(IR2asm::Reg(-1)){}
             ~Operand2(){}
             bool is_const() final {return false;}
             bool is_reg() final {return false;}
@@ -192,9 +197,11 @@ enum Operand2Type{
                                                         else if (shift_op == ShiftOp::LSL) return "lsl";
                                                         else if (shift_op == ShiftOp::LSR) return "lsr";
                                                         else return "";}
-            std::string get_code(){if (shift_op_ == NOSHIFT) {if (ty == RegTy) return reg_1_.get_code(); else return "#" + std::to_string(value_);}
+            std::string get_code(){if (shift_op_ == NOSHIFT) {if (ty == RegTy) return reg_1_.get_code(); else if(!is_float) return "#" + std::to_string(value_);else return "#" + std::to_string(value_float_);}
                                     else {if (ty == RegShiftRegTy) return reg_1_.get_code() + ", " + get_operand2(shift_op_) + " " + reg_2_.get_code();
-                                            else return reg_1_.get_code() + ", " + get_operand2(shift_op_) + " " + "#" + std::to_string(value_);}}
+                                            else if(!is_float) return reg_1_.get_code() + ", " + get_operand2(shift_op_) + " " + "#" + std::to_string(value_);
+                                            else return reg_1_.get_code() + ", " + get_operand2(shift_op_) + " " + "#" + std::to_string(value_float_);}
+                                            }
     };
 
 }
