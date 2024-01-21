@@ -19,7 +19,7 @@
 
 namespace SysYF{
 namespace IR{
-#define stack_test
+// #define stack_test
 int CodeGen::stack_space_allocation(Ptr<Function>fun)
 {
     /*
@@ -112,6 +112,8 @@ int CodeGen::stack_space_allocation(Ptr<Function>fun)
 
     offset+=reg_size;//lr
     offset+=used_reg.second.size()*reg_size;//callee_save
+    if(have_func_call) size+=reg_size;//fp
+    if(have_func_call) offset+=reg_size;//fp
 
     #ifdef stack_test
         std::cout<<"offset after lr and callee_save:"<<offset<<std::endl;
